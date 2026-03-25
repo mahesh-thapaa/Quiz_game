@@ -44,7 +44,7 @@ class JurseyQuizTopBar extends StatelessWidget {
                 ),
               ),
               const Text(
-                'PLAYER QUIZ',
+                'JURSEY QUIZ',
                 style: TextStyle(
                   color: AppColors.hText,
                   fontSize: 17,

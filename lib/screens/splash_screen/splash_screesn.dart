@@ -1,190 +1,273 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
-import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/screens/login.dart';
 
 class SplashScreen extends StatefulWidget {
-  final Duration duration;
-  final Widget nextScreen;
-  final LinearGradient gradient;
-  // final String assetPath;
-  final String appName;
-  final String tagline;
-
-  const SplashScreen({
-    Key? key,
-    required this.duration,
-    required this.nextScreen,
-    required this.gradient,
-    // required this.assetPath,
-    required this.appName,
-    required this.tagline,
-  }) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _progressAnimation;
-  late Animation<double> _fadeIn;
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _logoCtrl;
+  late AnimationController _textCtrl;
+  late AnimationController _progressCtrl;
+
+  late Animation<double> _logoScale;
+  late Animation<double> _logoFade;
+  late Animation<double> _textFade;
+  late Animation<Offset> _textSlide;
+  late Animation<double> _progressAnim;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: widget.duration);
-
-    _progressAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    _fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeIn),
-      ),
+    // Logo animation
+    _logoCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
     );
 
-    _controller.forward();
+    _logoScale = CurvedAnimation(
+      parent: _logoCtrl,
+      curve: Curves.elasticOut,
+    ).drive(Tween(begin: 0.5, end: 1.0));
 
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => widget.nextScreen),
-        );
-      }
+    _logoFade = CurvedAnimation(
+      parent: _logoCtrl,
+      curve: Curves.easeIn,
+    ).drive(Tween(begin: 0.0, end: 1.0));
+
+    // Text animation
+    _textCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _textFade = CurvedAnimation(
+      parent: _textCtrl,
+      curve: Curves.easeIn,
+    ).drive(Tween(begin: 0.0, end: 1.0));
+
+    _textSlide = CurvedAnimation(
+      parent: _textCtrl,
+      curve: Curves.easeOut,
+    ).drive(Tween(begin: const Offset(0, 0.3), end: Offset.zero));
+
+    // Progress bar animation
+    _progressCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    );
+
+    _progressAnim = CurvedAnimation(
+      parent: _progressCtrl,
+      curve: Curves.easeInOut,
+    ).drive(Tween(begin: 0.0, end: 1.0));
+
+    // Sequence the animations
+    _logoCtrl.forward().then((_) {
+      _textCtrl.forward();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        _progressCtrl.forward().then((_) {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => Login()),
+          );
+        });
+      });
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _logoCtrl.dispose();
+    _textCtrl.dispose();
+    _progressCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeIn,
-          child: Column(
-            children: [
-              const Spacer(flex: 3),
+      backgroundColor: const Color(0xFF0A0E1A),
+      body: Stack(
+        children: [
+          // Subtle radial glow in center
+          Center(
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF1DB954).withValues(alpha: 0.06),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
 
-              Center(
-                child: Container(
-                  width: 130,
-                  height: 130,
-                  decoration: BoxDecoration(
-                    gradient: widget.gradient,
-                    borderRadius: BorderRadius.circular(28),
+          // Main content
+          Column(
+            children: [
+              const Spacer(flex: 2),
+
+              // Logo
+              FadeTransition(
+                opacity: _logoFade,
+                child: ScaleTransition(
+                  scale: _logoScale,
+                  child: Container(
+                    width: 110,
+                    height: 110,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1DB954),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF1DB954,
+                          ).withValues(alpha: 0.35),
+                          blurRadius: 30,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.sports_soccer_rounded,
+                        color: Colors.white,
+                        size: 54,
+                      ),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(28),
-                  // child: SvgPicture.asset(
-                  //   // widget.assetPath,
-                  //   colorFilter: const ColorFilter.mode(
-                  //     AppColors.hText,
-                  //     BlendMode.srcIn,
-                  //   ),
-                  //   placeholderBuilder: (_) => const Icon(
-                  //     Icons.sports_soccer,
-                  //     color: AppColors.hText,
-                  //     size: 56,
-                  //   ),
-                  // ),
                 ),
               ),
 
               const SizedBox(height: 36),
 
-              Text(
-                widget.appName,
-                style: const TextStyle(
-                  color: AppColors.hText,
-                  fontSize: 34,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                widget.tagline,
-                style: TextStyle(
-                  color: AppColors.hText.withValues(alpha: 0.45),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 3,
+              // GOALIQ text
+              FadeTransition(
+                opacity: _textFade,
+                child: SlideTransition(
+                  position: _textSlide,
+                  child: Column(
+                    children: [
+                      const Text(
+                        'GOALIQ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 3.0,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ELITE FOOTBALL TRIVIA',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 2.5,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
               const Spacer(flex: 2),
 
+              // Progress bar section
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: AnimatedBuilder(
-                  animation: _progressAnimation,
-                  builder: (context, _) {
-                    final dots =
-                        '.' * ((_progressAnimation.value * 6).toInt() % 4 + 1);
-                    final fillWidth =
-                        (screenWidth - 80) * _progressAnimation.value;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Stack(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+                child: FadeTransition(
+                  opacity: _textFade,
+                  child: Column(
+                    children: [
+                      // Progress bar
+                      AnimatedBuilder(
+                        animation: _progressAnim,
+                        builder: (context, _) {
+                          return Column(
                             children: [
-                              Container(
-                                height: 4,
-                                width: double.infinity,
-                                color: AppColors.hText.withValues(alpha: 0.15),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: Stack(
+                                  children: [
+                                    // Background track
+                                    Container(
+                                      height: 4,
+                                      width: double.infinity,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                    ),
+                                    // Filled portion
+                                    Container(
+                                      height: 4,
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                          _progressAnim.value *
+                                          (1 -
+                                              48 *
+                                                  2 /
+                                                  MediaQuery.of(
+                                                    context,
+                                                  ).size.width),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFF1DB954),
+                                            Color(0xFF25E86A),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(
+                                              0xFF1DB954,
+                                            ).withValues(alpha: 0.6),
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-
-                              Container(
-                                height: 4,
-                                width: fillWidth,
-                                decoration: BoxDecoration(
-                                  gradient: widget.gradient,
-                                  borderRadius: BorderRadius.circular(100),
+                              const SizedBox(height: 14),
+                              Text(
+                                'LOADING....',
+                                style: TextStyle(
+                                  color: const Color(
+                                    0xFF1DB954,
+                                  ).withValues(alpha: 0.8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 2.0,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        Text(
-                          'LOADING$dots',
-                          style: TextStyle(
-                            color: AppColors.titleColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
-              const Spacer(flex: 1),
+              const SizedBox(height: 60),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

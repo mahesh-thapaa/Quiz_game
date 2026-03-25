@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/player_question_model.dart';
+import 'package:quiz_game/models/jursey_question_model.dart';
 import 'jursey_quiz_gameplay_screen.dart';
 
 class JurseyLevelCompleteScreen extends StatelessWidget {

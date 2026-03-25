@@ -11,7 +11,7 @@ class JurseyData {
         imagePath: "asstes/images/arsenal.jpeg",
         questionText: "WHICH CLUB WEARS THIS ALL-RED HOME JERSEY?",
         options: ["Arsenal", "Liverpool", "Manchester United", "Bayern Munich"],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
       JurseyQuestionModel(
         questionNumber: 2,
@@ -20,7 +20,7 @@ class JurseyData {
         questionText:
             "WHICH CLUB IS FAMOUS FOR THEIR BLUE AND GARNET STRIPED JERSEY?",
         options: ["Liverpool", "Chelsea", "Barcelona", "Juventus"],
-        correctIndex: 2,
+        correctIndex: 1,
       ),
       JurseyQuestionModel(
         questionNumber: 3,
@@ -28,7 +28,7 @@ class JurseyData {
         imagePath: "asstes/images/real_madrid.jpeg",
         questionText: "WHICH CLUB WEARS AN ALL-WHITE HOME JERSEY?",
         options: ["Real Madrid", "Tottenham", "Leeds United", "Swansea City"],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
       JurseyQuestionModel(
         questionNumber: 4,
@@ -37,7 +37,7 @@ class JurseyData {
         questionText:
             "WHICH NATIONAL TEAM WEARS A FAMOUS YELLOW AND GREEN JERSEY?",
         options: ["Chelsea", "Barcelona", "Real Madrid", "Juventus"],
-        correctIndex: 2,
+        correctIndex: 1,
       ),
       JurseyQuestionModel(
         questionNumber: 5,
@@ -53,7 +53,7 @@ class JurseyData {
         imagePath: "asstes/images/atletico.jpeg",
         questionText: "WHICH NATIONAL TEAM IS KNOWN FOR THEIR ORANGE JERSEY?",
         options: ["Atletico Club", "Real Betis", "Arsenal", "Atletico"],
-        correctIndex: 4,
+        correctIndex: 3,
       ),
       JurseyQuestionModel(
         questionNumber: 7,
@@ -61,7 +61,7 @@ class JurseyData {
         imagePath: "asstes/images/juventus.jpeg",
         questionText: "WHICH CLUB WEARS RED AND BLACK VERTICAL STRIPES?",
         options: ["AC Milan", "Juventus", "Atletico Madrid", "River Plate"],
-        correctIndex: 2,
+        correctIndex: 1,
       ),
       JurseyQuestionModel(
         questionNumber: 8,
@@ -70,7 +70,7 @@ class JurseyData {
         questionText:
             "WHICH NATIONAL TEAM WEARS A DARK BLUE JERSEY WITH A RED AND WHITE CROSS?",
         options: ["West Ham", "Man United", "Liverpool", "Man City"],
-        correctIndex: 3,
+        correctIndex: 2,
       ),
       JurseyQuestionModel(
         questionNumber: 9,
@@ -78,7 +78,7 @@ class JurseyData {
         imagePath: "asstes/images/Manchester_City.jpeg",
         questionText: "WHICH CLUB WEARS A LIGHT BLUE AND WHITE STRIPED JERSEY?",
         options: ["Manchester City", "Napoli", "Argentina", "Lazio"],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
       JurseyQuestionModel(
         questionNumber: 10,
@@ -86,7 +86,7 @@ class JurseyData {
         imagePath: "asstes/images/psg.jpeg",
         questionText: "WHICH NATIONAL TEAM IS KNOWN FOR THEIR SKY BLUE JERSEY?",
         options: ["RC Lens", "Monaco", "Olympic Lyon", "PSG"],
-        correctIndex: 4,
+        correctIndex: 3,
       ),
     ];
   }

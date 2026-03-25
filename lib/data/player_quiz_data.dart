@@ -1,11 +1,11 @@
 // lib/data/player_quiz_data.dart
 
-import '../models/player_question_model.dart';
+import 'package:quiz_game/models/player_question_model.dart';
 
 class PlayerQuizData {
-  static List<PlayerQuestion> getQuestions() {
+  static List<PlayerQuestionModel> getQuestions() {
     return [
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 1,
         totalQuestions: 10,
         imagePath: "asstes/images/ronaldo.png",
@@ -16,9 +16,9 @@ class PlayerQuizData {
           "Patrick Mahomes",
           "Aaron Rodgers",
         ],
-        correctIndex: 2,
+        correctIndex: 1,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 2,
         totalQuestions: 10,
         imagePath: "asstes/images/lm10.jpeg",
@@ -29,9 +29,9 @@ class PlayerQuizData {
           "Linol Messi",
           "Zinedine Zidane",
         ],
-        correctIndex: 3,
+        correctIndex: 2,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 3,
         totalQuestions: 10,
         imagePath: "asstes/images/vini.jpeg",
@@ -42,9 +42,9 @@ class PlayerQuizData {
           "Riyad Mahrez",
           "Vinicious Jr",
         ],
-        correctIndex: 4,
+        correctIndex: 3,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 4,
         totalQuestions: 10,
         imagePath: "asstes/images/njr.jpeg",
@@ -55,9 +55,9 @@ class PlayerQuizData {
           "Edinson Cavani",
           "Sergio Agüero",
         ],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 5,
         totalQuestions: 10,
         imagePath: "asstes/images/hk.jpeg",
@@ -68,9 +68,9 @@ class PlayerQuizData {
           "Harry Kane",
           "Romelu Lukaku",
         ],
-        correctIndex: 3,
+        correctIndex: 2,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 6,
         totalQuestions: 10,
         imagePath: "asstes/images/kdb.jpeg",
@@ -81,17 +81,17 @@ class PlayerQuizData {
           "Romelu Lukaku",
           "Paul Pogba",
         ],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 7,
         totalQuestions: 10,
-        imagePath: "asstes/images/zinedinezidande.jpeg",
+        imagePath: "asstes/images/zinedinezidane.jpeg",
         questionText: "WHO IS THIS PLAYER?",
         options: ["Pelé", "Diego Maradona", "Ronaldo", "Zidane"],
-        correctIndex: 4,
+        correctIndex: 3,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 8,
         totalQuestions: 10,
         imagePath: "asstes/images/andycole.jpeg",
@@ -102,9 +102,9 @@ class PlayerQuizData {
           "Alan Shearer",
           "Frank Lampard",
         ],
-        correctIndex: 2,
+        correctIndex: 1,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 9,
         totalQuestions: 10,
         imagePath: "asstes/images/martinodegaard.jpeg",
@@ -115,15 +115,15 @@ class PlayerQuizData {
           "Marcus Rashford",
           "Darwin Núñez",
         ],
-        correctIndex: 1,
+        correctIndex: 0,
       ),
-      PlayerQuestion(
+      PlayerQuestionModel(
         questionNumber: 10,
         totalQuestions: 10,
         imagePath: "asstes/images/romario.jpeg",
         questionText: "WHO IS THIS PLAYER?",
         options: ["Lionel Messi", "Cristiano Ronaldo", "Ali Daei", "Romário"],
-        correctIndex: 4,
+        correctIndex: 3,
       ),
     ];
   }

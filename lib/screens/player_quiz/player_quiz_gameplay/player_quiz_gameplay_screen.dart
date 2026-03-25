@@ -17,7 +17,7 @@ class PlayerQuizGameplayScreen extends StatefulWidget {
 
 class _PlayerQuizGameplayScreenState extends State<PlayerQuizGameplayScreen>
     with TickerProviderStateMixin {
-  late List<PlayerQuestion> _questions;
+  late List<PlayerQuestionModel> _questions;
   int _currentIndex = 0;
   int? _selectedIndex;
   bool _answered = false;

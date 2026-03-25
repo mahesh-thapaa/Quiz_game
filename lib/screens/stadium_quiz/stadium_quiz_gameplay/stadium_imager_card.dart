@@ -32,12 +32,14 @@ class StadiumImagerCard extends StatelessWidget {
             child: Image.asset(
               imagePath,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.cardBg,
-                child: const Center(
-                  child: Icon(Icons.person, color: AppColors.stext, size: 60),
-                ),
-              ),
+              width: double.infinity,
+              height: double.infinity,
+              // errorBuilder: (_, __, ___) => Container(
+              //   color: AppColors.cardBg,
+              //   child: const Center(
+              //     child: Icon(Icons.person, color: AppColors.stext, size: 60),
+              //   ),
+              // ),
             ),
           ),
         ),
@@ -92,7 +94,7 @@ class _PowerUp extends StatelessWidget {
       width: 52,
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? color.withOpacity(0.15) : AppColors.cardBg,
+        color: isActive ? color.withValues(alpha: 0.15) : AppColors.cardBg,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isActive ? color : AppColors.divider,

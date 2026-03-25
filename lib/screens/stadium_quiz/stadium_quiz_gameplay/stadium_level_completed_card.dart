@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/player_question_model.dart';
 import 'stadium_quiz_gameplay_screen.dart';
+import 'package:quiz_game/models/stadium_question_model.dart';
 
 class StadiumLevelCompletedCard extends StatelessWidget {
   final StadiumQuizResult result;

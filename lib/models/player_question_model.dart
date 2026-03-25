@@ -1,4 +1,4 @@
-class PlayerQuestion {
+class PlayerQuestionModel {
   final int questionNumber;
   final int totalQuestions;
   final String imagePath;
@@ -6,7 +6,7 @@ class PlayerQuestion {
   final List<String> options;
   final int correctIndex;
 
-  PlayerQuestion({
+  PlayerQuestionModel({
     required this.questionNumber,
     required this.totalQuestions,
     required this.imagePath,
@@ -25,42 +25,6 @@ class PlayerQuizResult {
   final int accuracy;
 
   PlayerQuizResult({
-    required this.score,
-    required this.totalQuestions,
-    required this.starsEarned,
-    required this.xpEarned,
-    required this.coinsEarned,
-    required this.accuracy,
-  });
-}
-
-class StadiumQuizResult {
-  final int score;
-  final int totalQuestions;
-  final int starsEarned;
-  final int xpEarned;
-  final int coinsEarned;
-  final int accuracy;
-
-  StadiumQuizResult({
-    required this.score,
-    required this.totalQuestions,
-    required this.starsEarned,
-    required this.xpEarned,
-    required this.coinsEarned,
-    required this.accuracy,
-  });
-}
-
-class JurseyQuizResult {
-  final int score;
-  final int totalQuestions;
-  final int starsEarned;
-  final int xpEarned;
-  final int coinsEarned;
-  final int accuracy;
-
-  JurseyQuizResult({
     required this.score,
     required this.totalQuestions,
     required this.starsEarned,

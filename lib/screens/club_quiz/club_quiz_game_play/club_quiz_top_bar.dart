@@ -44,7 +44,7 @@ class ClubQuizTopBar extends StatelessWidget {
                 ),
               ),
               const Text(
-                'PLAYER QUIZ',
+                'CLUB QUIZ',
                 style: TextStyle(
                   color: AppColors.hText,
                   fontSize: 17,

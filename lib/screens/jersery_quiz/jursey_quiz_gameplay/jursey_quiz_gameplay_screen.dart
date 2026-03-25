@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/player_question_model.dart';
-import 'package:quiz_game/data/player_quiz_data.dart';
+import 'package:quiz_game/models/jursey_question_model.dart';
+import 'package:quiz_game/data/jursey_data.dart';
+import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_level_complete-screen.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_top_bar.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_image_card.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_answer_option.dart';
-import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_level_complete_screen.dart';
 
 class JurseyQuizGameplayScreen extends StatefulWidget {
   const JurseyQuizGameplayScreen({super.key});
@@ -17,7 +17,7 @@ class JurseyQuizGameplayScreen extends StatefulWidget {
 
 class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
     with TickerProviderStateMixin {
-  late List<PlayerQuestion> _questions;
+  late List<JurseyQuestionModel> _questions;
   int _currentIndex = 0;
   int? _selectedIndex;
   bool _answered = false;
@@ -32,7 +32,7 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
   @override
   void initState() {
     super.initState();
-    _questions = PlayerQuizData.getQuestions();
+    _questions = JurseyData.getQuestions();
 
     _progressCtrl = AnimationController(
       vsync: this,
@@ -95,7 +95,7 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
   void _finish() {
     final total = _questions.length;
 
-    final result = PlayerQuizResult(
+    final result = JurseyQuizResult(
       score: _score,
       totalQuestions: total,
       starsEarned: _score,
@@ -107,7 +107,7 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => PlayerLevelCompleteScreen(result: result),
+        builder: (_) => JurseyLevelCompleteScreen(result: result),
       ),
     );
   }
