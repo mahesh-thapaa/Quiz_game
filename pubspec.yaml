@@ -35,6 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.2.4
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +85,30 @@ flutter:
     - asstes/images/tactuse.png
     - asstes/images/assists.png
     - asstes/images/finals.jpg
+    - asstes/images/cr7.jpeg
+    - asstes/images/lm10.jpeg
+    - asstes/images/arsenal.jpeg
+    - asstes/images/atletico.jpeg
+    - asstes/images/barcelona.jpeg
+    - asstes/images/chelsea.jpeg
+    - asstes/images/dortmund.jpeg
+    - asstes/images/juventus.jpeg
+    - asstes/images/liverpool.jpeg
+    - asstes/images/man_city.jpeg
+    - asstes/images/psg.jpeg
+    - asstes/images/real_madrid.jpeg
+    - asstes/images/vini.jpeg
+    - asstes/images/romario.jpeg
+    - asstes/images/martinodegaard.jpeg
+    - asstes/images/andycole.jpeg
+    - asstes/images/zinedinezidane.jpeg
+    - asstes/images/kdb.jpeg
+    - asstes/images/hk.jpeg
+    - asstes/images/njr.jpeg
+    - asstes/images/vini.jpeg
+
+
+    
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

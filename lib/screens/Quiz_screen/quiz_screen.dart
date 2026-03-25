@@ -9,8 +9,12 @@ import 'package:quiz_game/screens/Quiz_screen/widgets/progess_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/challenger_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/locked_section.dart';
 import 'package:quiz_game/screens/discover_screen/diccover_screen.dart';
-
-import 'package:quiz_game/screens/playerQuizScreen/player_screen_quiz.dart';
+// import 'package:quiz_game/screens/jerrsy_quiz/jersey_quiz_screen.dart';
+import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
+import 'package:quiz_game/screens/jersery_quiz/jersey_quiz_screen.dart';
+import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
+import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
+// import 'package:quiz_game/models/level_result_model.dart';
 
 class QuizScreen extends StatelessWidget {
   const QuizScreen({super.key});
@@ -64,8 +68,6 @@ class QuizScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.blueGrey, fontSize: 14),
               ),
               const SizedBox(height: 10),
-
-              // ✅ Wrapped each card with GestureDetector for navigation
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -83,7 +85,6 @@ class QuizScreen extends StatelessWidget {
                   );
                 },
               ),
-
               const SizedBox(height: 20),
               const ProgressCard(),
               const SizedBox(height: 20),
@@ -91,15 +92,11 @@ class QuizScreen extends StatelessWidget {
               const SizedBox(height: 20),
               LockedSection(),
               const SizedBox(height: 20),
-
-              // Discover button
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => DiscoverScreen()),
-                  );
-                },
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => DiscoverScreen()),
+                ),
                 child: Container(
                   height: 55,
                   decoration: BoxDecoration(
@@ -136,7 +133,6 @@ class QuizScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -145,28 +141,62 @@ class QuizScreen extends StatelessWidget {
     );
   }
 
-  // ── Route each quiz card to its screen ──────────────────────
   void _onQuizTap(BuildContext context, String title) {
+    final navigator = Navigator.of(context); // ✅ save before async use
+
     switch (title) {
       case "Player Quiz":
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const PlayerQuizScreen(), // ✅ navigates here
-          ),
+        navigator.push(
+          MaterialPageRoute(builder: (_) => const PlayerScreenQuiz()),
         );
         break;
 
       case "Stadium Quiz":
-        // TODO: add StadiumQuizScreen later
+        navigator.push(
+          MaterialPageRoute(builder: (_) => const StadiumQuizScreen()),
+        );
         break;
 
       case "Jersey Quiz":
-        // TODO: add JerseyQuizScreen later
+        // navigator.push(
+        //   MaterialPageRoute(
+        //     builder: (_) => JerseyQuizScreen(
+        //       onQuizComplete: (int score, int total) {
+        //         navigator.pushReplacement(
+        //           MaterialPageRoute(
+        //             builder: (_) => LevelCompletedScreen(
+        //               result: LevelResultModel.fromScore(
+        //                 score: score,
+        //                 totalQuestions: total,
+        //                 xpEarned: 50,
+        //                 coinsEarned: 20,
+        //               ),
+        //               onNextLevel: () =>
+        //                   navigator.popUntil((route) => route.isFirst),
+        //               onReplay: () => navigator.pushReplacement(
+        //                 MaterialPageRoute(
+        //                   builder: (_) =>
+        //                       JerseyQuizScreen(onQuizComplete: (s, t) {}),
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   ),
+        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const JerseyQuizScreen()),
+        );
         break;
 
       case "Club Quiz":
-        // TODO: add ClubQuizScreen later
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ClubQuizScreen()),
+        );
         break;
     }
   }

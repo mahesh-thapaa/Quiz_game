@@ -34,3 +34,48 @@ class AppColors {
   static Color outlineBorder = const Color(0xFF19B357).withValues(alpha: 0.56);
   static Color shadow = const Color(0xFF19B357).withValues(alpha: 0.35);
 }
+
+class ThemeColors {
+  final Color background;
+  final Color cardBg;
+  final Color deepCard;
+  final Color navBg;
+  final Color hText;
+  final Color stext;
+  final Color divider;
+
+  const ThemeColors._({
+    required this.background,
+    required this.cardBg,
+    required this.deepCard,
+    required this.navBg,
+    required this.hText,
+    required this.stext,
+    required this.divider,
+  });
+
+  factory ThemeColors.of(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return const ThemeColors._(
+        background: Color(0xFF0B141E),
+        cardBg: Color(0xFF112233),
+        deepCard: Color(0xFF0F1E2D),
+        navBg: Color(0xFF0F1E2D),
+        hText: Colors.white,
+        stext: Color(0xFF94A3B8),
+        divider: Color(0xFF1E2D3D),
+      );
+    } else {
+      return const ThemeColors._(
+        background: Color(0xFFF1F5F9),
+        cardBg: Color(0xFFFFFFFF),
+        deepCard: Color(0xFFE2E8F0),
+        navBg: Color(0xFFFFFFFF),
+        hText: Color(0xFF0F172A),
+        stext: Color(0xFF64748B),
+        divider: Color(0xFFE2E8F0),
+      );
+    }
+  }
+}
