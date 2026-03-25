@@ -20,7 +20,7 @@ class QuizCard extends StatelessWidget {
           children: [
             // ── Local Asset Image ──
             Image.asset(
-              quiz.imageUrl, // ← 'assets/images/player_challenge.jpg'
+              quiz.imageUrl,
               height: 150,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -42,7 +42,10 @@ class QuizCard extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.85)],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),

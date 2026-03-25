@@ -12,6 +12,11 @@ import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
 import 'package:quiz_game/screens/bonus/clain_reward_dialog.dart';
 
+// ── Quiz screen imports ──────────────────────────────────────────
+import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
+import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
+import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   final UserModel user;
   final DailyBonusModel dailyBonus;
@@ -62,11 +67,52 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ── Category navigation ────────────────────────────────────────
+  void _onCategoryTap(CategoryModel category) {
+    switch (category.title) {
+      case 'Player Quiz':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PlayerScreenQuiz()),
+        );
+        break;
+      case 'Club Quiz':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ClubQuizScreen()),
+        );
+        break;
+      case 'Stadium Quiz':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const StadiumQuizScreen()),
+        );
+        break;
+    }
+  }
+
+  // ── Recommended quiz navigation ────────────────────────────────
+  void _onRecommendedQuizTap(QuizCardModel quiz) {
+    switch (quiz.title) {
+      case 'Player Challenge':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PlayerScreenQuiz()),
+        );
+        break;
+      case 'Logo Master':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ClubQuizScreen()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -96,12 +142,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SectionHeader(title: 'RECOMMENDED FOR YOU'),
               const SizedBox(height: 12),
+
+              // ── Recommended quizzes with navigation ─────────────
               Row(
                 children: widget.recommendedQuizzes.map((q) {
                   return Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: QuizCard(quiz: q, onTap: () {}),
+                      child: QuizCard(
+                        quiz: q,
+                        onTap: () => _onRecommendedQuizTap(q), // ✅
+                      ),
                     ),
                   );
                 }).toList(),
@@ -115,12 +166,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SectionHeader(title: 'POPULAR CATEGORIES'),
               const SizedBox(height: 12),
+
+              // ── Categories with navigation ───────────────────────
               Row(
                 children: widget.categories.map((c) {
                   return Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: CategoryCard(category: c, onTap: () {}),
+                      child: CategoryCard(
+                        category: c,
+                        onTap: () => _onCategoryTap(c), // ✅
+                      ),
                     ),
                   );
                 }).toList(),
