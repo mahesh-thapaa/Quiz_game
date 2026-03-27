@@ -6,6 +6,7 @@ import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_t
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_image_card.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_answer_option.dart';
 import 'stadium_level_completed_card.dart';
+import 'package:quiz_game/models/level_result_models.dart';
 
 class StadiumQuizGameplayScreen extends StatefulWidget {
   const StadiumQuizGameplayScreen({super.key});
@@ -102,7 +103,7 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
   void _finish() {
     final total = _questions.length;
 
-    final result = StadiumQuizResult(
+    final result = LevelResultModels(
       score: _score,
       totalQuestions: total,
       starsEarned: _score,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/jursey_question_model.dart';
 import 'package:quiz_game/data/jursey_data.dart';
+import 'package:quiz_game/models/level_result_models.dart'; // ✅ FIXED
+// import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jersey_level_complete_screen.dart';
 import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_level_complete-screen.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_top_bar.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_image_card.dart';
@@ -50,6 +52,13 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
     _updateProgress();
   }
 
+  @override
+  void dispose() {
+    _progressCtrl.dispose();
+    _fadeCtrl.dispose();
+    super.dispose();
+  }
+
   void _updateProgress() {
     _progressCtrl.animateTo((_currentIndex + 1) / _questions.length);
   }
@@ -95,7 +104,8 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
   void _finish() {
     final total = _questions.length;
 
-    final result = JurseyQuizResult(
+    final result = LevelResultModels(
+      // ✅ FIXED: was JurseyQuizResult
       score: _score,
       totalQuestions: total,
       starsEarned: _score,
@@ -107,7 +117,7 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => JurseyLevelCompleteScreen(result: result),
+        builder: (_) => JerseyLevelCompleteScreen(result: result), // ✅ FIXED
       ),
     );
   }
@@ -162,31 +172,37 @@ class _JurseyQuizGameplayScreenState extends State<JurseyQuizGameplayScreen>
             Expanded(
               child: FadeTransition(
                 opacity: _fadeAnim,
-                child: Column(
-                  children: [
-                    PlayerImageCard(imagePath: q.imagePath),
-                    const SizedBox(height: 20),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      PlayerImageCard(imagePath: q.imagePath),
+                      const SizedBox(height: 20),
 
-                    Text(
-                      q.questionText,
-                      style: const TextStyle(
-                        color: AppColors.hText,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        q.questionText,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.hText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    ...List.generate(q.options.length, (i) {
-                      return PlayerAnswerOption(
-                        label: _labels[i],
-                        text: q.options[i],
-                        state: _getState(i),
-                        onTap: () => _onOptionTap(i),
-                      );
-                    }),
-                  ],
+                      ...List.generate(q.options.length, (i) {
+                        return PlayerAnswerOption(
+                          label: _labels[i],
+                          text: q.options[i],
+                          state: _getState(i),
+                          onTap: () => _onOptionTap(i),
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
             ),

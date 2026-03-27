@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/club_question_model.dart';
 import 'package:quiz_game/data/club_data.dart';
-
+import 'package:quiz_game/models/level_result_models.dart'; // ✅ FIXED IMPORT
 import 'package:quiz_game/screens/club_quiz/club_quiz_game_play/club_answer_options.dart';
 import 'package:quiz_game/screens/club_quiz/club_quiz_game_play/club_quiz_top_bar.dart';
 import 'club_level_complete_screen.dart';
@@ -47,6 +47,13 @@ class _ClubQuizGameplayScreenState extends State<ClubQuizGameplayScreen>
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeInOut);
 
     _updateProgress();
+  }
+
+  @override
+  void dispose() {
+    _progressCtrl.dispose();
+    _fadeCtrl.dispose();
+    super.dispose();
   }
 
   void _updateProgress() {
@@ -94,7 +101,8 @@ class _ClubQuizGameplayScreenState extends State<ClubQuizGameplayScreen>
   void _finish() {
     final total = _questions.length;
 
-    final result = ClubQuizResult(
+    final result = LevelResultModels(
+      // ✅ FIXED: was ClubQuizResult
       score: _score,
       totalQuestions: total,
       starsEarned: _score,

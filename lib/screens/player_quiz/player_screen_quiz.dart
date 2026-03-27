@@ -4,7 +4,6 @@ import 'package:quiz_game/models/player_quiz/player_level_tile.dart';
 import 'package:quiz_game/models/club/level_overview_model.dart';
 import 'widgets/level_tile.dart';
 import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_gameplay_screen.dart';
-
 import 'widgets/level_overview_sheet.dart';
 
 class PlayerScreenQuiz extends StatefulWidget {
@@ -21,8 +20,8 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
   @override
   void initState() {
     super.initState();
-    block1Items = _generateLevelBlock(startLevel: 1); // Levels 1 to 20
-    block2Items = _generateLevelBlock(startLevel: 21); // Levels 21 to 40
+    block1Items = _generateLevelBlock(startLevel: 1);
+    block2Items = _generateLevelBlock(startLevel: 21);
   }
 
   List<ProfileLevel> _generateLevelBlock({required int startLevel}) {
@@ -37,7 +36,7 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
           ProfileLevel(
             number: currentLevel,
             isCurrent: currentLevel == 1,
-            isUnlocked: currentLevel <= 3, // Unlock first 3 levels
+            isUnlocked: currentLevel <= 3,
             starsEarned: currentLevel == 1 ? 2 : 0,
           ),
         );
@@ -192,7 +191,6 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
           level: item,
           onTap: () {
             if (item.isUnlocked && !item.hasStar) {
-              // 🚀 SHOW THE DIALOG WHEN LEVEL IS TAPPED
               showLevelOverview(
                 context: context,
                 model: LevelOverviewModel(
@@ -206,7 +204,8 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PlayerQuizGameplayScreen(),
+                      builder: (context) =>
+                          const PlayerQuizGameplayScreen(), // ✅ FIXED
                     ),
                   );
                 },

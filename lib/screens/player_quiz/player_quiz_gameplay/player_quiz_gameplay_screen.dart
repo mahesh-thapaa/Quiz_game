@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_game/data/player_quiz_data.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/player_question_model.dart';
-import 'package:quiz_game/data/player_quiz_data.dart';
-import 'player_quiz_top_bar.dart';
-import 'player_image_card.dart';
-import 'player_answer_option.dart';
-import 'player_level_complete_screen.dart';
+import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_top_bar.dart';
+import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_image_card.dart';
+import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_answer_option.dart';
+import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_level_complete_screen.dart';
+import 'package:quiz_game/models/level_result_models.dart';
 
 class PlayerQuizGameplayScreen extends StatefulWidget {
   const PlayerQuizGameplayScreen({super.key});
@@ -48,6 +49,13 @@ class _PlayerQuizGameplayScreenState extends State<PlayerQuizGameplayScreen>
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeInOut);
 
     _updateProgress();
+  }
+
+  @override
+  void dispose() {
+    _progressCtrl.dispose();
+    _fadeCtrl.dispose();
+    super.dispose();
   }
 
   void _updateProgress() {
@@ -95,7 +103,7 @@ class _PlayerQuizGameplayScreenState extends State<PlayerQuizGameplayScreen>
   void _finish() {
     final total = _questions.length;
 
-    final result = PlayerQuizResult(
+    final result = LevelResultModels(
       score: _score,
       totalQuestions: total,
       starsEarned: _score,
@@ -162,31 +170,37 @@ class _PlayerQuizGameplayScreenState extends State<PlayerQuizGameplayScreen>
             Expanded(
               child: FadeTransition(
                 opacity: _fadeAnim,
-                child: Column(
-                  children: [
-                    PlayerImageCard(imagePath: q.imagePath),
-                    const SizedBox(height: 20),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      PlayerImageCard(imagePath: q.imagePath),
+                      const SizedBox(height: 20),
 
-                    Text(
-                      q.questionText,
-                      style: const TextStyle(
-                        color: AppColors.hText,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        q.questionText,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.hText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    ...List.generate(q.options.length, (i) {
-                      return PlayerAnswerOption(
-                        label: _labels[i],
-                        text: q.options[i],
-                        state: _getState(i),
-                        onTap: () => _onOptionTap(i),
-                      );
-                    }),
-                  ],
+                      ...List.generate(q.options.length, (i) {
+                        return PlayerAnswerOption(
+                          label: _labels[i],
+                          text: q.options[i],
+                          state: _getState(i),
+                          onTap: () => _onOptionTap(i),
+                        );
+                      }),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
             ),
