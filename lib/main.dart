@@ -1,11 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quiz_game/firebase_options.dart';
 import 'package:quiz_game/provider/theme_provider.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screesn.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
-    ChangeNotifierProvider(create: (_) => ThemeProvider(), child: MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProgressProvider()),
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -17,11 +29,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: context.watch<ThemeProvider>().themeMode,
-
       theme: ThemeData(brightness: Brightness.light),
       darkTheme: ThemeData(brightness: Brightness.dark),
-
-      home: SplashScreen(),
+      home: const SplashScreen(),
+      // home: AdminHomePage(),
     );
   }
 }

@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 
-class FacebookSignInButton extends StatelessWidget {
+class LogoutButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const FacebookSignInButton({super.key, required this.onTap});
+  const LogoutButton({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -14,25 +14,27 @@ class FacebookSignInButton extends StatelessWidget {
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: const Color(0xFF1877F2),
+          color: Colors.black,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red, width: 2),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF1877F2).withValues(alpha: 0.35),
+              color: Colors.red.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
+
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.facebook, color: Colors.white, size: 22),
+            Icon(Icons.logout_outlined, color: Colors.redAccent, size: 22),
             SizedBox(width: 10),
             Text(
-              'Sign in with Facebook',
+              'Logout',
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.redAccent,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.3,

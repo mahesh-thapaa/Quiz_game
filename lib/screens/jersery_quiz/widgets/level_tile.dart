@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/player_quiz/player_level_tile.dart';
+import 'package:quiz_game/models/jersey/jersey_level_tile.dart';
 
 class LevelTile extends StatelessWidget {
   final ProfileLevel level;
@@ -134,7 +134,7 @@ class _StarRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (i) {
         return Icon(
-          Icons.star_rounded,
+          i < filled ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 11,
           color: i < filled
               ? AppColors.doller

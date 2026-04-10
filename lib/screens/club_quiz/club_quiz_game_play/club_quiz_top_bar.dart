@@ -1,5 +1,3 @@
-// lib/screens/player_quiz_gameplay/widgets/player_quiz_top_bar.dart
-
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 
@@ -10,8 +8,8 @@ class ClubQuizTopBar extends StatelessWidget {
 
   const ClubQuizTopBar({
     super.key,
-    this.stars = 3,
-    this.coins = 640,
+    required this.stars, // ✅ required — no hardcoded default
+    required this.coins, // ✅ required — no hardcoded default
     required this.onBack,
   });
 
@@ -55,14 +53,12 @@ class ClubQuizTopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Stars chip
           _Chip(
             icon: Icons.star_rounded,
             iconColor: AppColors.doller,
             value: '$stars',
           ),
           const SizedBox(width: 8),
-          // Coins chip
           _Chip(
             icon: Icons.monetization_on_rounded,
             iconColor: AppColors.doller,

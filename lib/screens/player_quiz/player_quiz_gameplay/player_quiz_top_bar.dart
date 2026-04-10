@@ -1,22 +1,18 @@
-// lib/screens/player_quiz_gameplay/widgets/player_quiz_top_bar.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 
 class PlayerQuizTopBar extends StatelessWidget {
-  final int stars;
-  final int coins;
   final VoidCallback onBack;
 
-  const PlayerQuizTopBar({
-    super.key,
-    this.stars = 3,
-    this.coins = 640,
-    required this.onBack,
-  });
+  const PlayerQuizTopBar({super.key, required this.onBack});
 
   @override
   Widget build(BuildContext context) {
+    // ✅ live values from provider
+    final p = context.watch<UserProgressProvider>();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
       child: Row(
@@ -31,10 +27,10 @@ class PlayerQuizTopBar extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           const SizedBox(width: 4),
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'GOALIQ',
                 style: TextStyle(
                   color: AppColors.stext,
@@ -43,7 +39,7 @@ class PlayerQuizTopBar extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-              const Text(
+              Text(
                 'PLAYER QUIZ',
                 style: TextStyle(
                   color: AppColors.hText,
@@ -55,18 +51,18 @@ class PlayerQuizTopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Stars chip
+          // ✅ live stars from provider
           _Chip(
             icon: Icons.star_rounded,
             iconColor: AppColors.doller,
-            value: '$stars',
+            value: '${p.stars}',
           ),
           const SizedBox(width: 8),
-          // Coins chip
+          // ✅ live coins from provider
           _Chip(
             icon: Icons.monetization_on_rounded,
             iconColor: AppColors.doller,
-            value: '$coins',
+            value: '${p.coins}',
           ),
         ],
       ),

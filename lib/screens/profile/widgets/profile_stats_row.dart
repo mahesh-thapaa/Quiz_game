@@ -5,7 +5,7 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/profile_models.dart';
 
 class ProfileStatsRow extends StatelessWidget {
-  final ProfileModel user;
+  final LeaderboardEntry user;
 
   const ProfileStatsRow({super.key, required this.user});
 

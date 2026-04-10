@@ -1,5 +1,3 @@
-// lib/screens/player_quiz_gameplay/widgets/player_quiz_top_bar.dart
-
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 
@@ -10,8 +8,8 @@ class JurseyQuizTopBar extends StatelessWidget {
 
   const JurseyQuizTopBar({
     super.key,
-    this.stars = 3,
-    this.coins = 640,
+    required this.stars, // ✅ required — no hardcoded default
+    required this.coins, // ✅ required — no hardcoded default
     required this.onBack,
   });
 
@@ -31,10 +29,10 @@ class JurseyQuizTopBar extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           const SizedBox(width: 4),
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'GOALIQ',
                 style: TextStyle(
                   color: AppColors.stext,
@@ -43,8 +41,8 @@ class JurseyQuizTopBar extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-              const Text(
-                'JURSEY QUIZ',
+              Text(
+                'JERSEY QUIZ',
                 style: TextStyle(
                   color: AppColors.hText,
                   fontSize: 17,
@@ -55,14 +53,12 @@ class JurseyQuizTopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Stars chip
           _Chip(
             icon: Icons.star_rounded,
             iconColor: AppColors.doller,
             value: '$stars',
           ),
           const SizedBox(width: 8),
-          // Coins chip
           _Chip(
             icon: Icons.monetization_on_rounded,
             iconColor: AppColors.doller,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 
 class StadiumLevelCompletedCard extends StatefulWidget {
-  final LevelResultModels result; // ✅ fixed type
+  final LevelResultModels result;
   final VoidCallback? onNextLevel;
   final VoidCallback? onReplayLevel;
 
@@ -23,12 +23,20 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
   late AnimationController _controller;
   late Animation<double> _fadeIn;
 
+  // ✅ Calculate stars from score
+  int get _starsEarned {
+    final correct = widget.result.score;
+    if (correct >= 10) return 3;
+    if (correct >= 5) return 2;
+    return 1;
+  }
+
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
     );
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
@@ -40,12 +48,13 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
     super.dispose();
   }
 
+  // ✅ Outline for unearned, filled for earned
   Widget buildStars(int stars) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
         return Icon(
-          Icons.star,
+          index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 48,
           color: index < stars ? Colors.amber : Colors.grey[700],
         );
@@ -61,27 +70,27 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
   ) {
     return Container(
       width: 140,
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF1E2A38),
+        color: const Color(0xFF1E2A38),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Icon(icon, color: iconColor, size: 30),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 11,
               letterSpacing: 1.2,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -92,20 +101,25 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
     );
   }
 
+  // ✅ Pop back with score
+  void _popWithScore() {
+    Navigator.pop(context, widget.result.score);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF0F1923),
+      backgroundColor: const Color(0xFF0F1923),
       body: FadeTransition(
         opacity: _fadeIn,
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ✅ Title
-                Text(
+                // Title
+                const Text(
                   "LEVEL COMPLETED!",
                   style: TextStyle(
                     color: Colors.white,
@@ -114,32 +128,35 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                     letterSpacing: 1.5,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                // ✅ Stars
-                buildStars(widget.result.starsEarned), // ✅ starsEarned
-                SizedBox(height: 20),
+                // Dynamic stars
+                buildStars(_starsEarned),
+                const SizedBox(height: 20),
 
-                // ✅ Score
+                // Score
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1E2A38),
+                    color: const Color(0xFF1E2A38),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "Score: ${widget.result.score}/${widget.result.totalQuestions}", // ✅ totalQuestions
-                    style: TextStyle(
+                    "Score: ${widget.result.score}/${widget.result.totalQuestions}",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-                // ✅ Rewards Label
-                Text(
+                // Rewards Label
+                const Text(
                   "REWARDS EARNED",
                   style: TextStyle(
                     color: Colors.grey,
@@ -147,40 +164,43 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                     letterSpacing: 2,
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                // ✅ Reward Cards
+                // Reward Cards
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     buildRewardCard(
                       Icons.bolt,
                       "EXPERIENCE",
-                      "+${widget.result.xpEarned} XP", // ✅ xpEarned
+                      "+${widget.result.xpEarned} XP",
                       Colors.yellow,
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     buildRewardCard(
                       Icons.monetization_on,
                       "CURRENCY",
-                      "+${widget.result.coinsEarned} Coins", // ✅ coinsEarned
+                      "+${widget.result.coinsEarned} Coins",
                       Colors.orange,
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                // ✅ Accuracy Row
+                // Accuracy Row
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1E2A38),
+                    color: const Color(0xFF1E2A38),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(
                             Icons.check_circle,
@@ -195,8 +215,8 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                         ],
                       ),
                       Text(
-                        "${widget.result.accuracy}%", // ✅ accuracy is int
-                        style: TextStyle(
+                        "${widget.result.accuracy}%",
+                        style: const TextStyle(
                           color: Colors.green,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -205,51 +225,89 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                     ],
                   ),
                 ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-                // ✅ Next Level Button
+                // Next Level Button — not available
                 GestureDetector(
-                  onTap: widget.onNextLevel ?? () => Navigator.pop(context),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(
+                              Icons.lock_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'Next level coming soon!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFF1E2A38),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: Colors.grey.shade800,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Icon(
+                            Icons.lock_rounded,
+                            color: Colors.white54,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
                           Text(
                             "NEXT LEVEL",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.white54,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chevron_right, color: Colors.white),
+                          Icon(Icons.chevron_right, color: Colors.white54),
                         ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                // ✅ Replay Button
+                // Replay Button
                 GestureDetector(
-                  onTap: widget.onReplayLevel ?? () => Navigator.pop(context),
+                  onTap: () {
+                    _popWithScore();
+                    widget.onReplayLevel?.call();
+                  },
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Color(0xFF1E2A38),
+                      color: const Color(0xFF1E2A38),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

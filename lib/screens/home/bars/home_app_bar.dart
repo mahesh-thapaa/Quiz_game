@@ -1,8 +1,8 @@
-// lib/widgets/home/home_app_bar.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 
 class HomeAppBar extends StatelessWidget {
   final UserModel user;
@@ -11,6 +11,8 @@ class HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.watch<UserProgressProvider>();
+
     return Row(
       children: [
         Container(
@@ -23,12 +25,11 @@ class HomeAppBar extends StatelessWidget {
           child: const Center(child: Text('⚽', style: TextStyle(fontSize: 20))),
         ),
         const SizedBox(width: 12),
-
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'GoallQ',
+              'GoalIQ',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -41,13 +42,10 @@ class HomeAppBar extends StatelessWidget {
             ),
           ],
         ),
-
         const Spacer(),
-
-        _Badge(label: 'LVL ${user.level}'),
+        _Badge(label: 'LVL ${p.level}'),
         const SizedBox(width: 8),
-
-        _CoinsBadge(coins: user.coins),
+        _CoinsBadge(coins: p.coins),
       ],
     );
   }
@@ -83,25 +81,31 @@ class _CoinsBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          const Text('🪙', style: TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text(
-            '$coins',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (child, anim) =>
+          ScaleTransition(scale: anim, child: child),
+      child: Container(
+        key: ValueKey(coins),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.cardBg,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            const Text('🪙', style: TextStyle(fontSize: 14)),
+            const SizedBox(width: 4),
+            Text(
+              '$coins',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

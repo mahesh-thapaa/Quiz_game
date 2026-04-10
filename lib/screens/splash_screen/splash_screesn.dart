@@ -24,7 +24,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Logo animation
     _logoCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -40,7 +39,6 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeIn,
     ).drive(Tween(begin: 0.0, end: 1.0));
 
-    // Text animation
     _textCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -56,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeOut,
     ).drive(Tween(begin: const Offset(0, 0.3), end: Offset.zero));
 
-    // Progress bar animation
     _progressCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2500),
@@ -67,7 +64,6 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeInOut,
     ).drive(Tween(begin: 0.0, end: 1.0));
 
-    // Sequence the animations
     _logoCtrl.forward().then((_) {
       _textCtrl.forward();
       Future.delayed(const Duration(milliseconds: 200), () {
@@ -190,22 +186,22 @@ class _SplashScreenState extends State<SplashScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 48),
                 child: FadeTransition(
                   opacity: _textFade,
-                  child: Column(
-                    children: [
-                      // Progress bar
-                      AnimatedBuilder(
-                        animation: _progressAnim,
-                        builder: (context, _) {
-                          return Column(
-                            children: [
-                              ClipRRect(
+                  child: AnimatedBuilder(
+                    animation: _progressAnim,
+                    builder: (context, _) {
+                      return Column(
+                        children: [
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final trackWidth = constraints.maxWidth;
+                              return ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
                                 child: Stack(
                                   children: [
                                     // Background track
                                     Container(
                                       height: 4,
-                                      width: double.infinity,
+                                      width: trackWidth,
                                       color: Colors.white.withValues(
                                         alpha: 0.1,
                                       ),
@@ -213,15 +209,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     // Filled portion
                                     Container(
                                       height: 4,
-                                      width:
-                                          MediaQuery.of(context).size.width *
-                                          _progressAnim.value *
-                                          (1 -
-                                              48 *
-                                                  2 /
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width),
+                                      width: trackWidth * _progressAnim.value,
                                       decoration: BoxDecoration(
                                         gradient: const LinearGradient(
                                           colors: [
@@ -242,24 +230,24 @@ class _SplashScreenState extends State<SplashScreen>
                                     ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(height: 14),
-                              Text(
-                                'LOADING....',
-                                style: TextStyle(
-                                  color: const Color(
-                                    0xFF1DB954,
-                                  ).withValues(alpha: 0.8),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 2.0,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            'LOADING....',
+                            style: TextStyle(
+                              color: const Color(
+                                0xFF1DB954,
+                              ).withValues(alpha: 0.8),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2.0,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),

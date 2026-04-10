@@ -1,49 +1,42 @@
-// lib/widgets/locked_section.dart
-
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-
-class LockedCategoryModel {
-  final String title;
-  final String unlockText;
-  final String imagePath;
-  final bool requiresCoins;
-
-  const LockedCategoryModel({
-    required this.title,
-    required this.unlockText,
-    required this.imagePath,
-    this.requiresCoins = false,
-  });
-}
+import 'package:quiz_game/models/locked_category_models.dart';
 
 class LockedSection extends StatelessWidget {
   const LockedSection({super.key});
 
-  static const List<LockedCategoryModel> _items = [
+  static final List<LockedCategoryModel> _items = [
     LockedCategoryModel(
       title: 'Legends Quiz',
       unlockText: 'Level 5 Required',
       imagePath: 'asstes/images/legend.jpg',
       requiresCoins: false,
+      snackbarMessage: 'Level 5 to unlock Legends Quiz!',
+      snackbarColor: Colors.blue,
     ),
     LockedCategoryModel(
       title: 'National',
       unlockText: '1000 Coins',
       imagePath: 'asstes/images/national.jpg',
       requiresCoins: true,
+      snackbarMessage: 'You need 1000 Coins to unlock National!',
+      snackbarColor: Colors.blue,
     ),
     LockedCategoryModel(
       title: 'Manager Quiz',
       unlockText: 'Level 8 Required',
       imagePath: 'asstes/images/manager.jpg',
       requiresCoins: false,
+      snackbarMessage: 'Reach Level 8 to unlock Manager Quiz!',
+      snackbarColor: Colors.blue,
     ),
     LockedCategoryModel(
       title: 'Transfer Quiz',
       unlockText: '500 Coins',
       imagePath: 'asstes/images/transfer.png',
       requiresCoins: true,
+      snackbarMessage: 'You need 500 Coins to unlock Transfer Quiz!',
+      snackbarColor: Colors.blue,
     ),
   ];
 
@@ -95,89 +88,120 @@ class _LockedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // ── Background image ──────────────────────────────
-          Image.asset(
-            item.imagePath,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(color: AppColors.deepCard),
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: item.snackbarColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            content: Row(
+              children: [
+                // Icon(
+                //   item.requiresCoins ? Icons.monetization_on : Icons.lock,
+                //   color: Colors.white,
+                // ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item.snackbarMessage,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            duration: Duration(seconds: 2),
           ),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              item.imagePath,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  Container(color: AppColors.deepCard),
+            ),
 
-          // ── Dark gradient overlay ─────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.25),
-                  Colors.black.withValues(alpha: 0.75),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.25),
+                    Colors.black.withValues(alpha: 0.75),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Lock icon top right ───────────────────────────
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.50),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.lock_rounded,
+                  color: Colors.white70,
+                  size: 15,
+                ),
+              ),
+            ),
+
+            // ── Bottom label ──────────────────────────────────
+            Positioned(
+              bottom: 12,
+              left: 12,
+              right: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  item.requiresCoins
+                      ? _CoinBadge(text: item.unlockText)
+                      : Text(
+                          item.unlockText,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white70,
+                          ),
+                        ),
                 ],
               ),
             ),
-          ),
-
-          // ── Lock icon top right ───────────────────────────
-          Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.50),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.lock_rounded,
-                color: Colors.white70,
-                size: 15,
-              ),
-            ),
-          ),
-
-          // ── Bottom label ──────────────────────────────────
-          Positioned(
-            bottom: 12,
-            left: 12,
-            right: 12,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black54,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                item.requiresCoins
-                    ? _CoinBadge(text: item.unlockText)
-                    : Text(
-                        item.unlockText,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white70,
-                        ),
-                      ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -36,6 +36,12 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.2.4
   provider: ^6.1.5+1
+  image_picker: ^1.2.1
+  firebase_auth: ^6.3.0
+  firebase_core: ^4.6.0
+  firebase_database: ^12.2.0
+  cloud_firestore: ^6.2.0
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +72,6 @@ flutter:
     - asstes/images/quiz.jpg
     - asstes/images/ronaldo.png
     - asstes/images/stadium.jpg
-    # - asstes/svg/football.svg
     - asstes/svg/gift.svg
     - asstes/images/jursey.jpg
     - asstes/svg/arrow.svg
@@ -115,7 +120,7 @@ flutter:
     - asstes/images/a.jpeg
     - asstes/images/ss.jpeg
     - asstes/images/es.jpeg
-    
+    - asstes/images/profile.png
     - asstes/images/sb.jpeg
 
 

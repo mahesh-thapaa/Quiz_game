@@ -13,7 +13,6 @@ class PlayerImageCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Player image ──────────────────────────────────
         Expanded(
           child: Container(
             height: 200,
@@ -29,21 +28,24 @@ class PlayerImageCard extends StatelessWidget {
               ],
             ),
             clipBehavior: Clip.hardEdge,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
-              // errorBuilder: (_, __, ___) => Container(
-              //   color: AppColors.cardBg,
-              //   child: const Center(
-              //     child: Icon(Icons.person, color: AppColors.stext, size: 60),
-              //   ),
-              // ),
+            child: AspectRatio(
+              aspectRatio: 3 / 4,
+              child: Image.network(
+                imagePath,
+                fit: BoxFit.cover,
+                // alignment: Alignment.center,
+                // errorBuilder: (_, __, ___) => Container(
+                //   color: AppColors.cardBg,
+                //   child: const Center(
+                //     child: Icon(Icons.person, color: AppColors.stext, size: 60),
+                //   ),
+                // ),
+              ),
             ),
           ),
         ),
         const SizedBox(width: 10),
 
-        // ── Side power-up buttons ─────────────────────────
         Column(
           children: [
             _PowerUp(

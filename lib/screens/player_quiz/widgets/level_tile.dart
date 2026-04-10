@@ -134,7 +134,7 @@ class _StarRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (i) {
         return Icon(
-          Icons.star_rounded,
+          i < filled ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 11,
           color: i < filled
               ? AppColors.doller

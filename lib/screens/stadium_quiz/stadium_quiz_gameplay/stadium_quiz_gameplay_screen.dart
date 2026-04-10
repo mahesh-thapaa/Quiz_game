@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/stadium_question_model.dart';
-import 'package:quiz_game/data/stadium_quiz_data.dart';
-import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_top_bar.dart';
-import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_image_card.dart';
-import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_answer_option.dart';
-import 'stadium_level_completed_card.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/screens/stadium_quiz/stadium_quiz_gameplay/stadium_quiz_top_bar.dart';
+import 'package:quiz_game/screens/stadium_quiz/stadium_quiz_gameplay/stadium_imager_card.dart';
+import 'package:quiz_game/screens/stadium_quiz/stadium_quiz_gameplay/stadium_answer_option.dart';
+import 'package:quiz_game/screens/stadium_quiz/stadium_quiz_gameplay/stadium_level_completed_card.dart';
 import 'package:quiz_game/models/level_result_models.dart';
+import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 
 class StadiumQuizGameplayScreen extends StatefulWidget {
-  const StadiumQuizGameplayScreen({super.key});
+  final List<QuizQuestion> questions;
+
+  const StadiumQuizGameplayScreen({super.key, required this.questions});
 
   @override
   State<StadiumQuizGameplayScreen> createState() =>
@@ -33,7 +37,19 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
   @override
   void initState() {
     super.initState();
-    _questions = StadiumQuizData.getQuestions();
+
+    _questions = widget.questions.asMap().entries.map((entry) {
+      final index = entry.key;
+      final q = entry.value;
+      return StadiumQuestionModel(
+        questionNumber: index + 1,
+        totalQuestions: widget.questions.length,
+        questionText: q.title,
+        options: q.options,
+        correctIndex: q.correctAnswerIndex,
+        imagePath: q.imagePath ?? '',
+      );
+    }).toList();
 
     _progressCtrl = AnimationController(
       vsync: this,
@@ -47,7 +63,6 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
     );
 
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeInOut);
-
     _updateProgress();
   }
 
@@ -62,15 +77,27 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
     _progressCtrl.animateTo((_currentIndex + 1) / _questions.length);
   }
 
+  void _resetGame() {
+    setState(() {
+      _currentIndex = 0;
+      _selectedIndex = null;
+      _answered = false;
+      _score = 0;
+    });
+    _fadeCtrl.value = 1;
+    _updateProgress();
+  }
+
   void _onOptionTap(int index) {
     if (_answered) return;
 
     setState(() {
       _selectedIndex = index;
       _answered = true;
-
       if (index == _questions[_currentIndex].correctIndex) {
         _score++;
+        // Award XP/coins for each correct answer in real time
+        context.read<UserProgressProvider>().onCorrectAnswer();
       }
     });
 
@@ -87,7 +114,6 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
     }
 
     await _fadeCtrl.reverse();
-
     if (!mounted) return;
 
     setState(() {
@@ -100,46 +126,73 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
     await _fadeCtrl.forward();
   }
 
-  void _finish() {
+  Future<void> _finish() async {
     final total = _questions.length;
+    final starsEarned = _score >= 10
+        ? 3
+        : _score >= 5
+        ? 2
+        : 1;
+
+    // Award completion bonus (stars already counted per-answer above,
+    // so pass earnedStars=0 here to avoid double-counting stars).
+    await context.read<UserProgressProvider>().onQuizCompleted(
+      earnedStars: starsEarned,
+    );
+
+    if (!mounted) return;
 
     final result = LevelResultModels(
       score: _score,
       totalQuestions: total,
-      starsEarned: _score,
+      starsEarned: starsEarned,
       xpEarned: _score * 20,
       coinsEarned: _score * 10,
-      accuracy: ((_score / total) * 100).toInt(),
+      accuracy: total > 0 ? ((_score / total) * 100).round() : 0,
     );
 
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => StadiumLevelCompletedCard(result: result),
+        builder: (_) => StadiumLevelCompletedCard(
+          result: result,
+          onNextLevel: () {
+            Navigator.pop(context, _score);
+          },
+          onReplayLevel: () {
+            Navigator.pop(context);
+            _resetGame();
+          },
+        ),
       ),
     );
   }
 
-  PlayerOptionState _getState(int index) {
+  StadiumAnswerOption _getState(int index) {
     if (!_answered) {
       return _selectedIndex == index
-          ? PlayerOptionState.selected
-          : PlayerOptionState.idle;
+          ? StadiumAnswerOption.selected
+          : StadiumAnswerOption.idle;
     }
-
     if (index == _questions[_currentIndex].correctIndex) {
-      return PlayerOptionState.correct;
+      return StadiumAnswerOption.correct;
     }
-
     if (index == _selectedIndex) {
-      return PlayerOptionState.wrong;
+      return StadiumAnswerOption.wrong;
     }
-
-    return PlayerOptionState.idle;
+    return StadiumAnswerOption.idle;
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_questions.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('No questions available')),
+      );
+    }
+
+    // Watch provider so top bar rebuilds whenever coins/stars change
+    final progress = context.watch<UserProgressProvider>();
     final q = _questions[_currentIndex];
 
     return Scaffold(
@@ -147,7 +200,12 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
       body: SafeArea(
         child: Column(
           children: [
-            PlayerQuizTopBar(onBack: () => Navigator.pop(context)),
+            // ✅ Top bar now receives live values from the provider
+            StadiumQuizTopBar(
+              stars: progress.stars,
+              coins: progress.coins,
+              onBack: () => Navigator.pop(context),
+            ),
 
             Padding(
               padding: const EdgeInsets.all(16),
@@ -174,7 +232,7 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      PlayerImageCard(imagePath: q.imagePath),
+                      StadiumImagerCard(imagePath: q.imagePath),
                       const SizedBox(height: 20),
 
                       Text(
@@ -186,11 +244,10 @@ class _StadiumQuizGameplayScreenState extends State<StadiumQuizGameplayScreen>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 20),
 
                       ...List.generate(q.options.length, (i) {
-                        return PlayerAnswerOption(
+                        return StadiumAnswerOptionWidget(
                           label: _labels[i],
                           text: q.options[i],
                           state: _getState(i),

@@ -11,8 +11,7 @@ class DiscoverScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final challenges =
-        DiscoverData.getChallenges(); // ✅ DiscoverData not ChallengeData
+    final challenges = DiscoverData.getChallenges();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -77,7 +76,7 @@ class DiscoverScreen extends StatelessWidget {
                             childAspectRatio: 1.0,
                           ),
                       itemBuilder: (context, index) =>
-                          ChallengeCard(model: challenges[index]),
+                          DiscoverWidgetsCard(model: challenges[index]),
                     ),
                   ],
                 ),

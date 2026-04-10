@@ -1,4 +1,4 @@
-// lib/screens/player_quiz_gameplay/widgets/player_image_card.dart
+// lib/screens/stadium_quiz/stadium_quiz_gameplay/stadium_imager_card.dart
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -10,10 +10,12 @@ class StadiumImagerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Validation: check if the string is a valid URL to prevent "No host specified" crash
+    final bool isValidUrl = Uri.tryParse(imagePath)?.hasAbsolutePath ?? false;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Player image ──────────────────────────────────
         Expanded(
           child: Container(
             height: 200,
@@ -22,30 +24,34 @@ class StadiumImagerCard extends StatelessWidget {
               border: Border.all(color: AppColors.outlineBorder, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadow,
+                  color: AppColors.shadow.withOpacity(0.3),
                   blurRadius: 16,
                   spreadRadius: 2,
                 ),
               ],
             ),
             clipBehavior: Clip.hardEdge,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              // errorBuilder: (_, __, ___) => Container(
-              //   color: AppColors.cardBg,
-              //   child: const Center(
-              //     child: Icon(Icons.person, color: AppColors.stext, size: 60),
-              //   ),
-              // ),
-            ),
+            child: !isValidUrl
+                ? _buildPlaceholder() // Show placeholder if URL is empty or invalid
+                : Image.network(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 200,
+                    // 2. Loading state for better UX
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    },
+                    // 3. Error state if the URL is valid but the image fails to load (404, etc)
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildPlaceholder(),
+                  ),
           ),
         ),
         const SizedBox(width: 10),
-
-        // ── Side power-up buttons ─────────────────────────
         Column(
           children: [
             _PowerUp(
@@ -73,6 +79,26 @@ class StadiumImagerCard extends StatelessWidget {
       ],
     );
   }
+
+  // Placeholder shown when image is missing or broken
+  Widget _buildPlaceholder() {
+    return Container(
+      color: AppColors.cardBg,
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.stadium_rounded, color: AppColors.stext, size: 50),
+            SizedBox(height: 8),
+            Text(
+              "No Image",
+              style: TextStyle(color: AppColors.stext, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _PowerUp extends StatelessWidget {
@@ -94,7 +120,7 @@ class _PowerUp extends StatelessWidget {
       width: 52,
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? color.withValues(alpha: 0.15) : AppColors.cardBg,
+        color: isActive ? color.withOpacity(0.15) : AppColors.cardBg,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isActive ? color : AppColors.divider,

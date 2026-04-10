@@ -44,7 +44,6 @@ class ProfileLeaderboard extends StatelessWidget {
             ),
           ),
 
-          // Column headers
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(

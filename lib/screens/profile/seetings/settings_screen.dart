@@ -60,7 +60,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── GENERAL ──────────────────────────────────
             const SettingsSectionHeader(title: 'GENERAL'),
             _SectionCard(
               children: [
@@ -89,7 +88,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
 
-            // ── ACCOUNT ──────────────────────────────────
             const SettingsSectionHeader(title: 'ACCOUNT'),
             _SectionCard(
               children: [
@@ -101,7 +99,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
 
-            // ── PREFERENCES ──────────────────────────────
             const SettingsSectionHeader(title: 'PREFERENCES'),
             _SectionCard(
               children: [

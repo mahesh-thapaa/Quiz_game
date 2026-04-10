@@ -5,7 +5,7 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/profile_models.dart';
 
 class ProfileAvatar extends StatelessWidget {
-  final ProfileModel user;
+  final LeaderboardEntry user;
 
   const ProfileAvatar({super.key, required this.user});
 

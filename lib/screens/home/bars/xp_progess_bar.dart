@@ -1,17 +1,10 @@
-// lib/widgets/home/xp_progress_bar.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 
 class XPProgressBar extends StatelessWidget {
-  final int currentXP;
-  final int maxXP;
-
-  const XPProgressBar({
-    super.key,
-    required this.currentXP,
-    required this.maxXP,
-  });
+  const XPProgressBar({super.key});
 
   String _format(int n) => n >= 1000
       ? '${(n / 1000).toStringAsFixed(0)},${(n % 1000).toString().padLeft(3, '0')}'
@@ -19,11 +12,12 @@ class XPProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = (currentXP / maxXP).clamp(0.0, 1.0);
+    // ✅ watches provider — no need to pass currentXP/maxXP as params anymore
+    final p = context.watch<UserProgressProvider>();
+    final progress = p.xpProgress;
 
     return Column(
       children: [
-        // ── Labels ──
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -37,7 +31,7 @@ class XPProgressBar extends StatelessWidget {
               ),
             ),
             Text(
-              '${_format(currentXP)} / ${_format(maxXP)}',
+              '${_format(p.currentLevelXP)} / ${_format(p.maxLevelXP)}',
               style: const TextStyle(
                 color: AppColors.secondary,
                 fontSize: 11,
@@ -47,7 +41,6 @@ class XPProgressBar extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-
         ClipRRect(
           borderRadius: BorderRadius.circular(100),
           child: Stack(

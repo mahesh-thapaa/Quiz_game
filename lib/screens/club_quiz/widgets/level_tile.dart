@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/player_quiz/player_level_tile.dart';
+import 'package:quiz_game/models/club/club_level_tile.dart';
 
 class LevelTile extends StatelessWidget {
   final ProfileLevel level;

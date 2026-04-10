@@ -1,4 +1,6 @@
+// ─────────────────────────────────────────────────────────────────────────────
 // lib/widgets/reward_dialog.dart
+// ─────────────────────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -36,9 +38,10 @@ class _RewardDialogState extends State<RewardDialog>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _scale = Tween<double>(begin: 0.7, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _scale = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
     _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -71,7 +74,7 @@ class _RewardDialogState extends State<RewardDialog>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Coin ──
+                // ── Coin icon ──
                 Container(
                   width: 90,
                   height: 90,
@@ -137,7 +140,9 @@ class _RewardDialogState extends State<RewardDialog>
                 // ── Coins row ──
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 12),
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.deepCard,
                     borderRadius: BorderRadius.circular(14),

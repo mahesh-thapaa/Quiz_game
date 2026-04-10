@@ -23,7 +23,9 @@ class StarRating extends StatelessWidget {
         return Icon(
           Icons.star_rounded,
           size: size,
-          color: i < stars ? AppColors.doller : Colors.white.withOpacity(0.15),
+          color: i < stars
+              ? AppColors.doller
+              : Colors.white.withValues(alpha: 0.15),
         );
       }),
     );

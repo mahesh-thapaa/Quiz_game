@@ -29,7 +29,7 @@ class ClubImageCard extends StatelessWidget {
               ],
             ),
             clipBehavior: Clip.hardEdge,
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(

@@ -4,102 +4,134 @@ import 'package:flutter/material.dart';
 // import 'package:quiz_game/models/discover_models.dart';
 
 import 'package:quiz_game/models/discover/discover_models.dart';
-// ✅ correct import
+
 import 'package:quiz_game/models/colors.dart';
 
-class ChallengeCard extends StatelessWidget {
-  final ChallengeModel model;
+class DiscoverWidgetsCard extends StatelessWidget {
+  final DiscoverModels model;
 
-  const ChallengeCard({super.key, required this.model});
+  const DiscoverWidgetsCard({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // ── Background image ────────────────────────────
-          Image.asset(
-            model.imagePath,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(color: AppColors.deepCard),
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: model.snackbarColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            content: Row(
+              children: [
+                // Icon(
+                //   model.unlockType == UnlockType.coins
+                //       ? Icons.monetization_on
+                //       : model.unlockType == UnlockType.level
+                //       ? Icons.lock
+                //       : Icons.access_time,
+                //   color: Colors.white,
+                // ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    model.snackbarMessage,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            duration: Duration(seconds: 2),
           ),
+        );
+      },
 
-          // ── Dark gradient overlay ───────────────────────
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.20),
-                  Colors.black.withValues(alpha: 0.78),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              model.imagePath,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  Container(color: AppColors.deepCard),
+            ),
+
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.20),
+                    Colors.black.withValues(alpha: 0.78),
+                  ],
+                ),
+              ),
+            ),
+
+            if (model.unlockType == UnlockType.comingSoon)
+              Container(color: Colors.black.withValues(alpha: 0.25)),
+
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.50),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.lock_rounded,
+                  color: Colors.white70,
+                  size: 15,
+                ),
+              ),
+            ),
+
+            Positioned(
+              bottom: 12,
+              left: 12,
+              right: 12,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    model.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  _UnlockBadge(model: model),
                 ],
               ),
             ),
-          ),
-
-          // ── Extra dim for coming soon ───────────────────
-          if (model.unlockType == UnlockType.comingSoon)
-            Container(color: Colors.black.withValues(alpha: 0.25)),
-
-          // ── Lock icon top right ─────────────────────────
-          Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.50),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.lock_rounded,
-                color: Colors.white70,
-                size: 15,
-              ),
-            ),
-          ),
-
-          // ── Bottom content ──────────────────────────────
-          Positioned(
-            bottom: 12,
-            left: 12,
-            right: 12,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  model.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black54,
-                        blurRadius: 4,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                _UnlockBadge(model: model),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// ── Unlock badge ──────────────────────────────────────────────
 class _UnlockBadge extends StatelessWidget {
-  final ChallengeModel model;
+  final DiscoverModels model;
 
   const _UnlockBadge({required this.model});
 

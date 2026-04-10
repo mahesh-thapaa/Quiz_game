@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/data/home_data.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
 import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
 import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
@@ -11,8 +13,6 @@ import 'package:quiz_game/screens/home/bars/streak_card.dart';
 import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
 import 'package:quiz_game/screens/bonus/clain_reward_dialog.dart';
-
-// ── Quiz screen imports ──────────────────────────────────────────
 import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
 import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
 import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
@@ -43,11 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.showRewardOnLoad) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _goToBonus();
-      });
-    }
+    // ✅ Load user data from Firestore when home screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<UserProgressProvider>().loadFromFirestore();
+      if (widget.showRewardOnLoad) _goToBonus();
+    });
   }
 
   void _goToBonus() {
@@ -59,15 +59,16 @@ class _HomeScreenState extends State<HomeScreen> {
           subtitle: 'REWARD CLAIMED SUCCESSFULLY',
           coins: widget.dailyBonus.coins,
           buttonLabel: 'AWESOME',
-          onTap: () {
-            Navigator.pop(context);
-          },
+          onTap: () => Navigator.pop(context),
         ),
       ),
     );
   }
 
-  // ── Category navigation ────────────────────────────────────────
+  // void _onBonusClaimed(int newCoins) {
+  //   context.read<UserProgressProvider>().updateCoins(newCoins);
+  // }
+
   void _onCategoryTap(CategoryModel category) {
     switch (category.title) {
       case 'Player Quiz':
@@ -91,7 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // ── Recommended quiz navigation ────────────────────────────────
   void _onRecommendedQuizTap(QuizCardModel quiz) {
     switch (quiz.title) {
       case 'Player Challenge':
@@ -120,30 +120,16 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-
               HomeAppBar(user: widget.user),
-
               const SizedBox(height: 16),
-
-              XPProgressBar(
-                currentXP: widget.user.currentXP,
-                maxXP: widget.user.maxXP,
-              ),
-
+              const XPProgressBar(),
               const SizedBox(height: 20),
-
-              DailyBonusCard(bonus: widget.dailyBonus, onClaim: _goToBonus),
-
+              DailyBonusCard(bonus: widget.dailyBonus),
               const SizedBox(height: 16),
-
               QuickPlayCard(onTap: () {}),
-
               const SizedBox(height: 24),
-
               const SectionHeader(title: 'RECOMMENDED FOR YOU'),
               const SizedBox(height: 12),
-
-              // ── Recommended quizzes with navigation ─────────────
               Row(
                 children: widget.recommendedQuizzes.map((q) {
                   return Expanded(
@@ -151,23 +137,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(right: 8),
                       child: QuizCard(
                         quiz: q,
-                        onTap: () => _onRecommendedQuizTap(q), // ✅
+                        onTap: () => _onRecommendedQuizTap(q),
                       ),
                     ),
                   );
                 }).toList(),
               ),
-
               const SizedBox(height: 20),
-
-              StreakCard(streak: widget.streak),
-
+              StreakCard(),
               const SizedBox(height: 24),
-
               const SectionHeader(title: 'POPULAR CATEGORIES'),
               const SizedBox(height: 12),
-
-              // ── Categories with navigation ───────────────────────
               Row(
                 children: widget.categories.map((c) {
                   return Expanded(
@@ -175,13 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(right: 8),
                       child: CategoryCard(
                         category: c,
-                        onTap: () => _onCategoryTap(c), // ✅
+                        onTap: () => _onCategoryTap(c),
                       ),
                     ),
                   );
                 }).toList(),
               ),
-
               const SizedBox(height: 24),
             ],
           ),

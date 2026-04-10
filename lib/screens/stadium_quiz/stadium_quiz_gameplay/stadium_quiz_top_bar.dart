@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 
-class PlayerQuizTopBar extends StatelessWidget {
+class StadiumQuizTopBar extends StatelessWidget {
   final int stars;
   final int coins;
   final VoidCallback onBack;
 
-  const PlayerQuizTopBar({
+  const StadiumQuizTopBar({
     super.key,
     this.stars = 3,
     this.coins = 640,

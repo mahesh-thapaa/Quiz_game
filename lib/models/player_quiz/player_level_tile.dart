@@ -1,15 +1,17 @@
 class ProfileLevel {
   final int? number;
-  final int starsEarned;
-  final bool isUnlocked;
-  final bool isCurrent;
   final bool hasStar;
+  final bool isCurrent;
+  bool isUnlocked;
+  int starsEarned;
+  final String? levelDocId;
 
   ProfileLevel({
     this.number,
-    this.starsEarned = 0,
-    this.isUnlocked = false,
-    this.isCurrent = false,
     this.hasStar = false,
+    this.isCurrent = false,
+    this.isUnlocked = false,
+    this.starsEarned = 0,
+    this.levelDocId,
   });
 }

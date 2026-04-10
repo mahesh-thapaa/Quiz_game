@@ -29,7 +29,7 @@ class JurseyImageCard extends StatelessWidget {
               ],
             ),
             clipBehavior: Clip.hardEdge,
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               fit: BoxFit.contain,
               errorBuilder: (_, __, ___) => Container(

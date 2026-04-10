@@ -1,10 +1,10 @@
-// lib/screens/login.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/buttons/buttons.dart';
-// import 'package:quiz_game/screens/home/home_screen.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
+import 'package:quiz_game/auth/email_signup.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -13,11 +13,28 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> with TickerProviderStateMixin {
-  void _goToHome() {
+class _LoginState extends State<Login> {
+  bool _isLoading = false;
+
+  // Guest / Google login (your existing flow)
+  Future<void> _goToHome() async {
+    setState(() => _isLoading = true);
+
+    await context.read<UserProgressProvider>().loadFromFirestore();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const MainScreen()),
+    );
+  }
+
+  void _goToEmailSignup() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EmailSignup()),
     );
   }
 
@@ -41,9 +58,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Container(
                   height: 130,
                   width: 130,
@@ -59,9 +74,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Text(
                   "Play Football Quiz",
                   textAlign: TextAlign.center,
@@ -72,9 +85,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                     letterSpacing: 0.5,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: 250,
                   child: Text(
@@ -88,10 +99,43 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
+                const SizedBox(height: 32),
 
-                const SizedBox(height: 20),
+                // ── Original login button (Google / Guest) ───────────────────
+                if (_isLoading)
+                  const CircularProgressIndicator()
+                else
+                  Buttons(onGuestTap: _goToHome, onEmailTap: _goToEmailSignup),
 
-                Buttons(onButtonTap: _goToHome),
+                // const SizedBox(height: 16),
+
+                // // ── Email login button ───────────────────────────────────────
+                // SizedBox(
+                //   width: double.infinity,
+                //   height: 52,
+                //   child: OutlinedButton.icon(
+                //     style: OutlinedButton.styleFrom(
+                //       side: BorderSide(color: AppColors.divider),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(12),
+                //       ),
+                //     ),
+                //     onPressed: _isLoading ? null : _goToEmailSignup,
+                //     icon: Icon(
+                //       Icons.email_outlined,
+                //       color: AppColors.hText,
+                //       size: 20,
+                //     ),
+                //     label: Text(
+                //       'Login with Email',
+                //       style: TextStyle(
+                //         color: AppColors.hText,
+                //         fontSize: 15,
+                //         fontWeight: FontWeight.w600,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

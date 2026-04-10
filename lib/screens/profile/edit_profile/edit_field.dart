@@ -25,7 +25,6 @@ class EditField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label
         Text(
           label,
           style: TextStyle(
@@ -36,7 +35,7 @@ class EditField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        // Input
+
         Container(
           decoration: BoxDecoration(
             color: c.cardBg,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/quiz_category/quiz_models.dart';
+import 'package:quiz_game/models/quiz_models/quiz_modsels.dart';
 // import '../models/colors.dart';
 // import '../models/quiz_model.dart';
 

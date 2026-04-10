@@ -1,5 +1,3 @@
-// lib/screens/profile/profile_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/profile_models.dart';
@@ -7,21 +5,44 @@ import 'package:quiz_game/screens/profile/edit_profile/edit_profile_screen.dart'
 import 'package:quiz_game/screens/profile/widgets/profile_avatar.dart';
 import 'package:quiz_game/screens/profile/widgets/profile_stats_row.dart';
 import 'package:quiz_game/screens/profile/widgets/profile_leaderboard.dart';
-import 'package:quiz_game/screens/profile/widgets/facebook_signin_button.dart';
+import 'package:quiz_game/screens/profile/widgets/logout_button.dart';
 import 'package:quiz_game/screens/profile/seetings/settings_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final ProfileModel user;
+class ProfileScreen extends StatefulWidget {
+  final LeaderboardEntry user;
   final List<LeaderboardEntry> leaderboard;
 
   const ProfileScreen({
     super.key,
-    this.user = ProfileData.user,
-    this.leaderboard = ProfileData.leaderboard,
+    this.user = LeaderboardEntry.user,
+    this.leaderboard = LeaderboardEntry.leaderboard,
   });
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late String _name;
+  late String _bio;
+  late String _avatarAsset;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = widget.user.name;
+    _bio = widget.user.bio;
+    _avatarAsset = widget.user.avatarAsset;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final updatedUser = widget.user.copyWith(
+      name: _name,
+      bio: _bio,
+      avatarAsset: _avatarAsset,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -33,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.settings_outlined,
                     color: AppColors.stext,
                     size: 24,
@@ -47,22 +68,28 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              ProfileAvatar(user: user),
+              ProfileAvatar(user: updatedUser), // ✅ uses updated user
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
+                onTap: () async {
+                  final result = await Navigator.push<Map<String, String>>(
                     context,
                     MaterialPageRoute(
-                      builder: (_) {
-                        return EditProfileScreen(
-                          initialName: user.name,
-                          initialBio: user.bio,
-                          avatarAsset: user.avatarAsset,
-                        );
-                      },
+                      builder: (_) => EditProfileScreen(
+                        initialName: _name,
+                        initialBio: _bio,
+                        avatarAsset: _avatarAsset,
+                      ),
                     ),
                   );
+
+                  if (result != null) {
+                    setState(() {
+                      _name = result['name'] ?? _name;
+                      _bio = result['bio'] ?? _bio;
+                      _avatarAsset = result['avatarAsset'] ?? _avatarAsset;
+                    });
+                  }
                 },
                 child: Container(
                   height: 48,
@@ -89,11 +116,11 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              ProfileStatsRow(user: user),
+              ProfileStatsRow(user: updatedUser),
               const SizedBox(height: 20),
-              ProfileLeaderboard(entries: leaderboard),
+              ProfileLeaderboard(entries: widget.leaderboard),
               const SizedBox(height: 20),
-              FacebookSignInButton(onTap: () {}),
+              LogoutButton(onTap: () {}),
               const SizedBox(height: 24),
             ],
           ),

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/quiz_category/quiz_models.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/header.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/quiz_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/progess_card.dart';
@@ -14,6 +13,7 @@ import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
 import 'package:quiz_game/screens/jersery_quiz/jersey_quiz_screen.dart';
 import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
 import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
+import 'package:quiz_game/models/quiz_models/quiz_modsels.dart';
 // import 'package:quiz_game/models/level_result_model.dart';
 
 class QuizScreen extends StatelessWidget {
@@ -142,7 +142,7 @@ class QuizScreen extends StatelessWidget {
   }
 
   void _onQuizTap(BuildContext context, String title) {
-    final navigator = Navigator.of(context); // ✅ save before async use
+    final navigator = Navigator.of(context);
 
     switch (title) {
       case "Player Quiz":

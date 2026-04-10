@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 
-class JerseyLevelCompleteScreen extends StatefulWidget {
+class JurseyLevelCompleteScreen extends StatefulWidget {
   final LevelResultModels result;
   final VoidCallback? onNextLevel;
   final VoidCallback? onReplayLevel;
 
-  const JerseyLevelCompleteScreen({
+  const JurseyLevelCompleteScreen({
     super.key,
     required this.result,
     this.onNextLevel,
@@ -14,14 +14,22 @@ class JerseyLevelCompleteScreen extends StatefulWidget {
   });
 
   @override
-  State<JerseyLevelCompleteScreen> createState() =>
-      _JerseyLevelCompleteScreenState();
+  State<JurseyLevelCompleteScreen> createState() =>
+      _JurseyLevelCompletedCardState();
 }
 
-class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
+class _JurseyLevelCompletedCardState extends State<JurseyLevelCompleteScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeIn;
+
+  // ✅ Calculate stars from score
+  int get _starsEarned {
+    final correct = widget.result.score;
+    if (correct >= 10) return 3;
+    if (correct >= 5) return 2;
+    return 1;
+  }
 
   @override
   void initState() {
@@ -40,12 +48,13 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
     super.dispose();
   }
 
+  // ✅ Outline for unearned, filled for earned
   Widget buildStars(int stars) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
         return Icon(
-          Icons.star,
+          index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
           size: 48,
           color: index < stars ? Colors.amber : Colors.grey[700],
         );
@@ -92,6 +101,11 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
     );
   }
 
+  // ✅ Pop back with score
+  void _popWithScore() {
+    Navigator.pop(context, widget.result.score);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,8 +130,8 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
                 ),
                 const SizedBox(height: 20),
 
-                // Stars
-                buildStars(widget.result.starsEarned),
+                // Dynamic stars
+                buildStars(_starsEarned),
                 const SizedBox(height: 20),
 
                 // Score
@@ -186,8 +200,8 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Icon(
                             Icons.check_circle,
                             color: Colors.green,
@@ -213,31 +227,66 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
                 ),
                 const SizedBox(height: 32),
 
-                // Next Level Button
+                // Next Level Button — not available
                 GestureDetector(
-                  onTap: widget.onNextLevel ?? () => Navigator.pop(context),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(
+                              Icons.lock_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'Next level coming soon!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xFF1E2A38),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: Colors.grey.shade800,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
+                          Icon(
+                            Icons.lock_rounded,
+                            color: Colors.white54,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
                           Text(
                             "NEXT LEVEL",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.white54,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chevron_right, color: Colors.white),
+                          Icon(Icons.chevron_right, color: Colors.white54),
                         ],
                       ),
                     ),
@@ -247,7 +296,10 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
 
                 // Replay Button
                 GestureDetector(
-                  onTap: widget.onReplayLevel ?? () => Navigator.pop(context),
+                  onTap: () {
+                    _popWithScore();
+                    widget.onReplayLevel?.call();
+                  },
                   child: Container(
                     width: double.infinity,
                     height: 55,
@@ -255,10 +307,10 @@ class _JerseyLevelCompleteScreenState extends State<JerseyLevelCompleteScreen>
                       color: const Color(0xFF1E2A38),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.replay, color: Colors.white, size: 20),
                           SizedBox(width: 8),
                           Text(
