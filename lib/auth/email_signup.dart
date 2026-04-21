@@ -8,13 +8,18 @@ import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_login.dart';
 
 class EmailSignup extends StatefulWidget {
-  const EmailSignup({super.key});
+  // ✅ false when coming from logout — hides the back button
+  // true when coming from normal login flow — shows the back button
+  final bool showBackButton;
+
+  const EmailSignup({super.key, this.showBackButton = true});
 
   @override
   State<EmailSignup> createState() => _EmailSignupState();
 }
 
 class _EmailSignupState extends State<EmailSignup> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -25,6 +30,7 @@ class _EmailSignupState extends State<EmailSignup> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -39,25 +45,30 @@ class _EmailSignupState extends State<EmailSignup> {
     });
 
     try {
-      // Create the Firebase Auth account
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
           );
 
-      // ✅ Create the Firestore user document for the new user
       await FirebaseFirestore.instance
           .collection('user')
           .doc(credential.user!.uid)
           .set({
+            'username': _usernameController.text.trim(),
+            'bio': '',
             'Coin': 0,
             'XP': 0,
             'Level': 1,
             'Stars': 0,
             'email': _emailController.text.trim(),
             'createdAt': FieldValue.serverTimestamp(),
-            'quizProgress': {},
+            'CompletedSections': 0,
+            'QuizLevelsInSection': 0,
+            'streak_currentDay': 0,
+            'streak_consecutive': true,
+            'streak_lastLoginDate': '',
+            'streak_totalDays': 7,
           });
 
       if (!mounted) return;
@@ -99,10 +110,14 @@ class _EmailSignupState extends State<EmailSignup> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // ✅ Only show back button when showBackButton is true
+        automaticallyImplyLeading: false,
+        leading: widget.showBackButton
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -127,6 +142,28 @@ class _EmailSignupState extends State<EmailSignup> {
                 ),
                 const SizedBox(height: 32),
 
+                // ── Username ─────────────────────────────────────────────────
+                TextFormField(
+                  controller: _usernameController,
+                  keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  style: TextStyle(color: AppColors.hText),
+                  decoration: _inputDecoration(
+                    'Username',
+                    Icons.person_outline,
+                  ),
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty)
+                      return 'Please enter a username';
+                    if (v.trim().length < 3)
+                      return 'Username must be at least 3 characters';
+                    if (v.trim().length > 20)
+                      return 'Username must be 20 characters or less';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
                 // ── Email ────────────────────────────────────────────────────
                 TextFormField(
                   controller: _emailController,
@@ -134,9 +171,8 @@ class _EmailSignupState extends State<EmailSignup> {
                   style: TextStyle(color: AppColors.hText),
                   decoration: _inputDecoration('Email', Icons.email_outlined),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (v == null || v.trim().isEmpty)
                       return 'Please enter your email';
-                    }
                     if (!v.contains('@')) return 'Enter a valid email';
                     return null;
                   },
@@ -166,9 +202,8 @@ class _EmailSignupState extends State<EmailSignup> {
                   validator: (v) {
                     if (v == null || v.isEmpty)
                       return 'Please enter a password';
-                    if (v.length < 6) {
+                    if (v.length < 6)
                       return 'Password must be at least 6 characters';
-                    }
                     return null;
                   },
                 ),

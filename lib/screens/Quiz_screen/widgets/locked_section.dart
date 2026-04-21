@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/locked_category_models.dart';
+import 'package:quiz_game/models/quiz_models/locked_category_models.dart';
 
 class LockedSection extends StatelessWidget {
   const LockedSection({super.key});

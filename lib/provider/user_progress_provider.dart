@@ -1,30 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// lib/models/user_progress_provider.dart
-// ─────────────────────────────────────────────────────────────────────────────
-// ✅ NO CHANGES NEEDED — your existing updateCoins() already works perfectly.
-//
-// When BonusService.claimBonus() returns the new total coins, DailyBonusCard
-// calls:
-//
-//   context.read<UserProgressProvider>().updateCoins(newTotalCoins);
-//
-// Which hits this method in your provider:
-//
-//   void updateCoins(int newCoins) {
-//     _coins = newCoins;   // ← replaces with new Firestore total
-//     notifyListeners();   // ← top bar rebuilds instantly
-//   }
-//
-// Your top bar widget just needs to read coins like this:
-//
-//   Consumer<UserProgressProvider>(
-//     builder: (context, provider, _) {
-//       return Text('${provider.coins}');  // ← auto-updates on claim
-//     },
-//   )
-//
-// ─────────────────────────────────────────────────────────────────────────────
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,27 +8,34 @@ class UserProgressProvider extends ChangeNotifier {
 
   int _coins = 0;
   int _xp = 0;
-  int _level = 1;
   int _stars = 0;
   bool _loading = false;
 
-  // ── Config ──────────────────────────────────────────────────────────────────
-  static const int xpPerLevel = 100;
-  static const int coinsPerCorrect = 5;
-  static const int xpPerCorrect = 10;
-  static const int coinsOnCompletion = 20;
-  static const int xpOnCompletion = 30;
-  static const int coinsOnStreakComplete = 50;
+  String _username = '';
+  String _bio = '';
+  String _avatarPath = '';
 
-  // ── Getters ─────────────────────────────────────────────────────────────────
+  static const int totalSections = 4;
+  static const int quizLevelsPerSection = 48;
+  static const int coinsOnStreakComplete = 500;
+
+  int _completedSections = 0;
+  int _quizLevelsInSection = 0;
+
   int get coins => _coins;
   int get xp => _xp;
-  int get level => _level;
   int get stars => _stars;
   bool get isLoading => _loading;
-  double get xpProgress => (_xp % xpPerLevel) / xpPerLevel;
-  int get currentLevelXP => _xp % xpPerLevel;
-  int get maxLevelXP => xpPerLevel;
+
+  String get username => _username;
+  String get bio => _bio;
+  String get avatarPath => _avatarPath;
+
+  int get level => _completedSections + 1;
+  int get currentLevelXP => _quizLevelsInSection;
+  int get maxLevelXP => quizLevelsPerSection;
+  double get xpProgress => _quizLevelsInSection / quizLevelsPerSection;
+  bool get allSectionsCompleted => _completedSections >= totalSections;
 
   String? get _uid => _auth.currentUser?.uid;
 
@@ -73,8 +53,22 @@ class UserProgressProvider extends ChangeNotifier {
 
       _coins = data['Coin'] as int? ?? 0;
       _xp = data['XP'] as int? ?? 0;
-      _level = data['Level'] as int? ?? 1;
       _stars = data['Stars'] as int? ?? 0;
+      _username = data['username'] as String? ?? '';
+      _bio = data['bio'] as String? ?? '';
+      _avatarPath = data['avatarPath'] as String? ?? '';
+      _completedSections = data['CompletedSections'] as int? ?? 0;
+      _quizLevelsInSection = data['QuizLevelsInSection'] as int? ?? 0;
+
+      _completedSections = _completedSections.clamp(0, totalSections);
+      _quizLevelsInSection = _quizLevelsInSection.clamp(
+        0,
+        quizLevelsPerSection,
+      );
+
+      debugPrint(
+        '✅ loadFromFirestore → username:$_username | coins:$_coins | level:$level',
+      );
     } catch (e) {
       debugPrint('❌ loadFromFirestore: $e');
     } finally {
@@ -83,65 +77,116 @@ class UserProgressProvider extends ChangeNotifier {
     }
   }
 
-  // ── Called on every correct answer ──────────────────────────────────────────
-  Future<void> onCorrectAnswer() async {
-    _coins += coinsPerCorrect;
-    _xp += xpPerCorrect;
-    _checkLevelUp();
+  // ── ✅ ADDED: Wipes all in-memory state ────────────────────────────────────
+  // Call this before FirebaseAuth.signOut() so the next user
+  // never sees the previous user's username / coins / level.
+  void clearData() {
+    _coins = 0;
+    _xp = 0;
+    _stars = 0;
+    _username = '';
+    _bio = '';
+    _avatarPath = '';
+    _completedSections = 0;
+    _quizLevelsInSection = 0;
+    _loading = false;
     notifyListeners();
-    await _sync();
+    debugPrint('🧹 clearData → all user state wiped');
   }
 
-  // ── Called once when quiz ends ───────────────────────────────────────────────
-  Future<void> onQuizCompleted({
-    int correctAnswers = 0,
-    int? customCoins,
-    int? customXP,
+  // ── ✅ ADDED: Wipe then reload (use in HomeScreen.initState) ───────────────
+  // Guarantees the screen always shows the currently logged-in user's data.
+  Future<void> clearAndReload() async {
+    clearData();
+    await loadFromFirestore();
+  }
+
+  // ── Update profile ──────────────────────────────────────────────────────────
+  Future<void> updateProfile({
+    required String username,
+    String? bio,
+    String? avatarPath,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+
+    final trimmed = username.trim();
+    if (trimmed.isEmpty) return;
+
+    _username = trimmed;
+    if (bio != null) _bio = bio.trim();
+    if (avatarPath != null && avatarPath.isNotEmpty) _avatarPath = avatarPath;
+
+    notifyListeners();
+
+    try {
+      await _db.collection('user').doc(uid).set({
+        'username': _username,
+        if (bio != null) 'bio': _bio,
+        if (avatarPath != null && avatarPath.isNotEmpty)
+          'avatarPath': _avatarPath,
+      }, SetOptions(merge: true));
+
+      debugPrint(
+        '✅ updateProfile → username:$_username | bio:$_bio | avatarPath:$_avatarPath',
+      );
+    } catch (e) {
+      debugPrint('❌ updateProfile error: $e');
+    }
+  }
+
+  // ── Quiz level completed ────────────────────────────────────────────────────
+  Future<void> onQuizLevelCompleted({
+    int customCoins = 0,
+    int customXP = 0,
     int earnedStars = 0,
   }) async {
-    _coins += correctAnswers * coinsPerCorrect;
-    _xp += correctAnswers * xpPerCorrect;
-    _coins += customCoins ?? coinsOnCompletion;
-    _xp += customXP ?? xpOnCompletion;
+    if (allSectionsCompleted) return;
+
+    _coins += customCoins;
+    _xp += customXP;
     _stars += earnedStars;
-    _checkLevelUp();
+    _quizLevelsInSection++;
+
+    if (_quizLevelsInSection >= quizLevelsPerSection) {
+      _quizLevelsInSection = 0;
+      _completedSections++;
+      debugPrint('🏆 Section completed! Level up → level $level');
+    }
+
     notifyListeners();
     await _sync();
   }
 
-  // ── ✅ Called after daily bonus claim ────────────────────────────────────────
-  // Receives the NEW total coins from Firestore (not just the bonus amount).
-  // This guarantees the top bar always shows the correct Firestore value.
-  void updateCoins(int newCoins) {
-    _coins = newCoins;
-    notifyListeners(); // ← top bar rebuilds automatically
-  }
-
-  // ── Called when 7-day streak is completed ───────────────────────────────────
+  // ── Streak completed ────────────────────────────────────────────────────────
   Future<void> onStreakCompleted() async {
     _coins += coinsOnStreakComplete;
     notifyListeners();
     await _sync();
   }
 
-  // ── Internals ────────────────────────────────────────────────────────────────
-  void _checkLevelUp() {
-    final earned = (_xp ~/ xpPerLevel) + 1;
-    if (earned > _level) _level = earned;
+  // ── Manually update coins ───────────────────────────────────────────────────
+  void updateCoins(int newCoins) {
+    _coins = newCoins;
+    notifyListeners();
   }
 
+  // ── Sync to Firestore ───────────────────────────────────────────────────────
   Future<void> _sync() async {
     final uid = _uid;
     if (uid == null) return;
+
     try {
-      await _db.collection('user').doc(uid).update({
+      await _db.collection('user').doc(uid).set({
         'Coin': _coins,
         'XP': _xp,
-        'Level': _level,
+        'Level': level,
         'Stars': _stars,
-      });
+        'CompletedSections': _completedSections,
+        'QuizLevelsInSection': _quizLevelsInSection,
+      }, SetOptions(merge: true));
     } catch (e) {
-      debugPrint('❌ _sync: $e');
+      debugPrint('❌ _sync error: $e');
     }
   }
 }

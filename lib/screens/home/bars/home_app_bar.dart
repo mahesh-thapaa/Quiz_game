@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 
 class HomeAppBar extends StatelessWidget {
-  final UserModel user;
+  final bool showCoins;
 
-  const HomeAppBar({super.key, required this.user});
+  const HomeAppBar({super.key, this.showCoins = true});
 
   @override
   Widget build(BuildContext context) {
@@ -15,16 +15,9 @@ class HomeAppBar extends StatelessWidget {
 
     return Row(
       children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.hText,
-          ),
-          child: const Center(child: Text('⚽', style: TextStyle(fontSize: 20))),
-        ),
+        const ProfileAvatar(radius: 22),
         const SizedBox(width: 12),
+
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -37,12 +30,13 @@ class HomeAppBar extends StatelessWidget {
               ),
             ),
             Text(
-              user.name,
+              p.username.isNotEmpty ? p.username : 'Welcome!',
               style: const TextStyle(color: AppColors.stext, fontSize: 12),
             ),
           ],
         ),
         const Spacer(),
+
         _Badge(label: 'LVL ${p.level}'),
         const SizedBox(width: 8),
         _CoinsBadge(coins: p.coins),

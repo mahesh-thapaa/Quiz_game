@@ -1,12 +1,12 @@
-class ProfileLevel {
+class PlayerLevelTile {
   final int? number;
   final bool hasStar;
-  final bool isCurrent;
+  bool isCurrent;
   bool isUnlocked;
   int starsEarned;
   final String? levelDocId;
 
-  ProfileLevel({
+  PlayerLevelTile({
     this.number,
     this.hasStar = false,
     this.isCurrent = false,

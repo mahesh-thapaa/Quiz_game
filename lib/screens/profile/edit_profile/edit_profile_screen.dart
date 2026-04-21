@@ -1,82 +1,154 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/screens/profile/edit_profile/edit_field.dart';
+import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  final String initialName;
-  final String initialBio;
-  final String avatarAsset;
-
-  const EditProfileScreen({
-    super.key,
-    this.initialName = 'Sushant',
-    this.initialBio =
-        'UI/UX Enthusiast and trivia lover based in San Francisco. '
-        'Passionate about building seamless mobile experiences.',
-    this.avatarAsset = 'asstes/images/ronaldo.png',
-  });
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  late TextEditingController _nameCtrl;
-  late TextEditingController _bioCtrl;
-  bool _saving = false;
-  File? _pickedImage;
-  bool _pickingImage = false;
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController _usernameController;
+  late TextEditingController _bioController;
+
+  bool _isSaving = false;
+  bool _saved = false;
 
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: widget.initialName);
-    _bioCtrl = TextEditingController(text: widget.initialBio);
+    final p = context.read<UserProgressProvider>();
+    _usernameController = TextEditingController(text: p.username);
+    _bioController = TextEditingController(text: p.bio);
   }
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
-    _bioCtrl.dispose();
+    _usernameController.dispose();
+    _bioController.dispose();
     super.dispose();
   }
 
   Future<void> _pickImage() async {
-    if (_pickingImage) return;
+    // Show bottom sheet to choose source
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.cardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Choose Photo',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library_rounded,
+                color: AppColors.primary,
+              ),
+              title: const Text(
+                'Choose from Gallery',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.camera_alt_rounded,
+                color: AppColors.primary,
+              ),
+              title: const Text(
+                'Take a Photo',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
 
-    setState(() => _pickingImage = true);
+    if (source == null) return;
 
-    try {
-      final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      if (picked != null) {
-        setState(() {
-          _pickedImage = File(picked.path);
-        });
-      }
-    } catch (e) {
-      debugPrint('Image picker error: $e');
-    } finally {
-      setState(() => _pickingImage = false);
-    }
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: source,
+      imageQuality: 80,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+
+    if (picked == null) return;
+
+    // Save avatarPath immediately via provider so it shows everywhere at once
+    if (!mounted) return;
+    await context.read<UserProgressProvider>().updateProfile(
+      username: _usernameController.text.trim().isNotEmpty
+          ? _usernameController.text.trim()
+          : context.read<UserProgressProvider>().username,
+      avatarPath: picked.path,
+    );
   }
 
-  Future<void> _onSave() async {
-    setState(() => _saving = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    setState(() => _saving = false);
+  // ── Save username + bio ────────────────────────────────────────────────────
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    Navigator.pop(context, {
-      'name': _nameCtrl.text.trim(),
-      'bio': _bioCtrl.text.trim(),
-      'avatarAsset': _pickedImage?.path ?? widget.avatarAsset,
+    setState(() {
+      _isSaving = true;
+      _saved = false;
     });
+
+    await context.read<UserProgressProvider>().updateProfile(
+      username: _usernameController.text,
+      bio: _bioController.text,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSaving = false;
+      _saved = true;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Profile updated ✅'),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -86,177 +158,188 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.hText, size: 22),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Edit Profile',
           style: TextStyle(
             color: AppColors.hText,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Avatar with camera icon ────────────────────────────────
+                Center(
+                  child: Column(
+                    children: [
+                      // ProfileAvatar reads from provider automatically
+                      ProfileAvatar(
+                        radius: 52,
+                        showCameraIcon: true,
+                        onTap: _pickImage,
+                      ),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: const Text(
+                          'Change Photo',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // ── Username ───────────────────────────────────────────────
+                _label('Username'),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _usernameController,
+                  keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  style: TextStyle(color: AppColors.hText),
+                  decoration: _inputDecoration(
+                    'Enter your username',
+                    Icons.person_outline,
+                  ),
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return 'Username cannot be empty';
+                    }
+                    if (v.trim().length < 3) {
+                      return 'At least 3 characters required';
+                    }
+                    if (v.trim().length > 20) {
+                      return 'Max 20 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Shown on your profile and leaderboards.',
+                  style: TextStyle(color: AppColors.stext, fontSize: 12),
+                ),
+                const SizedBox(height: 24),
+
+                // ── Bio ────────────────────────────────────────────────────
+                Row(
+                  children: [
+                    _label('Bio'),
+                    const SizedBox(width: 6),
+                    Text(
+                      '(optional)',
+                      style: TextStyle(color: AppColors.stext, fontSize: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _bioController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 3,
+                  maxLength: 120,
+                  style: TextStyle(color: AppColors.hText),
+                  decoration:
+                      _inputDecoration(
+                        'Tell others a bit about yourself…',
+                        Icons.edit_note_rounded,
+                      ).copyWith(
+                        alignLabelWithHint: true,
+                        counterStyle: TextStyle(color: AppColors.stext),
+                      ),
+                ),
+                const SizedBox(height: 32),
+
+                // ── Save button ────────────────────────────────────────────
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _saved
+                          ? Colors.green
+                          : AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: _isSaving ? null : _save,
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : Text(
+                            _saved ? 'Saved ✓' : 'Save Changes',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
+    );
+  }
 
-            Center(
-              child: GestureDetector(
-                onTap: _pickingImage ? null : _pickImage,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppColors.primaryGradient,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.shadow,
-                            blurRadius: 20,
-                            spreadRadius: 4,
-                          ),
-                        ],
-                      ),
-                    ),
+  Widget _label(String text) => Text(
+    text,
+    style: const TextStyle(
+      color: AppColors.hText,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    ),
+  );
 
-                    Container(
-                      width: 90,
-                      height: 90,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.background,
-                      ),
-                    ),
-                    CircleAvatar(
-                      radius: 42,
-                      backgroundColor: AppColors.cardBg,
-                      backgroundImage: _pickedImage != null
-                          ? FileImage(_pickedImage!) as ImageProvider
-                          : AssetImage(widget.avatarAsset),
-                      onBackgroundImageError: (_, __) {},
-                      child: _pickedImage == null
-                          ? const Icon(
-                              Icons.person_rounded,
-                              color: AppColors.stext,
-                              size: 40,
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 2,
-                      right: 2,
-                      child: Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _pickingImage
-                              ? AppColors.stext
-                              : AppColors.primary,
-                          border: Border.all(
-                            color: AppColors.background,
-                            width: 2,
-                          ),
-                        ),
-                        child: _pickingImage
-                            ? const SizedBox(
-                                width: 10,
-                                height: 10,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.camera_alt_rounded,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            const Center(
-              child: Text(
-                'Tap to change photo',
-                style: TextStyle(color: AppColors.stext, fontSize: 12),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-
-            EditField(
-              label: 'NAME',
-              controller: _nameCtrl,
-              hint: 'Enter your name',
-            ),
-
-            const SizedBox(height: 20),
-
-            EditField(
-              label: 'SHORT BIO',
-              controller: _bioCtrl,
-              maxLines: 5,
-              hint: 'Tell us about yourself...',
-            ),
-
-            const SizedBox(height: 36),
-
-            GestureDetector(
-              onTap: _saving ? null : _onSave,
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: _saving
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : const Text(
-                        'Save Changes',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-          ],
-        ),
+  InputDecoration _inputDecoration(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: AppColors.stext.withValues(alpha: 0.6)),
+      prefixIcon: Icon(icon, color: AppColors.stext, size: 20),
+      filled: true,
+      fillColor: AppColors.cardBg,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.divider),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.divider),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red),
       ),
     );
   }

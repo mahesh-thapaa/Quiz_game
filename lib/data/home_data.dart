@@ -1,6 +1,7 @@
 // lib/data/home_data.dart
 
 import 'package:quiz_game/models/home_models/home_models.dart';
+import 'package:quiz_game/models/home_models/streak_model.dart';
 
 class HomeData {
   static const UserModel user = UserModel(

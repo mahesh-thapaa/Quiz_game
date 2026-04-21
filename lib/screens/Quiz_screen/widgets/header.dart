@@ -13,10 +13,10 @@ class Header extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "GoalIQ",
               style: TextStyle(
                 color: AppColors.hText,
@@ -24,7 +24,11 @@ class Header extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text("Sushant", style: TextStyle(color: AppColors.stext)),
+            // ✅ FIXED: was hardcoded "Sushant" — now reads from provider
+            Text(
+              p.username.isNotEmpty ? p.username : 'Welcome!',
+              style: const TextStyle(color: AppColors.stext),
+            ),
           ],
         ),
         Row(

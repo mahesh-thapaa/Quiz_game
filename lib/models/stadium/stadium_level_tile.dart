@@ -1,8 +1,8 @@
 class StadiumLevelTile {
   final int? number;
   int starsEarned;
-  final bool isUnlocked;
-  final bool isCurrent;
+  bool isUnlocked;
+  bool isCurrent;
   final bool hasStar;
 
   StadiumLevelTile({

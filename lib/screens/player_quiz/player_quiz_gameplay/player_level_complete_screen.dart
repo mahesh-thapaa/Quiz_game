@@ -1,25 +1,18 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// lib/screens/player_quiz/player_quiz_gameplay/player_level_complete_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
-//
-// FIX: This is now a Widget (not a full Scaffold route).
-//      It is shown as a Stack overlay inside PlayerQuizGameplayScreen.
-//      onNextLevel and onReplayLevel are called directly — no Navigator.pop
-//      needed here because the parent (GameplayScreen) handles navigation.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
+import 'package:quiz_game/services/star_calculation_service.dart';
 
 class PlayerLevelCompleteScreen extends StatefulWidget {
   final LevelResultModels result;
+  final int levelNumber; // ✅ NEW
   final VoidCallback? onNextLevel;
   final VoidCallback? onReplayLevel;
 
   const PlayerLevelCompleteScreen({
     super.key,
     required this.result,
+    required this.levelNumber,
     this.onNextLevel,
     this.onReplayLevel,
   });
@@ -35,10 +28,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
   late Animation<double> _fadeIn;
 
   int get _starsEarned {
-    final correct = widget.result.score;
-    if (correct >= 10) return 3;
-    if (correct >= 5) return 2;
-    return 1;
+    return StarCalculationService.calculateStars(widget.result.score);
   }
 
   @override
@@ -112,7 +102,6 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Covers entire screen as overlay (no Scaffold needed)
     return FadeTransition(
       opacity: _fadeIn,
       child: Container(
@@ -123,9 +112,10 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  "LEVEL COMPLETED!",
-                  style: TextStyle(
+                // ✅ Show which level was completed
+                Text(
+                  'LEVEL ${widget.levelNumber} COMPLETED!',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -137,7 +127,6 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                 _buildStars(_starsEarned),
                 const SizedBox(height: 20),
 
-                // Score
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -148,7 +137,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "Score: ${widget.result.score}/${widget.result.totalQuestions}",
+                    'Score: ${widget.result.score}/${widget.result.totalQuestions}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -159,7 +148,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                 const SizedBox(height: 30),
 
                 const Text(
-                  "REWARDS EARNED",
+                  'REWARDS EARNED',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 11,
@@ -173,22 +162,21 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                   children: [
                     _buildRewardCard(
                       Icons.bolt,
-                      "EXPERIENCE",
-                      "+${widget.result.xpEarned} XP",
+                      'EXPERIENCE',
+                      '+${widget.result.xpEarned} XP',
                       Colors.yellow,
                     ),
                     const SizedBox(width: 16),
                     _buildRewardCard(
                       Icons.monetization_on,
-                      "CURRENCY",
-                      "+${widget.result.coinsEarned} Coins",
+                      'CURRENCY',
+                      '+${widget.result.coinsEarned} Coins',
                       Colors.orange,
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // Accuracy
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -210,13 +198,13 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                           ),
                           SizedBox(width: 8),
                           Text(
-                            "Accuracy",
+                            'Accuracy',
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ],
                       ),
                       Text(
-                        "${widget.result.accuracy}%",
+                        '${widget.result.accuracy}%',
                         style: const TextStyle(
                           color: Colors.green,
                           fontSize: 16,
@@ -228,8 +216,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                 ),
                 const SizedBox(height: 32),
 
-                // ✅ Next Level button — calls onNextLevel directly
-                //    GameplayScreen handles Navigator.pop(context, _score)
+                // ✅ NEXT LEVEL button
                 GestureDetector(
                   onTap: widget.onNextLevel,
                   child: Container(
@@ -244,7 +231,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "CONTINUE",
+                            'NEXT LEVEL',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -253,7 +240,10 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chevron_right, color: Colors.white),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                          ),
                         ],
                       ),
                     ),
@@ -261,8 +251,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                 ),
                 const SizedBox(height: 16),
 
-                // ✅ Replay button — calls onReplayLevel directly
-                //    GameplayScreen resets the quiz in-place
+                // ✅ REPLAY button
                 GestureDetector(
                   onTap: widget.onReplayLevel,
                   child: Container(
@@ -279,7 +268,7 @@ class _PlayerLevelCompleteScreenState extends State<PlayerLevelCompleteScreen>
                           Icon(Icons.replay, color: Colors.white, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            "REPLAY LEVEL",
+                            'REPLAY LEVEL',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,

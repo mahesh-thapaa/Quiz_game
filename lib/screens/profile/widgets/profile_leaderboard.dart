@@ -2,15 +2,51 @@
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/profile_models.dart';
+import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
 
 class ProfileLeaderboard extends StatelessWidget {
   final List<LeaderboardEntry> entries;
 
   const ProfileLeaderboard({super.key, required this.entries});
 
+  /// Reorder entries so that the current user appears first if they have higher XP in top 3
+  List<LeaderboardEntry> _reorderForCurrentUser(
+    List<LeaderboardEntry> entries,
+  ) {
+    if (entries.isEmpty) return entries;
+
+    // Find the current user
+    final currentUserIndex = entries.indexWhere((e) => e.isCurrentUser);
+
+    // If no current user found, return entries as is
+    if (currentUserIndex == -1) {
+      return entries;
+    }
+
+    final currentUser = entries[currentUserIndex];
+
+    // If current user is already first, return as is
+    if (currentUserIndex == 0) {
+      return entries;
+    }
+
+    // If current user has higher XP than the first person, move them to first
+    if (currentUser.xpPoints > entries[0].xpPoints) {
+      final reordered = [...entries];
+      reordered.removeAt(currentUserIndex);
+      reordered.insert(0, currentUser);
+      return reordered;
+    }
+
+    // Otherwise, return original order
+    return entries;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Reorder entries to show current user first if they're in top 3
+    final orderedEntries = _reorderForCurrentUser(entries);
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.cardBg,
@@ -58,8 +94,11 @@ class ProfileLeaderboard extends StatelessWidget {
 
           const SizedBox(height: 4),
 
-          // Entries
-          ...entries.map((e) => _LeaderboardRow(entry: e)),
+          // Entries - with visual rank based on position
+          ...orderedEntries.asMap().entries.map((entry) {
+            final visualRank = entry.key + 1;
+            return _LeaderboardRow(entry: entry.value, visualRank: visualRank);
+          }),
 
           // View Global Standings
           Padding(
@@ -89,12 +128,13 @@ class ProfileLeaderboard extends StatelessWidget {
 
 class _LeaderboardRow extends StatelessWidget {
   final LeaderboardEntry entry;
+  final int visualRank;
 
-  const _LeaderboardRow({required this.entry});
+  const _LeaderboardRow({required this.entry, required this.visualRank});
 
   @override
   Widget build(BuildContext context) {
-    final isTop3 = entry.rank <= 3;
+    final isTop3 = visualRank <= 3;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
@@ -114,9 +154,9 @@ class _LeaderboardRow extends StatelessWidget {
           SizedBox(
             width: 28,
             child: isTop3
-                ? _RankBadge(rank: entry.rank)
+                ? _RankBadge(rank: visualRank)
                 : Text(
-                    '#${entry.rank}',
+                    '#${visualRank}',
                     style: TextStyle(
                       color: entry.isCurrentUser
                           ? AppColors.primary
@@ -131,7 +171,7 @@ class _LeaderboardRow extends StatelessWidget {
           // Avatar
           CircleAvatar(
             radius: 16,
-            backgroundColor: _avatarColor(entry.rank),
+            backgroundColor: _avatarColor(visualRank),
             child: Text(
               entry.username[0].toUpperCase(),
               style: const TextStyle(

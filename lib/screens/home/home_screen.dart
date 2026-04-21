@@ -1,7 +1,15 @@
+// lib/screens/home/home_screen.dart
+//
+// Key change from old version:
+//   StreakCard now receives  triggerLoginOnInit: true
+//   so it calls StreakLogic.onLogin() which persists the day,
+//   advances the counter, and auto-shows the reward dialog on day 7.
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
+import 'package:quiz_game/models/home_models/streak_model.dart';
 import 'package:quiz_game/data/home_data.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
@@ -9,7 +17,7 @@ import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
 import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
 import 'package:quiz_game/screens/home/bars/quick_play_card.dart';
 import 'package:quiz_game/screens/home/bars/quiz_card.dart';
-import 'package:quiz_game/screens/home/bars/streak_card.dart';
+import 'package:quiz_game/screens/home/bars/streak_card.dart'; // ← updated file
 import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
 import 'package:quiz_game/screens/bonus/clain_reward_dialog.dart';
@@ -43,10 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // ✅ Load user data from Firestore when home screen opens
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserProgressProvider>().loadFromFirestore();
-      if (widget.showRewardOnLoad) _goToBonus();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<UserProgressProvider>().clearAndReload();
+      if (widget.showRewardOnLoad && mounted) _goToBonus();
     });
   }
 
@@ -64,10 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  // void _onBonusClaimed(int newCoins) {
-  //   context.read<UserProgressProvider>().updateCoins(newCoins);
-  // }
 
   void _onCategoryTap(CategoryModel category) {
     switch (category.title) {
@@ -120,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              HomeAppBar(user: widget.user),
+              const HomeAppBar(),
               const SizedBox(height: 16),
               const XPProgressBar(),
               const SizedBox(height: 20),
@@ -144,7 +147,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 20),
-              StreakCard(),
+
+              const StreakCard(triggerLoginOnInit: true),
               const SizedBox(height: 24),
               const SectionHeader(title: 'POPULAR CATEGORIES'),
               const SizedBox(height: 12),

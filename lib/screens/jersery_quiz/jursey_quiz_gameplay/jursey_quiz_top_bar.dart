@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 
 class JurseyQuizTopBar extends StatelessWidget {
-  final int stars;
-  final int coins;
   final VoidCallback onBack;
 
-  const JurseyQuizTopBar({
-    super.key,
-    required this.stars, // ✅ required — no hardcoded default
-    required this.coins, // ✅ required — no hardcoded default
-    required this.onBack,
-  });
+  const JurseyQuizTopBar({super.key, required this.onBack});
 
   @override
   Widget build(BuildContext context) {
+    // ✅ reads live values from provider — no need to pass stars/coins as params
+    final p = context.watch<UserProgressProvider>();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 8, 12, 4),
       child: Row(
@@ -56,13 +54,13 @@ class JurseyQuizTopBar extends StatelessWidget {
           _Chip(
             icon: Icons.star_rounded,
             iconColor: AppColors.doller,
-            value: '$stars',
+            value: '${p.stars}',
           ),
           const SizedBox(width: 8),
           _Chip(
             icon: Icons.monetization_on_rounded,
             iconColor: AppColors.doller,
-            value: '$coins',
+            value: '${p.coins}',
           ),
         ],
       ),

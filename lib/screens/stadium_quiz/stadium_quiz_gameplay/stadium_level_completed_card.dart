@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 
 class StadiumLevelCompletedCard extends StatefulWidget {
   final LevelResultModels result;
-  final VoidCallback? onNextLevel;
-  final VoidCallback? onReplayLevel;
+  final int levelNumber;
+  final VoidCallback onNextLevel;
+  final VoidCallback onReplayLevel;
 
   const StadiumLevelCompletedCard({
     super.key,
     required this.result,
-    this.onNextLevel,
-    this.onReplayLevel,
+    required this.levelNumber,
+    required this.onNextLevel,
+    required this.onReplayLevel,
   });
 
   @override
@@ -23,7 +26,7 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
   late AnimationController _controller;
   late Animation<double> _fadeIn;
 
-  // ✅ Calculate stars from score
+  // ✅ Same star logic as PlayerLevelCompleteScreen
   int get _starsEarned {
     final correct = widget.result.score;
     if (correct >= 10) return 3;
@@ -48,8 +51,8 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
     super.dispose();
   }
 
-  // ✅ Outline for unearned, filled for earned
-  Widget buildStars(int stars) {
+  // ✅ Identical to PlayerLevelCompleteScreen._buildStars
+  Widget _buildStars(int stars) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
@@ -62,7 +65,8 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
     );
   }
 
-  Widget buildRewardCard(
+  // ✅ Identical to PlayerLevelCompleteScreen._buildRewardCard
+  Widget _buildRewardCard(
     IconData icon,
     String label,
     String value,
@@ -101,27 +105,21 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
     );
   }
 
-  // ✅ Pop back with score
-  void _popWithScore() {
-    Navigator.pop(context, widget.result.score);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1923),
-      body: FadeTransition(
-        opacity: _fadeIn,
+    return FadeTransition(
+      opacity: _fadeIn,
+      child: Container(
+        color: const Color(0xFF0F1923),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Title
-                const Text(
-                  "LEVEL COMPLETED!",
-                  style: TextStyle(
+                Text(
+                  'LEVEL ${widget.levelNumber} COMPLETED!',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
@@ -130,11 +128,9 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                 ),
                 const SizedBox(height: 20),
 
-                // Dynamic stars
-                buildStars(_starsEarned),
+                _buildStars(_starsEarned),
                 const SizedBox(height: 20),
 
-                // Score
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -145,7 +141,7 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    "Score: ${widget.result.score}/${widget.result.totalQuestions}",
+                    'Score: ${widget.result.score}/${widget.result.totalQuestions}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -155,9 +151,8 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                 ),
                 const SizedBox(height: 30),
 
-                // Rewards Label
                 const Text(
-                  "REWARDS EARNED",
+                  'REWARDS EARNED',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 11,
@@ -166,28 +161,26 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                 ),
                 const SizedBox(height: 16),
 
-                // Reward Cards
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildRewardCard(
+                    _buildRewardCard(
                       Icons.bolt,
-                      "EXPERIENCE",
-                      "+${widget.result.xpEarned} XP",
+                      'EXPERIENCE',
+                      '+${widget.result.xpEarned} XP',
                       Colors.yellow,
                     ),
                     const SizedBox(width: 16),
-                    buildRewardCard(
+                    _buildRewardCard(
                       Icons.monetization_on,
-                      "CURRENCY",
-                      "+${widget.result.coinsEarned} Coins",
+                      'CURRENCY',
+                      '+${widget.result.coinsEarned} Coins',
                       Colors.orange,
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // Accuracy Row
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -209,13 +202,13 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                           ),
                           SizedBox(width: 8),
                           Text(
-                            "Accuracy",
+                            'Accuracy',
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ],
                       ),
                       Text(
-                        "${widget.result.accuracy}%",
+                        '${widget.result.accuracy}%',
                         style: const TextStyle(
                           color: Colors.green,
                           fontSize: 16,
@@ -227,66 +220,34 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                 ),
                 const SizedBox(height: 32),
 
-                // Next Level Button — not available
+                // ✅ NEXT LEVEL button
                 GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Row(
-                          children: [
-                            Icon(
-                              Icons.lock_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              'Next level coming soon!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: const Color(0xFF1E2A38),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
+                  onTap: widget.onNextLevel,
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
+                      gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.lock_rounded,
-                            color: Colors.white54,
-                            size: 18,
-                          ),
-                          SizedBox(width: 8),
                           Text(
-                            "NEXT LEVEL",
+                            'NEXT LEVEL',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chevron_right, color: Colors.white54),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                          ),
                         ],
                       ),
                     ),
@@ -294,12 +255,9 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                 ),
                 const SizedBox(height: 16),
 
-                // Replay Button
+                // ✅ REPLAY button
                 GestureDetector(
-                  onTap: () {
-                    _popWithScore();
-                    widget.onReplayLevel?.call();
-                  },
+                  onTap: widget.onReplayLevel,
                   child: Container(
                     width: double.infinity,
                     height: 55,
@@ -314,7 +272,7 @@ class _StadiumLevelCompletedCardState extends State<StadiumLevelCompletedCard>
                           Icon(Icons.replay, color: Colors.white, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            "REPLAY LEVEL",
+                            'REPLAY LEVEL',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,

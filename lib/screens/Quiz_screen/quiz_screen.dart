@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/header.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/quiz_card.dart';
-import 'package:quiz_game/screens/Quiz_screen/widgets/progess_card.dart';
+// import 'package:quiz_game/screens/Quiz_screen/widgets/progess_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/challenger_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/locked_section.dart';
 import 'package:quiz_game/screens/discover_screen/diccover_screen.dart';
@@ -85,8 +85,8 @@ class QuizScreen extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 20),
-              const ProgressCard(),
+              // const SizedBox(height: 20),
+              // const ProgressCard(),
               const SizedBox(height: 20),
               const ChallengeCard(),
               const SizedBox(height: 20),

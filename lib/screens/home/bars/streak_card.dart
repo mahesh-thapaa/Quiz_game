@@ -1,42 +1,13 @@
+// lib/screens/home/bars/streak_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/home_models/home_models.dart';
-
-class StreakLogic {
-  static int _currentDay = 0;
-  static int _totalDays = 7;
-
-  static Future<StreakModel> onLogin({int totalDays = 7}) async {
-    _totalDays = totalDays;
-    _currentDay = 1;
-
-    return StreakModel(
-      title: 'Daily Streak',
-      currentDay: _currentDay,
-      totalDays: _totalDays,
-    );
-  }
-
-  static Future<StreakModel> load({int totalDays = 7}) async {
-    _totalDays = totalDays;
-
-    return StreakModel(
-      title: 'Daily Streak',
-      currentDay: _currentDay,
-      totalDays: _totalDays,
-    );
-  }
-
-  static Future<void> reset() async {
-    _currentDay = 0;
-    _totalDays = 7;
-  }
-}
+import 'package:quiz_game/models/home_models/streak_model.dart';
+import 'package:quiz_game/screens/streak/streak_logic.dart';
+import 'package:quiz_game/screens/home/widgets/streak_reward_page.dart';
 
 class StreakCard extends StatefulWidget {
   final StreakModel? initialStreak;
-
-  /// If true, the card calls [StreakLogic.onLogin
   final bool triggerLoginOnInit;
 
   const StreakCard({
@@ -49,160 +20,189 @@ class StreakCard extends StatefulWidget {
   State<StreakCard> createState() => _StreakCardState();
 }
 
-class _StreakCardState extends State<StreakCard>
-    with SingleTickerProviderStateMixin {
+class _StreakCardState extends State<StreakCard> {
   StreakModel? _streak;
-  late AnimationController _controller;
-  late Animation<double> _fadeAnim;
+
+  // ✅ fallback so shimmer never gets stuck
+  static const _defaultStreak = StreakModel(
+    title: 'Daily Login Streak',
+    currentDay: 0,
+    totalDays: 7,
+  );
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-
-    if (widget.initialStreak != null) {
-      _streak = widget.initialStreak;
-      _controller.forward();
-    }
+    // ✅ Set default IMMEDIATELY so shimmer never shows
+    _streak =
+        widget.initialStreak ??
+        const StreakModel(
+          title: 'Daily Login Streak',
+          currentDay: 0,
+          totalDays: 7,
+        );
 
     _init();
   }
 
   Future<void> _init() async {
-    final streak = widget.triggerLoginOnInit
-        ? await StreakLogic.onLogin()
-        : await StreakLogic.load();
+    if (widget.triggerLoginOnInit) {
+      try {
+        final result = await StreakLogic.onLogin();
+        if (!mounted) return;
+        setState(() => _streak = result.streak);
 
-    if (!mounted) return;
-    setState(() => _streak = streak);
-    _controller.forward(from: 0);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+        if (result.justCompletedCycle) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>
+                    const StreakRewardPage(streakDays: 7, coinsEarned: 500),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ StreakCard: $e');
+        // ✅ show default card instead of stuck shimmer
+        if (mounted) setState(() => _streak = _defaultStreak);
+      }
+    } else {
+      try {
+        final streak = await StreakLogic.load();
+        if (!mounted) return;
+        setState(() => _streak = streak);
+      } catch (e) {
+        debugPrint('⚠️ StreakCard: $e');
+        // ✅ show default card instead of stuck shimmer
+        if (mounted) setState(() => _streak = _defaultStreak);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Show a shimmer placeholder while loading
-    if (_streak == null) {
-      return _ShimmerCard();
-    }
+    if (_streak == null) return const _ShimmerCard();
 
     final streak = _streak!;
-    final isBroken = streak.currentDay == 0;
-    final isComplete = streak.currentDay >= streak.totalDays;
+    final isBroken = streak.isBroken;
+    final isComplete = streak.isComplete;
 
-    return FadeTransition(
-      opacity: _fadeAnim,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: const BoxDecoration(
-                color: AppColors.deepCard,
-                shape: BoxShape.circle,
-              ),
-              child: Center(child: Icon(Icons.candlestick_chart_outlined)),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          // Fire icon
+          Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+              color: AppColors.deepCard,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 14),
+            child: const Center(
+              child: Icon(
+                Icons.local_fire_department_rounded,
+                color: Color(0xFFFF6B35),
+                size: 22,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    streak.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
+          // Progress section
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  streak.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(height: 8),
+                ),
+                const SizedBox(height: 8),
 
-                  // Progress segments
-                  Row(
-                    children: List.generate(streak.totalDays, (i) {
-                      final done = i < streak.currentDay;
-                      return Expanded(
-                        child: Container(
-                          height: 5,
-                          margin: EdgeInsets.only(
-                            right: i < streak.totalDays - 1 ? 4 : 0,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: done ? AppColors.primaryGradient : null,
-                            color: done
-                                ? null
-                                : Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
+                // Day segments
+                Row(
+                  children: List.generate(streak.totalDays, (i) {
+                    final done = i < streak.currentDay;
+                    return Expanded(
+                      child: Container(
+                        height: 5,
+                        margin: EdgeInsets.only(
+                          right: i < streak.totalDays - 1 ? 4 : 0,
                         ),
-                      );
-                    }),
+                        decoration: BoxDecoration(
+                          gradient: done ? AppColors.primaryGradient : null,
+                          color: done
+                              ? null
+                              : Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+
+                if (isComplete) ...[
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Full week complete! Keep it going 🎉',
+                    style: TextStyle(color: AppColors.stext, fontSize: 11),
                   ),
-
-                  // ── Broken streak nudge ──
-                  if (isBroken) ...[
-                    // const SizedBox(height: 6),
-                    // const Text(
-                    //   'Login today to start a new streak!',
-                    //   style: TextStyle(color: AppColors.stext, fontSize: 11),
-                    // ),
-                  ],
-
-                  if (isComplete) ...[
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Full week complete! Keep it going 🎉',
-                      style: TextStyle(color: AppColors.stext, fontSize: 11),
-                    ),
-                  ],
+                ] else if (isBroken) ...[
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Login today to start a new streak!',
+                    style: TextStyle(color: AppColors.stext, fontSize: 11),
+                  ),
                 ],
-              ),
+              ],
             ),
+          ),
 
-            const SizedBox(width: 12),
+          const SizedBox(width: 12),
 
-            Text(
-              isBroken ? '—/7' : 'Day ${streak.currentDay}/${streak.totalDays}',
-              style: const TextStyle(
-                color: AppColors.stext,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+          // Day counter
+          Text(
+            isBroken
+                ? '—/${streak.totalDays}'
+                : 'Day ${streak.currentDay}/${streak.totalDays}',
+            style: const TextStyle(
+              color: AppColors.stext,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
+// ── Shimmer placeholder ───────────────────────────────────────────────────────
+
 class _ShimmerCard extends StatefulWidget {
+  const _ShimmerCard();
+
   @override
   State<_ShimmerCard> createState() => _ShimmerCardState();
 }
 
 class _ShimmerCardState extends State<_ShimmerCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
 
   @override
   void initState() {

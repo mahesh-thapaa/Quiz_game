@@ -1,18 +1,10 @@
-// lib/models/level_model.dart
-
-enum LevelStatus {
-  completed, // done — shows number + stars earned
-  current, // active — highlighted green border
-  locked, // not yet unlocked
-  star, // special star milestone cell
-  empty, // blank spacer cell
-}
+enum LevelStatus { completed, current, locked, star, empty }
 
 class LevelModel {
-  final int? number; // null for star/empty cells
+  final int? number;
   final LevelStatus status;
-  final int starsEarned; // 0-3
-  final bool isSpecialStar; // big gold star milestone
+  final int starsEarned;
+  final bool isSpecialStar;
 
   const LevelModel({
     this.number,

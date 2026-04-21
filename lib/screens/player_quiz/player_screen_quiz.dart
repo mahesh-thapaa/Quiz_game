@@ -1,15 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/player_quiz/player_level_tile.dart';
 import 'package:quiz_game/models/level_overview_model.dart';
 import 'package:quiz_game/models/level_result_models.dart';
-import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_gameplay_screen.dart';
+import 'package:quiz_game/services/level_progess_services.dart';
 import 'widgets/level_tile.dart';
 import 'widgets/level_overview_sheet.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quiz_game/screens/player_quiz/player_quiz_gameplay/player_quiz_gameplay_screen.dart';
 
 class PlayerScreenQuiz extends StatefulWidget {
   const PlayerScreenQuiz({super.key});
@@ -19,39 +20,43 @@ class PlayerScreenQuiz extends StatefulWidget {
 }
 
 class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
-  late List<ProfileLevel> block1Items;
-  late List<ProfileLevel> block2Items;
+  late List<PlayerLevelTile> block1Items;
+  late List<PlayerLevelTile> block2Items;
 
   final Map<String, List<QuizQuestion>> _questionsByLevel = {};
-
-  String? _quizDocId;
+  final Map<int, String> _levelDocIds = {};
+  final Map<int, String> _bonusSlotToDocId = {};
+  final Map<String, String> _levelTitles = {};
 
   bool _loadingQuestions = true;
 
   @override
   void initState() {
     super.initState();
-    block1Items = _generateLevelBlock(startLevel: 1);
-    block2Items = _generateLevelBlock(startLevel: 21);
+    // Grid Positions 1-24 and 25-48
+    block1Items = _generateLevelBlock(startPos: 1);
+    block2Items = _generateLevelBlock(startPos: 25);
     _fetchAllLevelsAndQuestions();
   }
 
-  List<ProfileLevel> _generateLevelBlock({required int startLevel}) {
-    final List<ProfileLevel> items = [];
-    int currentLevel = startLevel;
+  List<PlayerLevelTile> _generateLevelBlock({required int startPos}) {
+    final List<PlayerLevelTile> items = [];
     for (int i = 0; i < 24; i++) {
-      if (i == 5 || i == 11 || i == 17 || i == 23) {
-        items.add(ProfileLevel(hasStar: true));
+      int gridPos = startPos + i;
+      // Bonus positions: 6, 12, 18, 24, 30, 36...
+      if (gridPos % 6 == 0) {
+        items.add(
+          PlayerLevelTile(hasStar: true, number: gridPos, starsEarned: 0),
+        );
       } else {
         items.add(
-          ProfileLevel(
-            number: currentLevel,
-            isCurrent: currentLevel == 1,
-            isUnlocked: currentLevel <= 3,
+          PlayerLevelTile(
+            number: gridPos,
+            isCurrent: false,
+            isUnlocked: gridPos == 1,
             starsEarned: 0,
           ),
         );
-        currentLevel++;
       }
     }
     return items;
@@ -60,7 +65,11 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
   Future<void> _fetchAllLevelsAndQuestions() async {
     try {
       setState(() => _loadingQuestions = true);
+      final savedProgress = await LevelProgressService.loadAllLevelStars(
+        category: 'player_quiz',
+      );
 
+      // Fetch Player Quiz using dynamic category query
       final quizSnap = await FirebaseFirestore.instance
           .collection('quizzes')
           .where('category', isEqualTo: 'Player Quiz')
@@ -68,114 +77,156 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
           .get();
 
       if (quizSnap.docs.isEmpty) {
-        debugPrint('❌ Player Quiz not found in Firestore');
+        debugPrint('Player Quiz not found in Firestore');
         setState(() => _loadingQuestions = false);
         return;
       }
 
-      _quizDocId = quizSnap.docs.first.id;
-      debugPrint('✅ Found Player Quiz: $_quizDocId');
-
+      String playerQuizDocId = quizSnap.docs.first.id;
       final levelsSnap = await FirebaseFirestore.instance
           .collection('quizzes')
-          .doc(_quizDocId)
+          .doc(playerQuizDocId)
           .collection('levels')
           .orderBy('order')
           .get();
 
-      debugPrint('📂 Found ${levelsSnap.docs.length} levels');
-
+      int bonusCounter = 0;
       for (final levelDoc in levelsSnap.docs) {
-        final levelId = levelDoc.id;
+        final docId = levelDoc.id;
+        final data = levelDoc.data();
+        final int levelNumber = (data['levelNumber'] ?? 0) as int;
+        final bool isBonus = (data['isBonus'] ?? false) as bool;
 
-        final questionsSnap = await levelDoc.reference
+        if (data['title'] != null)
+          _levelTitles[docId] = data['title'].toString();
+
+        if (isBonus) {
+          _bonusSlotToDocId[bonusCounter] = docId;
+          bonusCounter++;
+        } else {
+          _levelDocIds[levelNumber] = docId;
+        }
+
+        final qSnap = await levelDoc.reference
             .collection('questions')
             .orderBy('order')
             .get();
-
-        final questions = questionsSnap.docs
-            .map((qDoc) => QuizQuestion.fromMap(qDoc.data()))
+        _questionsByLevel[docId] = qSnap.docs
+            .map((q) => QuizQuestion.fromMap(q.data()))
             .toList();
-
-        _questionsByLevel[levelId] = questions;
-
-        debugPrint('❓ $levelId → ${questions.length} questions fetched');
       }
 
-      debugPrint(
-        '✅ Total levels fetched: ${_questionsByLevel.length} | '
-        'Total questions: ${_questionsByLevel.values.fold(0, (sum, q) => sum + q.length)}',
-      );
-
+      _applyLevelProgress(savedProgress);
+      _recalculateCurrentTile();
       setState(() => _loadingQuestions = false);
     } catch (e) {
-      debugPrint('❌ Error fetching questions: $e');
+      debugPrint('❌ Initialization Error: $e');
       setState(() => _loadingQuestions = false);
     }
   }
 
-  List<QuizQuestion> _getQuestionsForLevel(int levelNumber) {
-    final levelId = 'level$levelNumber';
-    return _questionsByLevel[levelId] ?? [];
-  }
-
-  int _calcStars(int score, int total) {
-    if (total == 0) return 0;
-    final pct = score / total;
-    if (pct >= 0.9) return 3;
-    if (pct >= 0.5) return 2;
-    return 1;
-  }
-
-  Future<void> _handleQuizResult(
-    LevelResultModels result,
-    int levelNumber,
-  ) async {
-    debugPrint(
-      '🏆 Level $levelNumber | '
-      'score: ${result.score}/${result.totalQuestions} | '
-      'stars: ${result.starsEarned} | '
-      'coins: ${result.coinsEarned}',
-    );
-
-    final allTiles = [...block1Items, ...block2Items];
-    final tile = allTiles.firstWhere(
-      (t) => t.number == levelNumber,
-      orElse: () => ProfileLevel(number: levelNumber),
-    );
-    final previousStars = tile.starsEarned;
-    final newStars = result.starsEarned;
-
-    final starDiff = (newStars > previousStars) ? newStars - previousStars : 0;
-
-    debugPrint(
-      '⭐ prev: $previousStars | new: $newStars | diff added: $starDiff',
-    );
-
-    await context.read<UserProgressProvider>().onQuizCompleted(
-      customCoins: result.coinsEarned,
-      customXP: result.xpEarned,
-      earnedStars: starDiff,
-    );
-
-    _updateLevelStars(levelNumber, newStars);
-  }
-
-  void _updateLevelStars(int levelNumber, int newStars) {
-    setState(() {
-      for (final level in [...block1Items, ...block2Items]) {
-        if (level.number == levelNumber) {
-          if (newStars > level.starsEarned) level.starsEarned = newStars;
-          return;
+  void _applyLevelProgress(Map<int, int> savedStars) {
+    if (savedStars.isEmpty) return;
+    for (final tile in [...block1Items, ...block2Items]) {
+      if (tile.number != null && savedStars.containsKey(tile.number)) {
+        tile.starsEarned = savedStars[tile.number] ?? 0;
+        if (tile.starsEarned > 0) {
+          tile.isUnlocked = true;
+          _unlockNextTile(tile);
         }
       }
+    }
+  }
+
+  void _recalculateCurrentTile() {
+    final all = [...block1Items, ...block2Items];
+    for (final tile in all) tile.isCurrent = false;
+    for (final tile in all) {
+      if (!tile.hasStar && tile.isUnlocked && tile.starsEarned == 0) {
+        tile.isCurrent = true;
+        break;
+      }
+    }
+  }
+
+  Future<void> _onLevelComplete(LevelResultModels result, int gridPos) async {
+    // Find current stars earned on this level before update
+    int currentStars = 0;
+    for (final tile in [...block1Items, ...block2Items]) {
+      if (tile.number == gridPos) {
+        currentStars = tile.starsEarned;
+        break;
+      }
+    }
+
+    // Calculate the delta (increase in stars)
+    final int starsDelta = result.starsEarned > currentStars
+        ? result.starsEarned - currentStars
+        : 0;
+
+    // Update UI with the best performance (max of current and new)
+    setState(() {
+      for (final tile in [...block1Items, ...block2Items]) {
+        if (tile.number == gridPos) {
+          // Keep the maximum stars achieved (never decrease)
+          tile.starsEarned = currentStars > result.starsEarned
+              ? currentStars
+              : result.starsEarned;
+          if (tile.starsEarned > 0) _unlockNextTile(tile);
+          break;
+        }
+      }
+      _recalculateCurrentTile();
     });
+
+    // Save only the delta (increase) to database
+    if (starsDelta > 0) {
+      await LevelProgressService.saveLevelStars(
+        category: 'player_quiz',
+        levelNumber: gridPos,
+        starsEarned: result.starsEarned, // Save absolute stars (not delta)
+      );
+
+      await context.read<UserProgressProvider>().onQuizLevelCompleted(
+        customCoins: result.coinsEarned,
+        customXP: result.xpEarned,
+        earnedStars: starsDelta, // Add only the delta to total progress
+      );
+    }
+  }
+
+  void _unlockNextTile(PlayerLevelTile current) {
+    final all = [...block1Items, ...block2Items];
+    final idx = all.indexWhere((t) => t.number == current.number);
+    if (idx != -1 && idx < all.length - 1) all[idx + 1].isUnlocked = true;
+  }
+
+  List<QuizQuestion> _getQuestionsForLevel(int gridPos) {
+    String? docId;
+    if (gridPos % 6 == 0) {
+      // Bonus: Pos 6 -> Slot 0, Pos 12 -> Slot 1...
+      int slot = (gridPos ~/ 6) - 1;
+      docId = _bonusSlotToDocId[slot];
+    } else {
+      // Normal: Pos 1-5 -> Lvl 1-5, Pos 7-11 -> Lvl 6-10...
+      int actualLvlNum = gridPos - (gridPos ~/ 6);
+      docId = _levelDocIds[actualLvlNum];
+    }
+    return docId != null ? (_questionsByLevel[docId] ?? []) : [];
+  }
+
+  /// TITLE LOGIC: Dynamically formats title for Gameplay Screen
+  String _getGameplayTitle(int gridPos) {
+    if (gridPos % 6 == 0) {
+      return "BONUS LEVEL ${gridPos ~/ 6}";
+    } else {
+      int visualDisplayNum = gridPos - (gridPos ~/ 6);
+      return "LEVEL $visualDisplayNum";
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool hasAnyQuestions = _questionsByLevel.isNotEmpty;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -183,8 +234,6 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
             ? const Center(
                 child: CircularProgressIndicator(color: AppColors.doller),
               )
-            : !hasAnyQuestions
-            ? _buildEmptyState()
             : CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
@@ -196,7 +245,7 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
                     ),
                     sliver: _buildGridSection(block1Items),
                   ),
-                  SliverToBoxAdapter(child: _buildMilestoneSeparator()),
+                  SliverToBoxAdapter(child: _buildSeparator()),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: _buildGridSection(block2Items),
@@ -208,131 +257,7 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.quiz_outlined, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text(
-            'No questions found',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _fetchAllLevelsAndQuestions,
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    final p = context.watch<UserProgressProvider>();
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.iCOlor,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'GOALIQ',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.stext,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              Text(
-                'PLAYER QUIZ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.hText,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          _buildStatChip(Icons.star_rounded, '${p.stars}', AppColors.doller),
-          const SizedBox(width: 8),
-          _buildStatChip(
-            Icons.monetization_on_rounded,
-            '${p.coins}',
-            AppColors.doller,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatChip(IconData icon, String text, Color iconColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: iconColor, size: 16),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: AppColors.stext,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMilestoneSeparator() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-      child: const Column(
-        children: [
-          Text(
-            'Earn at least 1 star in previous level to unlock',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: AppColors.stext, height: 1.5),
-          ),
-          SizedBox(height: 36),
-          Text(
-            'Unlock Next Level with 50 ★ Stars',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.stext,
-            ),
-          ),
-          SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGridSection(List<ProfileLevel> items) {
+  Widget _buildGridSection(List<PlayerLevelTile> items) {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -342,60 +267,161 @@ class _PlayerScreenQuizState extends State<PlayerScreenQuiz> {
       ),
       delegate: SliverChildBuilderDelegate((context, index) {
         final item = items[index];
-        return LevelTile(
-          level: item,
-          onTap: () {
-            if (item.hasStar) {
+        final int gridPos = item.number!;
+
+        if (item.hasStar) {
+          return LevelTile(
+            key: ValueKey('bonus_$gridPos'),
+            level: item,
+            onTap: () {
+              if (!item.isUnlocked) return;
+              final questions = _getQuestionsForLevel(gridPos);
+              if (questions.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('No questions found for this bonus level'),
+                  ),
+                );
+                return;
+              }
               showBonusLevelSheet(
                 context: context,
-                isUnlocked: false,
-                unlockAtLevel: 5,
+                isUnlocked: item.isUnlocked,
+                unlockAtLevel: gridPos - 1,
+                onPlay: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PlayerQuizGameplayScreen(
+                      questions: questions,
+                      levelNumber: gridPos,
+                      levelTitle: _getGameplayTitle(
+                        gridPos,
+                      ), // Shows "BONUS LEVEL 1"
+                      isBonus: true,
+                      onLevelComplete: _onLevelComplete,
+                      getQuestionsForLevel: _getQuestionsForLevel,
+                      getGameplayTitle: _getGameplayTitle,
+                      isBonusLevel: (pos) => pos % 6 == 0,
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+
+        int visualDisplayNum = gridPos - (gridPos ~/ 6);
+
+        return LevelTile(
+          key: ValueKey('lvl_$gridPos'),
+          level: item,
+          onTap: () {
+            if (!item.isUnlocked) return;
+            final questions = _getQuestionsForLevel(gridPos);
+            if (questions.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('No question available in this level'),
+                ),
               );
               return;
             }
-
-            if (!item.isUnlocked) return;
-
-            final questions = _getQuestionsForLevel(item.number ?? 1);
-
             showLevelOverview(
               context: context,
               model: LevelOverviewModel(
-                levelNumber: item.number ?? 1,
-                levelName: 'PLAYER CHALLENGE',
+                levelNumber: visualDisplayNum,
                 starsEarned: item.starsEarned,
-                description: questions.isEmpty
-                    ? 'No questions available yet'
-                    : 'Identify the player correctly!\nTry to earn 3 stars\n${questions.length} questions',
+                levelName: 'PLAYER CHALLENGE',
+                description: 'Can you identify the player correctly?',
               ),
-              onPlay: () async {
-                if (questions.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('No questions for this level yet'),
-                    ),
-                  );
-                  return;
-                }
-
-                final result = await Navigator.push<LevelResultModels>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        PlayerQuizGameplayScreen(questions: questions),
+              onPlay: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PlayerQuizGameplayScreen(
+                    questions: questions,
+                    levelNumber: gridPos,
+                    levelTitle: _getGameplayTitle(
+                      gridPos,
+                    ), // Shows "LEVEL 5", "LEVEL 6", etc.
+                    onLevelComplete: _onLevelComplete,
+                    getQuestionsForLevel: _getQuestionsForLevel,
+                    getGameplayTitle: _getGameplayTitle,
+                    isBonusLevel: (pos) => pos % 6 == 0,
                   ),
-                );
-
-                debugPrint('📊 Level ${item.number} result: $result');
-
-                if (result != null && mounted) {
-                  await _handleQuizResult(result, item.number ?? 1);
-                }
-              },
+                ),
+              ),
             );
           },
         );
       }, childCount: items.length),
     );
   }
+
+  // --- UI Helpers ---
+  Widget _buildHeader() {
+    final p = context.watch<UserProgressProvider>();
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          ),
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'GOALIQ',
+                style: TextStyle(fontSize: 10, color: AppColors.stext),
+              ),
+              Text(
+                'PLAYER QUIZ',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          _buildChip(Icons.star, '${p.stars}'),
+          const SizedBox(width: 8),
+          _buildChip(Icons.monetization_on, '${p.coins}'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChip(IconData icon, String txt) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    decoration: BoxDecoration(
+      color: AppColors.cardBg,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Row(
+      children: [
+        Icon(icon, color: AppColors.doller, size: 16),
+        const SizedBox(width: 4),
+        Text(txt, style: const TextStyle(color: Colors.white, fontSize: 12)),
+      ],
+    ),
+  );
+
+  Widget _buildSeparator() => Container(
+    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+    child: const Column(
+      children: [
+        Text(
+          'Earn at least 1 star in previous level to unlock',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, color: AppColors.stext, height: 1.5),
+        ),
+        SizedBox(height: 24),
+        Divider(color: AppColors.divider, height: 1),
+        SizedBox(height: 24),
+      ],
+    ),
+  );
 }

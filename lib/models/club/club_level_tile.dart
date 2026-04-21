@@ -1,15 +1,17 @@
-class ProfileLevel {
-  final int? number;
-  int starsEarned;
-  final bool isUnlocked;
-  final bool isCurrent;
+class ClubLevelTile {
   final bool hasStar;
+  final int? number; // nullable only because bonus tiles have no number
+  bool isUnlocked;
+  bool isCurrent;
+  int starsEarned;
+  String? bonusDocId;
 
-  ProfileLevel({
+  ClubLevelTile({
+    this.hasStar = false,
     this.number,
-    this.starsEarned = 0,
     this.isUnlocked = false,
     this.isCurrent = false,
-    this.hasStar = false,
+    this.starsEarned = 0,
+    this.bonusDocId,
   });
 }

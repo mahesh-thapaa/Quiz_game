@@ -1,15 +1,15 @@
-class ProfileLevel {
+class JerseyLevelTile {
   final int? number;
-  int starsEarned;
-  final bool isUnlocked;
-  final bool isCurrent;
   final bool hasStar;
+  bool isCurrent;
+  bool isUnlocked;
+  int starsEarned;
 
-  ProfileLevel({
+  JerseyLevelTile({
     this.number,
-    this.starsEarned = 0,
-    this.isUnlocked = false,
-    this.isCurrent = false,
     this.hasStar = false,
+    this.isCurrent = false,
+    this.isUnlocked = false,
+    this.starsEarned = 0,
   });
 }

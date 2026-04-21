@@ -42,18 +42,6 @@ class QuizCardModel {
   });
 }
 
-class StreakModel {
-  final int totalDays;
-  final int currentDay;
-  final String title;
-
-  const StreakModel({
-    this.totalDays = 7,
-    required this.currentDay,
-    this.title = '7 Day Streak',
-  });
-}
-
 class CategoryModel {
   final String title;
   final String imageUrl;

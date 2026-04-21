@@ -3,14 +3,14 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/club/club_level_tile.dart';
 
 class LevelTile extends StatelessWidget {
-  final ProfileLevel level;
+  final ClubLevelTile level;
   final VoidCallback? onTap;
 
   const LevelTile({super.key, required this.level, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    if (level.hasStar) return _BonusTile(onTap: onTap);
+    if (level.hasStar) return _BonusTile(level: level, onTap: onTap);
 
     return GestureDetector(
       onTap: level.isUnlocked ? onTap : null,
@@ -76,14 +76,17 @@ class LevelTile extends StatelessWidget {
 }
 
 class _BonusTile extends StatelessWidget {
+  final ClubLevelTile level;
   final VoidCallback? onTap;
 
-  const _BonusTile({this.onTap});
+  const _BonusTile({required this.level, this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final bool isCompleted = level.starsEarned > 0;
+
     return GestureDetector(
-      onTap: onTap,
+      onTap: level.isUnlocked ? onTap : null,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -103,22 +106,67 @@ class _BonusTile extends StatelessWidget {
             ),
           ],
         ),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'BONUS',
-              style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFFA78BFA),
-                letterSpacing: 1.2,
+        child: isCompleted
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'BONUS',
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFA78BFA),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  // Display earned stars (0-3)
+                  _StarRow(filled: level.starsEarned),
+                ],
+              )
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'BONUS',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFFA78BFA),
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Icon(
+                        Icons.star_rounded,
+                        color: AppColors.doller,
+                        size: 28,
+                      ),
+                    ],
+                  ),
+                  // Lock icon overlay if not unlocked
+                  if (!level.isUnlocked)
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3B0764).withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(
+                          Icons.lock_rounded,
+                          color: AppColors.stext,
+                          size: 12,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
-            SizedBox(height: 2),
-            Icon(Icons.star_rounded, color: AppColors.doller, size: 28),
-          ],
-        ),
       ),
     );
   }

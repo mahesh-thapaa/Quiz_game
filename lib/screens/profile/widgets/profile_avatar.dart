@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/profile_models.dart';
+import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final LeaderboardEntry user;

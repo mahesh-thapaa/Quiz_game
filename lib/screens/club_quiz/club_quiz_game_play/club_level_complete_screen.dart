@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
+import 'package:quiz_game/services/star_calculation_service.dart';
 
 class ClubLevelCompleteScreen extends StatefulWidget {
   final LevelResultModels result;
-  final VoidCallback? onNextLevel;
-  final VoidCallback? onReplayLevel;
+  final int levelNumber;
+  final VoidCallback onNextLevel;
+  final VoidCallback onReplayLevel;
+  final VoidCallback onBack;
+  final VoidCallback onClose;
 
   const ClubLevelCompleteScreen({
     super.key,
     required this.result,
-    this.onNextLevel,
-    this.onReplayLevel,
+    required this.levelNumber,
+    required this.onNextLevel,
+    required this.onReplayLevel,
+    required this.onBack,
+    required this.onClose,
   });
 
   @override
@@ -24,10 +32,7 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
   late Animation<double> _fadeIn;
 
   int get _starsEarned {
-    final correct = widget.result.score;
-    if (correct >= 10) return 3;
-    if (correct >= 5) return 2;
-    return 1;
+    return StarCalculationService.calculateStars(widget.result.score);
   }
 
   @override
@@ -47,99 +52,115 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
     super.dispose();
   }
 
-  Widget buildStars(int stars) {
+  Widget _buildStars(int stars) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (index) {
-        return Icon(
-          index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: 48,
-          color: index < stars ? Colors.amber : Colors.grey[700],
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Icon(
+            index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+            size: 52,
+            color: index < stars ? Colors.amber : Colors.grey[700],
+          ),
         );
       }),
     );
   }
 
-  Widget buildRewardCard(
+  Widget _buildRewardCard(
     IconData icon,
     String label,
     String value,
     Color iconColor,
   ) {
-    return Container(
-      width: 140,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E2A38),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: iconColor, size: 30),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 11,
-              letterSpacing: 1.2,
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A2433),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 10),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 10,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _popWithScore() {
-    Navigator.pop(context, widget.result.score);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F1923),
-      body: FadeTransition(
-        opacity: _fadeIn,
+    return FadeTransition(
+      opacity: _fadeIn,
+      child: Container(
+        color: const Color(0xFF0F1923),
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // ── LEVEL COMPLETED Title ──
                 const Text(
-                  "LEVEL COMPLETED!",
+                  'LEVEL COMPLETED!',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
                     letterSpacing: 1.5,
                   ),
                 ),
-                const SizedBox(height: 20),
 
-                buildStars(_starsEarned),
-                const SizedBox(height: 20),
+                const SizedBox(height: 28),
 
+                // ── Stars ──
+                _buildStars(_starsEarned),
+
+                const SizedBox(height: 24),
+
+                // ── Score Badge ──
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 10,
+                    horizontal: 28,
+                    vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E2A38),
-                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF1A2433),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
-                    "Score: ${widget.result.score}/${widget.result.totalQuestions}",
+                    'Score: ${widget.result.score}/${widget.result.totalQuestions}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -147,45 +168,51 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
 
-                const Text(
-                  "REWARDS EARNED",
+                const SizedBox(height: 32),
+
+                // ── REWARDS EARNED label ──
+                Text(
+                  'REWARDS EARNED',
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: Colors.grey[500],
                     fontSize: 11,
-                    letterSpacing: 2,
+                    letterSpacing: 2.5,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 16),
 
+                const SizedBox(height: 14),
+
+                // ── XP & Coins reward cards ──
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    buildRewardCard(
+                    _buildRewardCard(
                       Icons.bolt,
-                      "EXPERIENCE",
-                      "+${widget.result.xpEarned} XP",
+                      'EXPERIENCE',
+                      '+${widget.result.xpEarned} XP',
                       Colors.yellow,
                     ),
-                    const SizedBox(width: 16),
-                    buildRewardCard(
+                    const SizedBox(width: 12),
+                    _buildRewardCard(
                       Icons.monetization_on,
-                      "CURRENCY",
-                      "+${widget.result.coinsEarned} Coins",
+                      'CURRENCY',
+                      '+${widget.result.coinsEarned} Coins',
                       Colors.orange,
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
 
+                const SizedBox(height: 16),
+
+                // ── Accuracy row ──
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 12,
+                    vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E2A38),
+                    color: const Color(0xFF1A2433),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -200,100 +227,69 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
                           ),
                           SizedBox(width: 8),
                           Text(
-                            "Accuracy",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            'Accuracy',
+                            style: TextStyle(color: Colors.white, fontSize: 15),
                           ),
                         ],
                       ),
                       Text(
-                        "${widget.result.accuracy}%",
+                        '${widget.result.accuracy}%',
                         style: const TextStyle(
                           color: Colors.green,
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
 
+                const SizedBox(height: 36),
+
+                // ── NEXT LEVEL button ──
                 GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Row(
-                          children: [
-                            Icon(
-                              Icons.lock_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              'Next level coming soon!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: const Color(0xFF1E2A38),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
+                  onTap: widget.onNextLevel,
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
+                      gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.lock_rounded,
-                            color: Colors.white54,
-                            size: 18,
-                          ),
-                          SizedBox(width: 8),
                           Text(
-                            "NEXT LEVEL",
+                            'NEXT LEVEL',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.chevron_right, color: Colors.white54),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
+                const SizedBox(height: 12),
+
+                // ── REPLAY LEVEL button ──
                 GestureDetector(
-                  onTap: () {
-                    _popWithScore();
-                    widget.onReplayLevel?.call();
-                  },
+                  onTap: widget.onReplayLevel,
                   child: Container(
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E2A38),
+                      color: const Color(0xFF1A2433),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
@@ -303,7 +299,7 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
                           Icon(Icons.replay, color: Colors.white, size: 20),
                           SizedBox(width: 8),
                           Text(
-                            "REPLAY LEVEL",
+                            'REPLAY LEVEL',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -316,6 +312,8 @@ class _ClubLevelCompletedCardState extends State<ClubLevelCompleteScreen>
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),

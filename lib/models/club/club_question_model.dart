@@ -4,6 +4,7 @@ class ClubQuestionModel {
   final String questionText;
   final List<String> options;
   final int correctIndex;
+  final String? imagePath;
 
   ClubQuestionModel({
     required this.questionNumber,
@@ -11,6 +12,7 @@ class ClubQuestionModel {
     required this.questionText,
     required this.options,
     required this.correctIndex,
+    this.imagePath,
   });
 }
 
