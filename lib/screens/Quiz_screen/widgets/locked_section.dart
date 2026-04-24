@@ -102,11 +102,11 @@ class _LockedCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final progress = context.read<UserProgressProvider>();
-        
+
         // ── UNLOCK LOGIC ──
         bool isUnlocked = true; // Always true for development/testing phase
-        
-        if (isUnlocked) { 
+
+        if (isUnlocked) {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -139,7 +139,9 @@ class _LockedCard extends StatelessWidget {
             Image.asset(
               item.imagePath,
               fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(1.0), // Full opacity for testing
+              opacity: const AlwaysStoppedAnimation(
+                1.0,
+              ), // Full opacity for testing
               errorBuilder: (_, __, ___) =>
                   Container(color: AppColors.deepCard),
             ),

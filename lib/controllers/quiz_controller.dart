@@ -45,8 +45,13 @@ class QuizController {
           levelDocIds[num] = doc.id;
         }
 
-        final qSnap = await doc.reference.collection('questions').orderBy('order').get();
-        questionsByLevel[doc.id] = qSnap.docs.map((q) => QuizQuestion.fromMap(q.data())).toList();
+        final qSnap = await doc.reference
+            .collection('questions')
+            .orderBy('order')
+            .get();
+        questionsByLevel[doc.id] = qSnap.docs
+            .map((q) => QuizQuestion.fromMap(q.data()))
+            .toList();
       }
     }
 
