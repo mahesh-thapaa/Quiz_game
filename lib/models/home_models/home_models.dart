@@ -34,11 +34,15 @@ class QuizCardModel {
   final String title;
   final String subtitle;
   final String imageUrl;
+  final String categoryId;
+  final String firestoreName;
 
   const QuizCardModel({
     required this.title,
     required this.subtitle,
     required this.imageUrl,
+    required this.categoryId,
+    required this.firestoreName,
   });
 }
 

@@ -1,115 +1,72 @@
-// lib/screens/home/home_screen.dart
-//
-// Key change from old version:
-//   StreakCard now receives  triggerLoginOnInit: true
-//   so it calls StreakLogic.onLogin() which persists the day,
-//   advances the counter, and auto-shows the reward dialog on day 7.
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/home_models/home_models.dart';
-import 'package:quiz_game/models/home_models/streak_model.dart';
-import 'package:quiz_game/data/home_data.dart';
-import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
-
+import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
 import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
 import 'package:quiz_game/screens/home/bars/quick_play_card.dart';
 import 'package:quiz_game/screens/home/bars/quiz_card.dart';
-import 'package:quiz_game/screens/home/bars/streak_card.dart'; // ← updated file
+import 'package:quiz_game/screens/home/bars/streak_card.dart';
 import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
-import 'package:quiz_game/screens/bonus/clain_reward_dialog.dart';
-import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
-import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
-import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
+import 'package:quiz_game/models/home_models/home_models.dart';
+import 'package:quiz_game/screens/common/level_grid_screen.dart';
+import 'package:quiz_game/data/home_data.dart';
 
 class HomeScreen extends StatefulWidget {
-  final UserModel user;
-  final DailyBonusModel dailyBonus;
-  final List<QuizCardModel> recommendedQuizzes;
-  final StreakModel streak;
-  final List<CategoryModel> categories;
-  final bool showRewardOnLoad;
-
-  const HomeScreen({
-    super.key,
-    this.user = HomeData.user,
-    this.dailyBonus = HomeData.dailyBonus,
-    this.recommendedQuizzes = HomeData.recommendedQuizzes,
-    this.streak = HomeData.streak,
-    this.categories = HomeData.categories,
-    this.showRewardOnLoad = false,
-  });
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<UserProgressProvider>().clearAndReload();
-      if (widget.showRewardOnLoad && mounted) _goToBonus();
-    });
-  }
-
-  void _goToBonus() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ClaimRewardDialog(
-          title: 'CONGRATULATIONS!',
-          subtitle: 'REWARD CLAIMED SUCCESSFULLY',
-          coins: widget.dailyBonus.coins,
-          buttonLabel: 'AWESOME',
-          onTap: () => Navigator.pop(context),
-        ),
-      ),
-    );
-  }
-
   void _onCategoryTap(CategoryModel category) {
-    switch (category.title) {
-      case 'Player Quiz':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PlayerScreenQuiz()),
-        );
-        break;
-      case 'Club Quiz':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ClubQuizScreen()),
-        );
-        break;
-      case 'Stadium Quiz':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const StadiumQuizScreen()),
-        );
-        break;
+    String categoryId = '';
+    String firestoreName = '';
+
+    if (category.title == 'Player Quiz') {
+      categoryId = 'player_quiz';
+      firestoreName = 'Player Quiz';
+    } else if (category.title == 'Stadium Quiz') {
+      categoryId = 'stadium_quiz';
+      firestoreName = 'Stadium Quiz';
+    } else if (category.title == 'Club Quiz') {
+      categoryId = 'club_quiz';
+      firestoreName = 'Club Quiz';
+    }
+
+    if (categoryId.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LevelGridScreen(
+            title: category.title.toUpperCase(),
+            categoryId: categoryId,
+            firestoreName: firestoreName,
+          ),
+        ),
+      );
     }
   }
 
   void _onRecommendedQuizTap(QuizCardModel quiz) {
-    switch (quiz.title) {
-      case 'Player Challenge':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const PlayerScreenQuiz()),
-        );
-        break;
-      case 'Logo Master':
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ClubQuizScreen()),
-        );
-        break;
+    String displayTitle = quiz.title;
+    
+    // Change 'Player Challenge' to 'Player Quiz' only for the next screen
+    if (displayTitle == 'Player Challenge') {
+      displayTitle = 'Player Quiz';
     }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LevelGridScreen(
+          title: displayTitle.toUpperCase(),
+          categoryId: quiz.categoryId,
+          firestoreName: quiz.firestoreName,
+        ),
+      ),
+    );
   }
 
   @override
@@ -118,54 +75,88 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
+              // 1. App Bar (Profile + Level + Coins)
               const HomeAppBar(),
-              // const SizedBox(height: 16),
-              // const XPProgressBar(),
-              const SizedBox(height: 20),
-              DailyBonusCard(bonus: widget.dailyBonus),
-              const SizedBox(height: 16),
-              QuickPlayCard(onTap: () {}),
-              const SizedBox(height: 24),
-              const SectionHeader(title: 'RECOMMENDED FOR YOU'),
-              const SizedBox(height: 12),
-              Row(
-                children: widget.recommendedQuizzes.map((q) {
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: QuizCard(
-                        quiz: q,
-                        onTap: () => _onRecommendedQuizTap(q),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
               const SizedBox(height: 20),
 
-              const StreakCard(triggerLoginOnInit: true),
-              const SizedBox(height: 24),
+              // 2. XP Progress Bar
+              const XPProgressBar(),
+              const SizedBox(height: 25),
+
+              // 3. Daily Bonus Card
+              const DailyBonusCard(bonus: HomeData.bonus),
+              const SizedBox(height: 20),
+
+              // 4. Quick Play Card
+              QuickPlayCard(
+                onTap: () {
+                  // Navigate to a "Random" quiz (Player Quiz as default)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LevelGridScreen(
+                        title: 'PLAYER QUIZ',
+                        categoryId: 'player_quiz',
+                        firestoreName: 'Player Quiz',
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+
+              // 5. Recommended Section Header
+              const SectionHeader(title: 'RECOMMENDED FOR YOU'),
+              const SizedBox(height: 15),
+
+              // 6. Recommended Grid (2 Columns)
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: HomeData.recommendedQuizzes.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 16, 
+                  childAspectRatio: 1.1,
+                ),
+                itemBuilder: (context, index) {
+                  final quiz = HomeData.recommendedQuizzes[index];
+                  return QuizCard(
+                    quiz: quiz,
+                    onTap: () => _onRecommendedQuizTap(quiz),
+                  );
+                },
+              ),
+              const SizedBox(height: 30),
+
+              // 7. Streak Card
+              const StreakCard(),
+              const SizedBox(height: 35),
+
+              // 8. Popular Categories Header
               const SectionHeader(title: 'POPULAR CATEGORIES'),
-              const SizedBox(height: 12),
+              const SizedBox(height: 15),
+
+              // 9. Popular Categories Row (Full Width)
               Row(
-                children: widget.categories.map((c) {
+                children: HomeData.categories.map((category) {
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
                       child: CategoryCard(
-                        category: c,
-                        onTap: () => _onCategoryTap(c),
+                        category: category,
+                        onTap: () => _onCategoryTap(category),
                       ),
                     ),
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
             ],
           ),
         ),

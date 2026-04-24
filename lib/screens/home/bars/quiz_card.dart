@@ -19,35 +19,35 @@ class QuizCard extends StatelessWidget {
         child: Stack(
           children: [
             // ── Local Asset Image ──
-            Image.asset(
-              quiz.imageUrl,
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 150,
-                color: AppColors.cardBg,
-                child: const Center(
-                  child: Icon(
-                    Icons.image_not_supported,
-                    color: AppColors.stext,
-                    size: 32,
+            Positioned.fill(
+              child: Image.asset(
+                quiz.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: AppColors.cardBg,
+                  child: const Center(
+                    child: Icon(
+                      Icons.image_not_supported,
+                      color: AppColors.stext,
+                      size: 32,
+                    ),
                   ),
                 ),
               ),
             ),
 
             // ── Dark gradient overlay ──
-            Container(
-              height: 150,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.85),
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.9),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
                 ),
               ),
             ),
@@ -64,8 +64,8 @@ class QuizCard extends StatelessWidget {
                     quiz.title,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 20, // Reduced from 22
+                      fontWeight: FontWeight.w900,
                       shadows: [
                         Shadow(
                           offset: Offset(0, 1),

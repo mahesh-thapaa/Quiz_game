@@ -1,0 +1,299 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/models/quiz_level_tile.dart';
+import 'package:quiz_game/models/level_overview_model.dart';
+import 'package:quiz_game/models/level_result_models.dart';
+import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/services/level_progess_services.dart';
+import 'package:quiz_game/controllers/quiz_controller.dart';
+import 'package:quiz_game/controllers/level_grid_controller.dart';
+import 'package:quiz_game/screens/common/widgets/quiz_sheets.dart';
+import 'package:quiz_game/screens/common/widgets/level_tile.dart';
+import 'package:quiz_game/screens/common/gameplay/quiz_gameplay_screen.dart';
+
+class LevelGridScreen extends StatefulWidget {
+  final String title;
+  final String categoryId;
+  final String firestoreName;
+
+  const LevelGridScreen({
+    super.key,
+    required this.title,
+    required this.categoryId,
+    required this.firestoreName,
+  });
+
+  @override
+  State<LevelGridScreen> createState() => _LevelGridScreenState();
+}
+
+class _LevelGridScreenState extends State<LevelGridScreen> {
+  late LevelGridController _controller;
+
+  Map<String, List<QuizQuestion>> _questionsByLevel = {};
+  Map<int, String> _levelDocIds = {};
+  Map<int, String> _bonusSlotToDocId = {};
+
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = LevelGridController.initial();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    final data = await QuizController.loadQuizData(
+      categoryId: widget.categoryId,
+      firestoreName: widget.firestoreName,
+    );
+
+    if (mounted) {
+      setState(() {
+        _questionsByLevel = data['questionsByLevel'];
+        _levelDocIds = data['levelDocIds'];
+        _bonusSlotToDocId = data['bonusSlotToDocId'];
+        _controller.applyProgress(data['progress']);
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F1420),
+      body: SafeArea(
+        child: _loading
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+              )
+            : CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: _buildHeader()),
+                  _buildGrid(_controller.block1Items),
+                  SliverToBoxAdapter(
+                    child: _buildSeparator(
+                      'Earn at least 1 star in previous level to unlock',
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: _buildUnlockNextHeader()),
+                  _buildGrid(_controller.block2Items),
+                  const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    final p = context.watch<UserProgressProvider>();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'GOALIQ',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          _buildChip('★', '${p.stars}'),
+          const SizedBox(width: 8),
+          _buildChip('🪙', '${p.coins}', suffix: ' +'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChip(String icon, String value, {String? suffix}) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F2E),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        ),
+        child: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: icon,
+                style: const TextStyle(color: Color(0xFFFFD700)),
+              ),
+              TextSpan(text: ' $value', style: const TextStyle(color: Colors.white)),
+              if (suffix != null)
+                TextSpan(
+                  text: suffix,
+                  style: const TextStyle(color: Color(0xFFFFD700)),
+                ),
+            ],
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+
+  Widget _buildGrid(List<QuizLevelTile> items) => SliverPadding(
+    padding: const EdgeInsets.symmetric(horizontal: 30),
+    sliver: SliverGrid(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.95,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (ctx, i) =>
+            LevelTile(level: items[i], onTap: () => _handleLevelTap(items[i])),
+        childCount: items.length,
+      ),
+    ),
+  );
+
+  void _handleLevelTap(QuizLevelTile item) {
+    if (!item.isUnlocked) return;
+    final qs = _controller.getQuestionsForPos(
+      item.number!,
+      _questionsByLevel,
+      _levelDocIds,
+      _bonusSlotToDocId,
+    );
+
+    if (qs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No questions available for this level yet.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    if (item.hasStar) {
+      QuizSheets.showBonusLevel(
+        context: context,
+        bonusNumber: item.number! ~/ 6,
+        onPlay: () => _startQuiz(qs, item.number!, true),
+      );
+    } else {
+      QuizSheets.showLevelOverview(
+        context: context,
+        model: LevelOverviewModel(
+          levelNumber: item.number! - (item.number! ~/ 6),
+          starsEarned: item.starsEarned,
+          levelName: widget.title,
+          description: 'Test your knowledge and earn 3 stars',
+        ),
+        onPlay: () => _startQuiz(qs, item.number!, false),
+      );
+    }
+  }
+
+  void _startQuiz(List<QuizQuestion> qs, int num, bool bonus) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => QuizGameplayScreen(
+          questions: qs,
+          levelNumber: num,
+          levelTitle: QuizController.getLevelTitle(num),
+          isBonus: bonus,
+          quizTitle: widget.title,
+          onLevelComplete: _onLevelComplete,
+          getQuestionsForLevel: (pos) => _controller.getQuestionsForPos(
+            pos,
+            _questionsByLevel,
+            _levelDocIds,
+            _bonusSlotToDocId,
+          ),
+          getGameplayTitle: QuizController.getLevelTitle,
+          isBonusLevel: QuizController.isBonusLevel,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onLevelComplete(LevelResultModels res, int gridPos) async {
+    final all = [..._controller.block1Items, ..._controller.block2Items];
+    int oldStars = 0;
+    for (var t in all) if (t.number == gridPos) oldStars = t.starsEarned;
+    int delta = res.starsEarned > oldStars ? res.starsEarned - oldStars : 0;
+
+    setState(() {
+      for (var t in all)
+        if (t.number == gridPos) {
+          t.starsEarned = res.starsEarned > oldStars
+              ? res.starsEarned
+              : oldStars;
+          if (t.starsEarned > 0) _controller.unlockNext(gridPos);
+        }
+      _controller.updateCurrentTile();
+    });
+
+    if (delta > 0) {
+      await LevelProgressService.saveLevelStars(
+        category: widget.categoryId,
+        levelNumber: gridPos,
+        starsEarned: res.starsEarned,
+      );
+      await context.read<UserProgressProvider>().onQuizLevelCompleted(
+        customCoins: res.coinsEarned,
+        customXP: res.xpEarned,
+        earnedStars: delta,
+      );
+    }
+  }
+
+  Widget _buildSeparator(String text) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
+    child: Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.white.withValues(alpha: 0.2),
+        fontSize: 13,
+        height: 1.5,
+      ),
+    ),
+  );
+  Widget _buildUnlockNextHeader() => Padding(
+    padding: const EdgeInsets.only(bottom: 24),
+    child: Center(
+      child: Text(
+        'Unlock Next Level with 50 ★ Stars',
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.3),
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
+}

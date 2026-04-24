@@ -7,6 +7,8 @@ class LockedCategoryModel {
   final String snackbarMessage;
   final Color snackbarColor;
   final bool requiresCoins;
+  final String categoryId;
+  final String firestoreName;
 
   LockedCategoryModel({
     required this.title,
@@ -14,6 +16,8 @@ class LockedCategoryModel {
     required this.snackbarMessage,
     required this.unlockText,
     required this.imagePath,
+    required this.categoryId,
+    required this.firestoreName,
     this.requiresCoins = false,
   });
 }

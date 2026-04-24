@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/quiz_models/locked_category_models.dart';
+import 'package:quiz_game/screens/common/level_grid_screen.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:provider/provider.dart';
 
 class LockedSection extends StatelessWidget {
   const LockedSection({super.key});
@@ -13,6 +16,8 @@ class LockedSection extends StatelessWidget {
       requiresCoins: false,
       snackbarMessage: 'Level 5 to unlock Legends Quiz!',
       snackbarColor: Colors.blue,
+      categoryId: 'legends_quiz',
+      firestoreName: 'Legend Quiz',
     ),
     LockedCategoryModel(
       title: 'National',
@@ -21,6 +26,8 @@ class LockedSection extends StatelessWidget {
       requiresCoins: true,
       snackbarMessage: 'You need 1000 Coins to unlock National!',
       snackbarColor: Colors.blue,
+      categoryId: 'national_quiz',
+      firestoreName: 'National QUiz',
     ),
     LockedCategoryModel(
       title: 'Manager Quiz',
@@ -29,6 +36,8 @@ class LockedSection extends StatelessWidget {
       requiresCoins: false,
       snackbarMessage: 'Reach Level 8 to unlock Manager Quiz!',
       snackbarColor: Colors.blue,
+      categoryId: 'manager_quiz',
+      firestoreName: 'Manager Quiz',
     ),
     LockedCategoryModel(
       title: 'Transfer Quiz',
@@ -37,6 +46,8 @@ class LockedSection extends StatelessWidget {
       requiresCoins: true,
       snackbarMessage: 'You need 500 Coins to unlock Transfer Quiz!',
       snackbarColor: Colors.blue,
+      categoryId: 'transfer_quiz',
+      firestoreName: 'Transfer Quiz',
     ),
   ];
 
@@ -90,34 +101,35 @@ class _LockedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: item.snackbarColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+        final progress = context.read<UserProgressProvider>();
+        
+        // ── UNLOCK LOGIC ──
+        bool isUnlocked = true; // Always true for development/testing phase
+        
+        if (isUnlocked) { 
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LevelGridScreen(
+                title: item.title.toUpperCase(),
+                categoryId: item.categoryId,
+                firestoreName: item.firestoreName,
+              ),
             ),
-            content: Row(
-              children: [
-                // Icon(
-                //   item.requiresCoins ? Icons.monetization_on : Icons.lock,
-                //   color: Colors.white,
-                // ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    item.snackbarMessage,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: item.snackbarColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              content: Text(item.snackbarMessage),
+              duration: const Duration(seconds: 2),
             ),
-            duration: Duration(seconds: 2),
-          ),
-        );
+          );
+        }
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -127,7 +139,7 @@ class _LockedCard extends StatelessWidget {
             Image.asset(
               item.imagePath,
               fit: BoxFit.cover,
-              opacity: const AlwaysStoppedAnimation(.5),
+              opacity: const AlwaysStoppedAnimation(1.0), // Full opacity for testing
               errorBuilder: (_, __, ___) =>
                   Container(color: AppColors.deepCard),
             ),
@@ -145,24 +157,7 @@ class _LockedCard extends StatelessWidget {
               ),
             ),
 
-            // ── Lock icon top right ───────────────────────────
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.50),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.lock_rounded,
-                  color: Colors.white70,
-                  size: 15,
-                ),
-              ),
-            ),
+            // Lock icon removed for testing phase
 
             // ── Bottom label ──────────────────────────────────
             Positioned(

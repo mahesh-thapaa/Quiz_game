@@ -1,22 +1,19 @@
-// lib/data/home_data.dart
-
 import 'package:quiz_game/models/home_models/home_models.dart';
-import 'package:quiz_game/models/home_models/streak_model.dart';
+import 'package:quiz_game/models/streak_models.dart';
 
 class HomeData {
   static const UserModel user = UserModel(
-    name: 'Sushant',
-    level: 3,
-    coins: 340,
-    currentXP: 1250,
-    maxXP: 2000,
+    name: 'Mahesh Thapa',
+    level: 12,
+    coins: 1250,
+    currentXP: 450,
+    maxXP: 1000,
   );
 
-  static const DailyBonusModel dailyBonus = DailyBonusModel(
+  static const DailyBonusModel bonus = DailyBonusModel(
     coins: 100,
     title: 'DAILY BONUS',
     subtitle: 'Collect your free coins',
-    buttonLabel: 'CLAIM REWARD',
   );
 
   static const List<QuizCardModel> recommendedQuizzes = [
@@ -24,11 +21,15 @@ class HomeData {
       title: 'Player Challenge',
       subtitle: 'Identify the players from the given question',
       imageUrl: 'asstes/images/ronaldo.png',
+      categoryId: 'player_quiz',
+      firestoreName: 'Player Quiz',
     ),
     QuizCardModel(
       title: 'Logo Master',
       subtitle: 'Guess the club from its crest',
-      imageUrl: 'asstes/images/logomatser.jpg',
+      imageUrl: 'asstes/images/stadium.jpg',
+      categoryId: 'club_quiz',
+      firestoreName: 'Club Quiz',
     ),
   ];
 
