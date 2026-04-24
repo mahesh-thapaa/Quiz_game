@@ -14,9 +14,12 @@ class ChallengeCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: DecorationImage(
-          image: AssetImage("asstes/images/ucl.jpg"),
+          image: const AssetImage("asstes/images/ucl.jpg"),
           fit: BoxFit.cover,
-          opacity: 0.5,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.4),
+            BlendMode.darken,
+          ),
         ),
       ),
       child: Column(
@@ -33,6 +36,13 @@ class ChallengeCard extends StatelessWidget {
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 2.0,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
                   ),
                 ),
                 Spacer(),
@@ -74,6 +84,13 @@ class ChallengeCard extends StatelessWidget {
                         color: AppColors.hText,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black,
+                            blurRadius: 2.0,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 10),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/club/club_question_model.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_answer_option.dart';
-import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_level_complete-screen.dart';
-import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_quiz_top_bar.dart';
-import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_image_card.dart';
+import 'package:quiz_game/screens/jersey_quiz/jursey_quiz_gameplay/jursey_answer_options.dart';
+import 'package:quiz_game/screens/jersey_quiz/jursey_quiz_gameplay/jursey_level_completed_screen.dart';
+import 'package:quiz_game/screens/jersey_quiz/jursey_quiz_gameplay/jursey_quiz_top_bar.dart';
+import 'package:quiz_game/screens/jersey_quiz/jursey_quiz_gameplay/jursey_image_card.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 import 'package:quiz_game/services/star_calculation_service.dart';

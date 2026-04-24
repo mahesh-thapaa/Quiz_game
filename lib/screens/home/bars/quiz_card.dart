@@ -66,6 +66,13 @@ class QuizCard extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 4.0,
+                          color: Colors.black,
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -74,6 +81,14 @@ class QuizCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.titleColor,
                       fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 4.0,
+                          color: Colors.black,
+                        ),
+                      ],
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

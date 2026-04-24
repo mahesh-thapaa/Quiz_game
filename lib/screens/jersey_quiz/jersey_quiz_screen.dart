@@ -10,7 +10,8 @@ import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/services/level_progess_services.dart';
 import 'widgets/level_tile.dart';
 import 'widgets/level_overview_sheet.dart';
-import 'package:quiz_game/screens/jersery_quiz/jursey_quiz_gameplay/jursey_quiz_gameplay_screen.dart';
+
+import 'package:quiz_game/screens/jersey_quiz/jursey_quiz_gameplay/jursey_quiz_gameplay_screen.dart';
 
 class JerseyQuizScreen extends StatefulWidget {
   const JerseyQuizScreen({super.key});

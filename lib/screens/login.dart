@@ -45,98 +45,74 @@ class _LoginState extends State<Login> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(28.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "GoalIQ",
-                  style: TextStyle(
-                    color: AppColors.titleColor,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  height: 130,
-                  width: 130,
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.sports_soccer,
-                      color: Colors.white,
-                      size: 62,
+          child: Center(
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "GoalIQ",
+                    style: TextStyle(
+                      color: AppColors.titleColor,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  "Play Football Quiz",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.hText,
-                    fontSize: 40,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+                  const SizedBox(height: 20),
+                  Container(
+                    height: 130,
+                    width: 130,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.sports_soccer,
+                        color: Colors.white,
+                        size: 62,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: 250,
-                  child: Text(
-                    "Test your knowledge against thousands of fans worldwide.",
+                  const SizedBox(height: 20),
+                  Text(
+                    "Play Football Quiz",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: AppColors.stext,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                      color: AppColors.hText,
+                      fontSize: 40,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
                     ),
                   ),
-                ),
-                const SizedBox(height: 32),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: 250,
+                    child: Text(
+                      "Test your knowledge against thousands of fans worldwide.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.stext,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
 
-                // ── Original login button (Google / Guest) ───────────────────
-                if (_isLoading)
-                  const CircularProgressIndicator()
-                else
-                  Buttons(onGuestTap: _goToHome, onEmailTap: _goToEmailSignup),
-
-                // const SizedBox(height: 16),
-
-                // // ── Email login button ───────────────────────────────────────
-                // SizedBox(
-                //   width: double.infinity,
-                //   height: 52,
-                //   child: OutlinedButton.icon(
-                //     style: OutlinedButton.styleFrom(
-                //       side: BorderSide(color: AppColors.divider),
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(12),
-                //       ),
-                //     ),
-                //     onPressed: _isLoading ? null : _goToEmailSignup,
-                //     icon: Icon(
-                //       Icons.email_outlined,
-                //       color: AppColors.hText,
-                //       size: 20,
-                //     ),
-                //     label: Text(
-                //       'Login with Email',
-                //       style: TextStyle(
-                //         color: AppColors.hText,
-                //         fontSize: 15,
-                //         fontWeight: FontWeight.w600,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-              ],
+                  // ── Original login button (Google / Guest) ───────────────────
+                  if (_isLoading)
+                    const CircularProgressIndicator()
+                  else
+                    Buttons(
+                      onGuestTap: _goToHome,
+                      onEmailTap: _goToEmailSignup,
+                    ),
+                ],
+              ),
             ),
           ),
         ),

@@ -9,7 +9,15 @@ import 'package:quiz_game/provider/leaderBoard_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // Firebase already initialized (common after hot reload)
+    debugPrint('⚠️ Firebase init: $e');
+  }
 
   runApp(
     MultiProvider(

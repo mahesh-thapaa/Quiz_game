@@ -10,7 +10,7 @@ import 'package:quiz_game/screens/Quiz_screen/widgets/locked_section.dart';
 import 'package:quiz_game/screens/discover_screen/diccover_screen.dart';
 // import 'package:quiz_game/screens/jerrsy_quiz/jersey_quiz_screen.dart';
 import 'package:quiz_game/screens/player_quiz/player_screen_quiz.dart';
-import 'package:quiz_game/screens/jersery_quiz/jersey_quiz_screen.dart';
+import 'package:quiz_game/screens/jersey_quiz/jersey_quiz_screen.dart';
 import 'package:quiz_game/screens/club_quiz/club_quiz_screen.dart';
 import 'package:quiz_game/screens/stadium_quiz/Stadium_quiz_screen.dart';
 import 'package:quiz_game/models/quiz_models/quiz_modsels.dart';

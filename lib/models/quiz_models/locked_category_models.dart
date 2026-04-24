@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:quiz_game/models/colors.dart';
 
 class LockedCategoryModel {
   final String title;

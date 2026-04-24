@@ -62,6 +62,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1035044927359',
     projectId: 'auth-30a86',
     storageBucket: 'auth-30a86.firebasestorage.app',
-    // databaseURL: '',
+    databaseURL: 'https://auth-30a86.firebaseio.com',
   );
 }

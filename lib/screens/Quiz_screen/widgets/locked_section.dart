@@ -24,7 +24,7 @@ class LockedSection extends StatelessWidget {
     ),
     LockedCategoryModel(
       title: 'Manager Quiz',
-      unlockText: 'Level 8 Required',
+      unlockText: 'Level 7 Required',
       imagePath: 'asstes/images/manager.jpg',
       requiresCoins: false,
       snackbarMessage: 'Reach Level 8 to unlock Manager Quiz!',
@@ -32,7 +32,7 @@ class LockedSection extends StatelessWidget {
     ),
     LockedCategoryModel(
       title: 'Transfer Quiz',
-      unlockText: '500 Coins',
+      unlockText: '5000 Coins',
       imagePath: 'asstes/images/transfer.png',
       requiresCoins: true,
       snackbarMessage: 'You need 500 Coins to unlock Transfer Quiz!',
@@ -127,6 +127,7 @@ class _LockedCard extends StatelessWidget {
             Image.asset(
               item.imagePath,
               fit: BoxFit.cover,
+              opacity: const AlwaysStoppedAnimation(.5),
               errorBuilder: (_, __, ___) =>
                   Container(color: AppColors.deepCard),
             ),
@@ -179,8 +180,8 @@ class _LockedCard extends StatelessWidget {
                       color: Colors.white,
                       shadows: [
                         Shadow(
-                          color: Colors.black54,
-                          blurRadius: 4,
+                          color: Colors.black,
+                          blurRadius: 2.0,
                           offset: Offset(0, 1),
                         ),
                       ],
@@ -195,6 +196,13 @@ class _LockedCard extends StatelessWidget {
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                             color: Colors.white70,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 2.0,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
                           ),
                         ),
                 ],
@@ -243,6 +251,13 @@ class _CoinBadge extends StatelessWidget {
             fontSize: 15,
             fontWeight: FontWeight.w600,
             color: Colors.white70,
+            shadows: [
+              Shadow(
+                color: Colors.black,
+                blurRadius: 2.0,
+                offset: Offset(0, 1),
+              ),
+            ],
           ),
         ),
       ],

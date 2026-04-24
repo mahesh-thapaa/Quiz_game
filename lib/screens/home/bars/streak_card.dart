@@ -25,9 +25,9 @@ class _StreakCardState extends State<StreakCard> {
 
   // ✅ fallback so shimmer never gets stuck
   static const _defaultStreak = StreakModel(
-    title: 'Daily Login Streak',
+    title: StreakLogic.streakTitle,
     currentDay: 0,
-    totalDays: 7,
+    totalDays: StreakLogic.totalDaysPerCycle,
   );
 
   @override
@@ -35,13 +35,7 @@ class _StreakCardState extends State<StreakCard> {
     super.initState();
 
     // ✅ Set default IMMEDIATELY so shimmer never shows
-    _streak =
-        widget.initialStreak ??
-        const StreakModel(
-          title: 'Daily Login Streak',
-          currentDay: 0,
-          totalDays: 7,
-        );
+    _streak = widget.initialStreak ?? _defaultStreak;
 
     _init();
   }
@@ -91,6 +85,16 @@ class _StreakCardState extends State<StreakCard> {
     final isBroken = streak.isBroken;
     final isComplete = streak.isComplete;
 
+    debugPrint('════════════════════════════════════════════════');
+    debugPrint('🎨 [STREAK CARD BUILD]');
+    debugPrint(
+      '   → currentDay: ${streak.currentDay} (should be 1-7 for green bars)',
+    );
+    debugPrint('   → totalDays: ${streak.totalDays}');
+    debugPrint('   → isBroken: $isBroken (currentDay == 0)');
+    debugPrint('   → isComplete: $isComplete (currentDay >= 7)');
+    debugPrint('════════════════════════════════════════════════');
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -136,6 +140,9 @@ class _StreakCardState extends State<StreakCard> {
                 Row(
                   children: List.generate(streak.totalDays, (i) {
                     final done = i < streak.currentDay;
+                    debugPrint(
+                      '🔍 [BAR DEBUG] i=$i | currentDay=${streak.currentDay} | done=$done',
+                    );
                     return Expanded(
                       child: Container(
                         height: 5,

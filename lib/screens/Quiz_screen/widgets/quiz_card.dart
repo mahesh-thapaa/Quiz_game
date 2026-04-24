@@ -19,7 +19,7 @@ class QuizCard extends StatelessWidget {
           image: AssetImage(model.image),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.2),
+            Colors.black.withValues(alpha: 0.4),
             BlendMode.darken,
           ),
         ),
@@ -42,6 +42,13 @@ class QuizCard extends StatelessWidget {
               color: AppColors.secondary,
               fontSize: 12,
               fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 1),
+                  blurRadius: 2.0,
+                  color: Colors.black,
+                ),
+              ],
             ),
           ),
         ],

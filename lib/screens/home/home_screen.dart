@@ -13,7 +13,7 @@ import 'package:quiz_game/models/home_models/streak_model.dart';
 import 'package:quiz_game/data/home_data.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
-import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
+
 import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
 import 'package:quiz_game/screens/home/bars/quick_play_card.dart';
 import 'package:quiz_game/screens/home/bars/quiz_card.dart';
@@ -124,8 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const SizedBox(height: 16),
               const HomeAppBar(),
-              const SizedBox(height: 16),
-              const XPProgressBar(),
+              // const SizedBox(height: 16),
+              // const XPProgressBar(),
               const SizedBox(height: 20),
               DailyBonusCard(bonus: widget.dailyBonus),
               const SizedBox(height: 16),

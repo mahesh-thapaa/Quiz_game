@@ -15,7 +15,7 @@ class LevelProgressService {
     if (uid == null) return;
 
     await _db
-        .collection('users')
+        .collection('user')
         .doc(uid)
         .collection('level_progress')
         .doc('${category}_grid$levelNumber')
@@ -33,7 +33,7 @@ class LevelProgressService {
     final uid = _uid;
     if (uid == null) return {};
     final snap = await _db
-        .collection('users')
+        .collection('user')
         .doc(uid)
         .collection('level_progress')
         .where('category', isEqualTo: category)

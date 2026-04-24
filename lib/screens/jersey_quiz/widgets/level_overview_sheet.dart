@@ -192,14 +192,10 @@ class PlayerBonus extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ✅ Top Row — centered pill, close button top right
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ✅ Invisible spacer to balance close button
-                const SizedBox(width: 28),
-
-                // ✅ Centered LEVEL OVERVIEW pill
+                SizedBox(width: 50),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -222,8 +218,6 @@ class PlayerBonus extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // ✅ Close button on the right
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
@@ -245,7 +239,6 @@ class PlayerBonus extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Title
             const Text(
               'BONUS LEVEL',
               style: TextStyle(
@@ -257,7 +250,6 @@ class PlayerBonus extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Star or Lock icon
             Icon(
               isUnlocked ? Icons.star_rounded : Icons.lock_rounded,
               color: isUnlocked ? AppColors.doller : AppColors.stext,
@@ -265,11 +257,10 @@ class PlayerBonus extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Description
             Text(
               isUnlocked
                   ? 'Test your knowledge on football players.\nGet double XP and Coin.'
-                  : 'Complete Level $unlockAtLevel to unlock\nthis Bonus Level.',
+                  : 'Complete Level $unlockAtLevel to unlock\nthis Bonus Level.', // ✅ dynamic level number
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 13,
@@ -279,7 +270,6 @@ class PlayerBonus extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Not available banner
             if (!isUnlocked)
               Container(
                 width: double.infinity,
@@ -316,7 +306,6 @@ class PlayerBonus extends StatelessWidget {
                 ),
               ),
 
-            // Play / Locked Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
