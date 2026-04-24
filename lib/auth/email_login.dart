@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
@@ -19,9 +19,7 @@ class _EmailLoginState extends State<EmailLogin> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _isLoading = false;
   bool _obscurePassword = true;
-  String _errorMessage = '';
 
   @override
   void dispose() {
@@ -33,74 +31,43 @@ class _EmailLoginState extends State<EmailLogin> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+    final auth = context.read<AuthController>();
+    final success = await auth.signIn(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
 
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      if (!mounted) return;
-
+    if (success && mounted) {
       await context.read<UserProgressProvider>().loadFromFirestore();
-
       if (!mounted) return;
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
       );
-    } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _friendlyError(e.code));
-    } catch (e) {
-      setState(() => _errorMessage = 'Something went wrong. Please try again.');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _forgotPassword() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
-      setState(
-        () => _errorMessage = 'Enter your email above to reset password.',
-      );
-      return;
-    }
+    final auth = context.read<AuthController>();
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await auth.resetPassword(_emailController.text);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password reset email sent. Check your inbox.'),
         ),
       );
-    } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _friendlyError(e.code));
-    }
-  }
-
-  String _friendlyError(String code) {
-    switch (code) {
-      case 'user-not-found':
-        return 'No account found with this email.';
-      case 'wrong-password':
-        return 'Incorrect password. Please try again.';
-      case 'invalid-email':
-        return 'Please enter a valid email address.';
-      case 'too-many-requests':
-        return 'Too many attempts. Please try again later.';
-      default:
-        return 'Login failed. Please try again.';
+    } catch (e) {
+      // Error handled by controller
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final isLoading = auth.isLoading;
+    final errorMessage = auth.errorMessage;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -110,7 +77,10 @@ class _EmailLoginState extends State<EmailLogin> {
         leading: widget.showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  auth.clearError();
+                  Navigator.pop(context);
+                },
               )
             : null,
       ),
@@ -197,7 +167,7 @@ class _EmailLoginState extends State<EmailLogin> {
                   ),
                   const SizedBox(height: 24),
 
-                  if (_errorMessage.isNotEmpty)
+                  if (errorMessage.isNotEmpty)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
@@ -210,7 +180,7 @@ class _EmailLoginState extends State<EmailLogin> {
                         ),
                       ),
                       child: Text(
-                        _errorMessage,
+                        errorMessage,
                         style: const TextStyle(color: Colors.red, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
@@ -226,8 +196,8 @@ class _EmailLoginState extends State<EmailLogin> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: _isLoading ? null : _submit,
-                      child: _isLoading
+                      onPressed: isLoading ? null : _submit,
+                      child: isLoading
                           ? const SizedBox(
                               width: 22,
                               height: 22,

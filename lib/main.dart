@@ -6,6 +6,7 @@ import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screesn.dart';
 import 'package:quiz_game/provider/leaderBoard_provider.dart';
+import 'package:quiz_game/controllers/auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProgressProvider()),
         ChangeNotifierProvider(create: (_) => LeaderboardProvider()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: const MyApp(),
     ),

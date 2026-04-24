@@ -1,17 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_login.dart';
 
 class EmailSignup extends StatefulWidget {
-  // ✅ false when coming from logout — hides the back button
-  // true when coming from normal login flow — shows the back button
   final bool showBackButton;
-
   const EmailSignup({super.key, this.showBackButton = true});
 
   @override
@@ -24,9 +20,7 @@ class _EmailSignupState extends State<EmailSignup> {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _isLoading = false;
   bool _obscurePassword = true;
-  String _errorMessage = '';
 
   @override
   void dispose() {
@@ -39,79 +33,42 @@ class _EmailSignupState extends State<EmailSignup> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+    final auth = context.read<AuthController>();
+    final success = await auth.signUp(
+      username: _usernameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
 
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          );
-
-      await FirebaseFirestore.instance
-          .collection('user')
-          .doc(credential.user!.uid)
-          .set({
-            'username': _usernameController.text.trim(),
-            'bio': '',
-            'Coin': 0,
-            'XP': 0,
-            'Level': 1,
-            'Stars': 0,
-            'email': _emailController.text.trim(),
-            'createdAt': FieldValue.serverTimestamp(),
-            'CompletedSections': 0,
-            'QuizLevelsInSection': 0,
-          });
-
-      if (!mounted) return;
-
+    if (success && mounted) {
       await context.read<UserProgressProvider>().loadFromFirestore();
-
       if (!mounted) return;
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
       );
-    } on FirebaseAuthException catch (e) {
-      setState(() => _errorMessage = _friendlyError(e.code));
-    } catch (e) {
-      setState(() => _errorMessage = 'Something went wrong. Please try again.');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  String _friendlyError(String code) {
-    switch (code) {
-      case 'email-already-in-use':
-        return 'An account with this email already exists.';
-      case 'invalid-email':
-        return 'Please enter a valid email address.';
-      case 'weak-password':
-        return 'Password must be at least 6 characters.';
-      default:
-        return 'Sign up failed. Please try again.';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final isLoading = auth.isLoading;
+    final errorMessage = auth.errorMessage;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        // ✅ Only show back button when showBackButton is true
         automaticallyImplyLeading: false,
         leading: widget.showBackButton
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  auth.clearError();
+                  Navigator.pop(context);
+                },
               )
             : null,
       ),
@@ -140,7 +97,6 @@ class _EmailSignupState extends State<EmailSignup> {
                   ),
                   const SizedBox(height: 32),
 
-                  // ── Username ─────────────────────────────────────────────────
                   TextFormField(
                     controller: _usernameController,
                     keyboardType: TextInputType.name,
@@ -162,7 +118,6 @@ class _EmailSignupState extends State<EmailSignup> {
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Email ────────────────────────────────────────────────────
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -177,7 +132,6 @@ class _EmailSignupState extends State<EmailSignup> {
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Password ─────────────────────────────────────────────────
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -207,8 +161,7 @@ class _EmailSignupState extends State<EmailSignup> {
                   ),
                   const SizedBox(height: 24),
 
-                  // ── Error ────────────────────────────────────────────────────
-                  if (_errorMessage.isNotEmpty)
+                  if (errorMessage.isNotEmpty)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
@@ -221,13 +174,12 @@ class _EmailSignupState extends State<EmailSignup> {
                         ),
                       ),
                       child: Text(
-                        _errorMessage,
+                        errorMessage,
                         style: const TextStyle(color: Colors.red, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ),
 
-                  // ── Sign Up button ───────────────────────────────────────────
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -238,8 +190,8 @@ class _EmailSignupState extends State<EmailSignup> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: _isLoading ? null : _submit,
-                      child: _isLoading
+                      onPressed: isLoading ? null : _submit,
+                      child: isLoading
                           ? const SizedBox(
                               width: 22,
                               height: 22,
@@ -260,7 +212,6 @@ class _EmailSignupState extends State<EmailSignup> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Go to Login ──────────────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -269,14 +220,17 @@ class _EmailSignupState extends State<EmailSignup> {
                         style: TextStyle(color: AppColors.stext, fontSize: 14),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EmailLogin(
-                              showBackButton: widget.showBackButton,
+                        onTap: () {
+                          auth.clearError();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => EmailLogin(
+                                showBackButton: widget.showBackButton,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                         child: Text(
                           'Login',
                           style: TextStyle(

@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onRecommendedQuizTap(QuizCardModel quiz) {
     String displayTitle = quiz.title;
-    
+
     // Change 'Player Challenge' to 'Player Quiz' only for the next screen
     if (displayTitle == 'Player Challenge') {
       displayTitle = 'Player Quiz';
@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
-                  mainAxisSpacing: 16, 
+                  mainAxisSpacing: 16,
                   childAspectRatio: 1.1,
                 ),
                 itemBuilder: (context, index) {
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 30),
 
               // 7. Streak Card
-              const StreakCard(),
+              const StreakCard(triggerLoginOnInit: true),
               const SizedBox(height: 35),
 
               // 8. Popular Categories Header
