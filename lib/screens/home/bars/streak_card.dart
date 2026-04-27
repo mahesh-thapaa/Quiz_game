@@ -10,8 +10,15 @@ import 'package:quiz_game/controllers/streak_controller.dart';
 import 'package:quiz_game/screens/home/widgets/streak_reward_popup.dart';
 import 'package:quiz_game/auth/email_signup.dart';
 
-class StreakCard extends StatelessWidget {
+class StreakCard extends StatefulWidget {
   const StreakCard({super.key});
+
+  @override
+  State<StreakCard> createState() => _StreakCardState();
+}
+
+class _StreakCardState extends State<StreakCard> {
+  bool _popupShown = false;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +26,7 @@ class StreakCard extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
     final isGuest = user == null || user.isAnonymous;
 
-    final streak =
-        p.streak ??
+    final streak = p.streak ??
         const StreakModel(
           title: StreakController.streakTitle,
           currentDay: 0,
@@ -30,7 +36,9 @@ class StreakCard extends StatelessWidget {
     // ✅ AUTOMATIC POPUP: Only for registered users
     if (!isGuest &&
         streak.currentDay >= streak.totalDays &&
-        !streak.rewardClaimed) {
+        !streak.rewardClaimed &&
+        !_popupShown) {
+      _popupShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showStreakRewardPopup(
           context,

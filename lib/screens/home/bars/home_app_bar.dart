@@ -36,14 +36,86 @@ class HomeAppBar extends StatelessWidget {
           ],
         ),
         const Spacer(),
-
+        _XPBadge(xp: p.xp),
+        const SizedBox(width: 8),
+        _StarsBadge(stars: p.stars),
+        const SizedBox(width: 8),
         _CoinsBadge(coins: p.coins),
       ],
     );
   }
 }
 
+class _XPBadge extends StatelessWidget {
+  final int xp;
+  const _XPBadge({required this.xp});
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          const Text(
+            'XP',
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            '$xp',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StarsBadge extends StatelessWidget {
+  final int stars;
+  const _StarsBadge({required this.stars});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.star_rounded,
+            color: AppColors.doller,
+            size: 18,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            '$stars',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _CoinsBadge extends StatelessWidget {
   final int coins;

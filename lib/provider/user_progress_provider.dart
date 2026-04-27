@@ -24,6 +24,7 @@ class UserProgressProvider extends ChangeNotifier {
 
   int _completedSections = 0;
   int _quizLevelsInSection = 0;
+  List<String> _unlockedCategories = [];
 
   int get coins => _coins;
   int get xp => _xp;
@@ -34,6 +35,7 @@ class UserProgressProvider extends ChangeNotifier {
   String get bio => _bio;
   String get avatarPath => _avatarPath;
   StreakModel? get streak => _streak;
+  List<String> get unlockedCategories => _unlockedCategories;
 
   int get level => _completedSections + 1;
   int get currentLevelXP => _quizLevelsInSection;
@@ -63,6 +65,10 @@ class UserProgressProvider extends ChangeNotifier {
       _avatarPath = data['avatarPath'] as String? ?? '';
       _completedSections = data['CompletedSections'] as int? ?? 0;
       _quizLevelsInSection = data['QuizLevelsInSection'] as int? ?? 0;
+      
+      // Load unlocked categories
+      final unlocked = data['unlockedCategories'] as List<dynamic>?;
+      _unlockedCategories = unlocked?.map((e) => e.toString()).toList() ?? [];
 
       _completedSections = _completedSections.clamp(0, totalSections);
       _quizLevelsInSection = _quizLevelsInSection.clamp(
@@ -71,7 +77,7 @@ class UserProgressProvider extends ChangeNotifier {
       );
 
       debugPrint(
-        'loadFromFirestore → username:$_username | coins:$_coins | level:$level',
+        'loadFromFirestore → username:$_username | coins:$_coins | level:$level | unlocked:${_unlockedCategories.length}',
       );
     } catch (e) {
       debugPrint('loadFromFirestore: $e');
@@ -79,6 +85,28 @@ class UserProgressProvider extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  // ── Category Unlocking ──────────────────────────────────────────────────────
+  bool isCategoryUnlocked(String categoryId, bool requiresCoins, int unlockValue) {
+    if (requiresCoins) {
+      return _unlockedCategories.contains(categoryId);
+    } else {
+      return _stars >= unlockValue;
+    }
+  }
+
+  Future<bool> unlockWithCoins(String categoryId, int cost) async {
+    if (_coins < cost) return false;
+
+    _coins -= cost;
+    if (!_unlockedCategories.contains(categoryId)) {
+      _unlockedCategories.add(categoryId);
+    }
+    
+    notifyListeners();
+    await _sync();
+    return true;
   }
 
   // ── Init Streak ─────────────────────────────────────────────────────────────
@@ -120,6 +148,7 @@ class UserProgressProvider extends ChangeNotifier {
     _avatarPath = '';
     _completedSections = 0;
     _quizLevelsInSection = 0;
+    _unlockedCategories = [];
     _loading = false;
     _streak = null;
     notifyListeners();
@@ -193,6 +222,9 @@ class UserProgressProvider extends ChangeNotifier {
   // ── Streak completed ────────────────────────────────────────────────────────
   Future<void> onStreakCompleted() async {
     _coins += coinsOnStreakComplete;
+    if (_streak != null) {
+      _streak = _streak!.copyWith(rewardClaimed: true);
+    }
     notifyListeners();
     await _sync();
   }
@@ -217,6 +249,7 @@ class UserProgressProvider extends ChangeNotifier {
         'Stars': _stars,
         'CompletedSections': _completedSections,
         'QuizLevelsInSection': _quizLevelsInSection,
+        'unlockedCategories': _unlockedCategories,
       }, SetOptions(merge: true));
       debugPrint('✅ Firestore Sync Complete.');
     } catch (e) {

@@ -15,21 +15,107 @@ class DiscoverWidgetsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
-    final userLevel = p.level;
-    final userCoins = p.coins;
 
-    bool isUnlocked = true;
+    bool isUnlocked = false;
     if (model.unlockType == UnlockType.level) {
-      isUnlocked = userLevel >= (model.unlockValue ?? 0);
+      isUnlocked = p.stars >= (model.unlockValue ?? 0);
     } else if (model.unlockType == UnlockType.coins) {
-      isUnlocked = userCoins >= (model.unlockValue ?? 0);
+      isUnlocked = p.unlockedCategories.contains(model.categoryId);
     } else if (model.unlockType == UnlockType.comingSoon) {
       isUnlocked = false;
     }
 
     return GestureDetector(
-      onTap: () {
-        if (!isUnlocked) {
+      onTap: () async {
+        if (isUnlocked) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LevelGridScreen(
+                title: model.title.toUpperCase(),
+                categoryId: model.categoryId,
+                firestoreName: model.firestoreName,
+              ),
+            ),
+          );
+        } else if (model.unlockType == UnlockType.coins) {
+          // ── Coin Purchase Dialog ───────────────────────────
+          final bool? confirmed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: AppColors.cardBg,
+              title: Text(
+                'Unlock ${model.title}',
+                style: const TextStyle(color: Colors.white),
+              ),
+              content: Text(
+                'Unlock this category for ${model.unlockValue} coins?',
+                style: const TextStyle(color: AppColors.stext),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    'UNLOCK',
+                    style: TextStyle(
+                      color: p.coins >= (model.unlockValue ?? 0)
+                          ? AppColors.primary
+                          : Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed == true) {
+            final success = await p.unlockWithCoins(
+              model.categoryId,
+              model.unlockValue ?? 0,
+            );
+            if (!context.mounted) return;
+
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.blue,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  content: const Text(
+                    'Category unlocked successfully!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.blue,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  content: const Text(
+                    'Not enough coins!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: Colors.blueAccent,
@@ -49,20 +135,7 @@ class DiscoverWidgetsCard extends StatelessWidget {
               ),
             ),
           );
-          return;
         }
-
-        // ✅ Navigate immediately (Unlocked Categories)
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LevelGridScreen(
-              title: model.title.toUpperCase(),
-              categoryId: model.categoryId,
-              firestoreName: model.firestoreName,
-            ),
-          ),
-        );
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),

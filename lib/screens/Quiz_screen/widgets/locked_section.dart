@@ -22,14 +22,14 @@ class LockedSection extends StatelessWidget {
     ),
     LockedCategoryModel(
       title: 'National',
-      unlockText: '1000 Coins',
+      unlockText: '10000 Coins',
       imagePath: 'asstes/images/national.jpg',
       requiresCoins: true,
-      snackbarMessage: 'You need 1000 Coins to unlock National!',
+      snackbarMessage: 'You need 100000 Coins to unlock National!',
       snackbarColor: Colors.blue,
       categoryId: 'national_quiz',
       firestoreName: 'National QUiz',
-      unlockValue: 1000,
+      unlockValue: 100000,
     ),
     LockedCategoryModel(
       title: 'Manager Quiz',
@@ -44,14 +44,14 @@ class LockedSection extends StatelessWidget {
     ),
     LockedCategoryModel(
       title: 'Transfer Quiz',
-      unlockText: '50000 Coins',
+      unlockText: '25000 Coins',
       imagePath: 'asstes/images/transfer.png',
       requiresCoins: true,
-      snackbarMessage: 'You need 500 Coins to unlock Transfer Quiz!',
+      snackbarMessage: 'You need 25000 Coins to unlock Transfer Quiz!',
       snackbarColor: Colors.blue,
       categoryId: 'transfer_quiz',
       firestoreName: 'Transfer Quiz',
-      unlockValue: 5000,
+      unlockValue: 25000,
     ),
   ];
 
@@ -104,12 +104,14 @@ class _LockedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
-    final bool isUnlocked = item.requiresCoins
-        ? p.coins >= item.unlockValue
-        : p.level >= item.unlockValue;
+    final bool isUnlocked = p.isCategoryUnlocked(
+      item.categoryId,
+      item.requiresCoins,
+      item.unlockValue,
+    );
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (isUnlocked) {
           Navigator.push(
             context,
@@ -121,6 +123,86 @@ class _LockedCard extends StatelessWidget {
               ),
             ),
           );
+        } else if (item.requiresCoins) {
+          // ── Coin Purchase Dialog ───────────────────────────
+          final bool? confirmed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: AppColors.cardBg,
+              title: Text(
+                'Unlock ${item.title}',
+                style: const TextStyle(color: Colors.white),
+              ),
+              content: Text(
+                'Unlock this category for ${item.unlockValue} coins?',
+                style: const TextStyle(color: AppColors.stext),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text(
+                    'CANCEL',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    'UNLOCK',
+                    style: TextStyle(
+                      color: p.coins >= item.unlockValue
+                          ? AppColors.primary
+                          : Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed == true) {
+            final success = await p.unlockWithCoins(
+              item.categoryId,
+              item.unlockValue,
+            );
+            if (!context.mounted) return;
+
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.blue,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  content: const Text(
+                    'Category unlocked successfully!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.blue,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  content: const Text(
+                    'Not enough coins!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

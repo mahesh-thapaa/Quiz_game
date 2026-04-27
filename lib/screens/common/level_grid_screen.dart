@@ -201,6 +201,8 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
             ),
           ),
           const SizedBox(width: 8),
+          _buildXPChip('${p.xp}'),
+          const SizedBox(width: 8),
           _buildChip('★', '${p.stars}'),
           const SizedBox(width: 8),
           _buildCoinChip('${p.coins}', suffix: ' +'),
@@ -208,6 +210,37 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       ),
     );
   }
+
+  Widget _buildXPChip(String value) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F2E),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'XP',
+              style: TextStyle(
+                color: Colors.greenAccent,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildCoinChip(String value, {String? suffix}) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

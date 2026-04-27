@@ -141,9 +141,11 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _alreadyClaimed ? 'Bonus Claimed ✓' : widget.bonus.title,
-                style: const TextStyle(
-                  color: AppColors.background,
+                _alreadyClaimed ? 'Bonus Claimed' : widget.bonus.title,
+                style: TextStyle(
+                  color: _alreadyClaimed
+                      ? AppColors.stext
+                      : AppColors.background,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
@@ -156,7 +158,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                 _alreadyClaimed
                     ? 'Come back tomorrow for your next bonus!'
                     : widget.bonus.subtitle,
-                style: const TextStyle(color: AppColors.background),
+                style: const TextStyle(color: Colors.black),
               ),
 
               const SizedBox(height: 14),
@@ -176,8 +178,8 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     'asstes/svg/coin-svgrepo-com.svg',
                     height: 24,
                     width: 24,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.doller,
+                    colorFilter: ColorFilter.mode(
+                      _alreadyClaimed ? Colors.grey : AppColors.doller,
                       BlendMode.srcIn,
                     ),
                   ),

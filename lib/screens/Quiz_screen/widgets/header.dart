@@ -33,10 +33,57 @@ class Header extends StatelessWidget {
         ),
         Row(
           children: [
+            _xpBadge("${p.xp}"),
+            const SizedBox(width: 8),
+            _starBadge("${p.stars}"),
+            const SizedBox(width: 8),
             _coinBadge("${p.coins}"),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _xpBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.deepCard,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "XP",
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(text, style: const TextStyle(color: AppColors.hText)),
+        ],
+      ),
+    );
+  }
+
+  Widget _starBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.deepCard,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star_rounded, color: AppColors.doller, size: 18),
+          const SizedBox(width: 5),
+          Text(text, style: const TextStyle(color: AppColors.hText)),
+        ],
+      ),
     );
   }
 
