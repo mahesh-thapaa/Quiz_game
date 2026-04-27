@@ -34,10 +34,12 @@ class _EmailSignupState extends State<EmailSignup> {
     if (!_formKey.currentState!.validate()) return;
 
     final auth = context.read<AuthController>();
+    final p = context.read<UserProgressProvider>();
     final success = await auth.signUp(
       username: _usernameController.text,
       email: _emailController.text,
       password: _passwordController.text,
+      provider: p,
     );
 
     if (success && mounted) {

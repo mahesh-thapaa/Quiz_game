@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/screens/buttons/buttons.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_signup.dart';
@@ -21,11 +22,16 @@ class _LoginState extends State<Login> {
     setState(() => _isLoading = true);
 
     try {
-      final p = context.read<UserProgressProvider>();
-      await Future.wait([
-        p.loadFromFirestore(),
-        p.initStreak(isLogin: true),
-      ]);
+      final auth = context.read<AuthController>();
+      final success = await auth.signInAnonymously();
+
+      if (success) {
+        final p = context.read<UserProgressProvider>();
+        await Future.wait([
+          p.loadFromFirestore(),
+          p.initStreak(isLogin: true),
+        ]);
+      }
     } catch (e) {
       debugPrint('❌ Login _goToHome error: $e');
     }

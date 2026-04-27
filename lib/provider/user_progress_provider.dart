@@ -84,10 +84,9 @@ class UserProgressProvider extends ChangeNotifier {
   // ── Init Streak ─────────────────────────────────────────────────────────────
   Future<void> initStreak({bool isLogin = false}) async {
     final user = FirebaseAuth.instance.currentUser;
-    final isGuest = user == null || user.isAnonymous;
 
-    if (isGuest) {
-      // ✅ INSTANT: For guests, don't even wait for Firestore
+    if (user == null) {
+      // ✅ INSTANT: Only for users who aren't signed in at all
       _streak = const StreakModel(
         title: StreakController.streakTitle,
         currentDay: 0,
@@ -210,6 +209,7 @@ class UserProgressProvider extends ChangeNotifier {
     if (uid == null) return;
 
     try {
+      debugPrint('☁️ Syncing progress to Firestore for UID: $uid');
       await _db.collection('user').doc(uid).set({
         'Coin': _coins,
         'XP': _xp,
@@ -218,8 +218,60 @@ class UserProgressProvider extends ChangeNotifier {
         'CompletedSections': _completedSections,
         'QuizLevelsInSection': _quizLevelsInSection,
       }, SetOptions(merge: true));
+      debugPrint('✅ Firestore Sync Complete.');
     } catch (e) {
       debugPrint('❌ _sync error: $e');
+    }
+  }
+
+  // ── Data Migration ──────────────────────────────────────────────────────────
+  /// Checks if a user already has data in Firestore
+  Future<bool> hasExistingData(String uid) async {
+    final doc = await _db.collection('user').doc(uid).get();
+    return doc.exists;
+  }
+
+  /// Migrates data from guest UID to new UID
+  Future<void> migrateGuestData(String guestUid, String newUid) async {
+    try {
+      // 1. Copy user document
+      final guestDoc = await _db.collection('user').doc(guestUid).get();
+      if (guestDoc.exists) {
+        await _db.collection('user').doc(newUid).set(
+              guestDoc.data()!,
+              SetOptions(merge: true),
+            );
+      }
+
+      // 2. Copy category progress
+      final categoriesSnap = await _db
+          .collection('user_progress')
+          .doc(guestUid)
+          .collection('categories')
+          .get();
+
+      for (var catDoc in categoriesSnap.docs) {
+        final levelsSnap = await catDoc.reference.collection('levels').get();
+        for (var lvlDoc in levelsSnap.docs) {
+          await _db
+              .collection('user_progress')
+              .doc(newUid)
+              .collection('categories')
+              .doc(catDoc.id)
+              .collection('levels')
+              .doc(lvlDoc.id)
+              .set(lvlDoc.data()!);
+        }
+      }
+
+      // 3. Delete guest data
+      await _db.collection('user').doc(guestUid).delete();
+      // Note: Deleting subcollections is complex in client SDK, 
+      // usually handled by Cloud Functions or just left orphaned.
+      
+      debugPrint('🚀 Guest data migrated from $guestUid to $newUid');
+    } catch (e) {
+      debugPrint('❌ Migration error: $e');
     }
   }
 }

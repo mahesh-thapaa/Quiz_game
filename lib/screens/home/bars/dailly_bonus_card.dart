@@ -172,10 +172,14 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     ),
                   ),
                   const SizedBox(width: 5),
-                  Icon(
-                    Icons.attach_money_outlined,
-                    color: AppColors.dShade,
-                    size: 24,
+                  SvgPicture.asset(
+                    'asstes/svg/coin-svgrepo-com.svg',
+                    height: 24,
+                    width: 24,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.doller,
+                      BlendMode.srcIn,
+                    ),
                   ),
 
                   const Spacer(),

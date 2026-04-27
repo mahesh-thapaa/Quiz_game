@@ -78,6 +78,7 @@ flutter:
     - asstes/svg/arrow.svg
     - asstes/images/legend.jpg
     - asstes/images/national.jpg
+    - asstes/svg/coin-svgrepo-com.svg
     - asstes/images/manager.jpg
     - asstes/images/transfer.png
     - asstes/images/ucl.jpg

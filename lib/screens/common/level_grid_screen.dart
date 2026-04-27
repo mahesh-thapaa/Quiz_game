@@ -203,11 +203,61 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           const SizedBox(width: 8),
           _buildChip('★', '${p.stars}'),
           const SizedBox(width: 8),
-          _buildChip('🪙', '${p.coins}', suffix: ' +'),
+          _buildCoinChip('${p.coins}', suffix: ' +'),
         ],
       ),
     );
   }
+
+  Widget _buildCoinChip(String value, {String? suffix}) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F2E),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              decoration: const BoxDecoration(
+                color: AppColors.doller,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: value,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  if (suffix != null)
+                    TextSpan(
+                      text: suffix,
+                      style: const TextStyle(color: Color(0xFFFFD700)),
+                    ),
+                ],
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _buildChip(String icon, String value, {String? suffix}) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),

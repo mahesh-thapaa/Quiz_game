@@ -37,37 +37,13 @@ class HomeAppBar extends StatelessWidget {
         ),
         const Spacer(),
 
-        _Badge(label: 'LVL ${p.level}'),
-        const SizedBox(width: 8),
         _CoinsBadge(coins: p.coins),
       ],
     );
   }
 }
 
-class _Badge extends StatelessWidget {
-  final String label;
-  const _Badge({required this.label});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
 
 class _CoinsBadge extends StatelessWidget {
   final int coins;
@@ -88,8 +64,25 @@ class _CoinsBadge extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Text('🪙', style: TextStyle(fontSize: 14)),
-            const SizedBox(width: 4),
+            Container(
+              width: 18,
+              height: 18,
+              decoration: const BoxDecoration(
+                color: AppColors.doller,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
             Text(
               '$coins',
               style: const TextStyle(

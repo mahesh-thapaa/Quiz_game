@@ -33,8 +33,6 @@ class Header extends StatelessWidget {
         ),
         Row(
           children: [
-            _badge("LVL ${p.level}"),
-            const SizedBox(width: 8),
             _coinBadge("${p.coins}"),
           ],
         ),
@@ -42,16 +40,7 @@ class Header extends StatelessWidget {
     );
   }
 
-  Widget _badge(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.deepCard,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(text, style: const TextStyle(color: AppColors.hText)),
-    );
-  }
+
 
   Widget _coinBadge(String text) {
     return Container(
@@ -63,8 +52,25 @@ class Header extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.monetization_on, color: Colors.amber, size: 16),
-          const SizedBox(width: 4),
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(
+              color: AppColors.doller,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text(
+                'S',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           Text(text, style: const TextStyle(color: AppColors.hText)),
         ],
       ),

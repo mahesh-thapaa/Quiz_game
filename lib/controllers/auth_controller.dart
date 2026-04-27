@@ -46,32 +46,97 @@ class AuthController with ChangeNotifier {
     }
   }
 
+  /// Guest Login: Persistent anonymous session
+  Future<bool> signInAnonymously() async {
+    setLoading(true);
+    _errorMessage = '';
+    try {
+      final credential = await _auth.signInAnonymously();
+      final uid = credential.user!.uid;
+      debugPrint('👤 Anonymous Auth Success: UID = $uid');
+
+      // Ensure a basic user document exists for the guest
+      final userDoc = await _db.collection('user').doc(uid).get();
+      if (!userDoc.exists) {
+        debugPrint('🆕 Creating new guest document in Firestore...');
+        await _db.collection('user').doc(uid).set({
+          'username': 'Guest',
+          'bio': 'Playing as Guest',
+          'Coin': 0,
+          'XP': 0,
+          'Level': 1,
+          'Stars': 0,
+          'createdAt': FieldValue.serverTimestamp(),
+          'CompletedSections': 0,
+          'QuizLevelsInSection': 0,
+          'isGuest': true,
+        });
+        debugPrint('✅ Guest document created successfully.');
+      } else {
+        debugPrint('🏠 Existing guest document found.');
+      }
+
+      setLoading(false);
+      return true;
+    } catch (e) {
+      debugPrint('❌ Guest login failed: $e');
+      _errorMessage = 'Guest login failed. Please try again.';
+      setLoading(false);
+      return false;
+    }
+  }
+
   Future<bool> signUp({
     required String username,
     required String email,
     required String password,
+    required UserProgressProvider provider,
   }) async {
     setLoading(true);
     _errorMessage = '';
 
+    final user = _auth.currentUser;
+    final bool wasGuest = user != null && user.isAnonymous;
+
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(
+      AuthCredential credential = EmailAuthProvider.credential(
         email: email.trim(),
         password: password.trim(),
       );
 
-      await _db.collection('user').doc(credential.user!.uid).set({
+      UserCredential userCredential;
+
+      if (wasGuest) {
+        debugPrint('🔗 Linking guest account to email: $email');
+        // This upgrades the anonymous account to a permanent one
+        // The UID stays the SAME, so all Firestore data stays!
+        userCredential = await user.linkWithCredential(credential);
+      } else {
+        debugPrint('🆕 Creating new fresh account...');
+        userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password.trim(),
+        );
+      }
+
+      final uid = userCredential.user!.uid;
+      debugPrint('✨ Account Ready: UID = $uid');
+
+      // Update or Create user record
+      await _db.collection('user').doc(uid).set({
         'username': username.trim(),
-        'bio': '',
-        'Coin': 0,
-        'XP': 0,
-        'Level': 1,
-        'Stars': 0,
         'email': email.trim(),
-        'createdAt': FieldValue.serverTimestamp(),
-        'CompletedSections': 0,
-        'QuizLevelsInSection': 0,
-      });
+        if (!wasGuest) ...{
+          'bio': '',
+          'Coin': 0,
+          'XP': 0,
+          'Level': 1,
+          'Stars': 0,
+          'createdAt': FieldValue.serverTimestamp(),
+          'CompletedSections': 0,
+          'QuizLevelsInSection': 0,
+        }
+      }, SetOptions(merge: true));
 
       // Initialize streak
       await StreakController.onLogin();
