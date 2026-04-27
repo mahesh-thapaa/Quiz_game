@@ -212,85 +212,84 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   }
 
   Widget _buildXPChip(String value) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1F2E),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1A1F2E),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'XP',
+          style: TextStyle(
+            color: Colors.greenAccent,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'XP',
-              style: TextStyle(
-                color: Colors.greenAccent,
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        const SizedBox(width: 5),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _buildCoinChip(String value, {String? suffix}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1F2E),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 18,
-              height: 18,
-              decoration: const BoxDecoration(
-                color: AppColors.doller,
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  'S',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
-                ),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1A1F2E),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 18,
+          height: 18,
+          decoration: const BoxDecoration(
+            color: AppColors.doller,
+            shape: BoxShape.circle,
+          ),
+          child: const Center(
+            child: Text(
+              'S',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
               ),
             ),
-            const SizedBox(width: 8),
-            Text.rich(
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text.rich(
+          TextSpan(
+            children: [
               TextSpan(
-                children: [
-                  TextSpan(
-                    text: value,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  if (suffix != null)
-                    TextSpan(
-                      text: suffix,
-                      style: const TextStyle(color: Color(0xFFFFD700)),
-                    ),
-                ],
-                style:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                text: value,
+                style: const TextStyle(color: Colors.white),
               ),
-            ),
-          ],
+              if (suffix != null)
+                TextSpan(
+                  text: suffix,
+                  style: const TextStyle(color: Color(0xFFFFD700)),
+                ),
+            ],
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _buildChip(String icon, String value, {String? suffix}) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -351,15 +350,15 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     if (qs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: const Color(0xFF1A1F2E),
+          backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           duration: const Duration(milliseconds: 1500),
           content: const Text(
-            'No questions available for this level yet.',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            'No questions available for this level yet!',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
           ),
         ),
       );
@@ -393,8 +392,10 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
         builder: (_) => QuizGameplayScreen(
           questions: qs,
           levelNumber: num,
-          levelTitle:
-              QuizController.getLevelTitle(num, categoryId: widget.categoryId),
+          levelTitle: QuizController.getLevelTitle(
+            num,
+            categoryId: widget.categoryId,
+          ),
           isBonus: bonus,
           quizTitle: widget.title,
           onLevelComplete: _onLevelComplete,

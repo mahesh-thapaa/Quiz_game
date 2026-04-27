@@ -37,11 +37,11 @@ class QuizScreen extends StatelessWidget {
         firestoreName: 'Jersey Quiz',
       ),
       QuizModel(
-        title: "Club Quiz",
+        title: "Logo Master",
         subtitle: "Logo challenge",
         image: "asstes/images/logomatser.jpg",
-        categoryId: 'club_quiz',
-        firestoreName: 'Club Quiz',
+        categoryId: 'logo_master',
+        firestoreName: 'Logo Master',
       ),
     ];
 

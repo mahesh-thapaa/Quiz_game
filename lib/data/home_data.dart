@@ -19,14 +19,14 @@ class HomeData {
       title: 'Logo Master',
       subtitle: 'Guess the club from its crest',
       imageUrl: 'asstes/images/stadium.jpg',
-      categoryId: 'club_quiz',
-      firestoreName: 'Club Quiz',
+      categoryId: 'logo_master',
+      firestoreName: 'Logo Master',
     ),
   ];
 
   static const List<CategoryModel> categories = [
     CategoryModel(title: 'Player Quiz', imageUrl: "asstes/images/quiz.jpg"),
-    CategoryModel(title: 'Club Quiz', imageUrl: 'asstes/images/club.jpg'),
+    CategoryModel(title: 'Logo Master', imageUrl: 'asstes/images/club.jpg'),
     CategoryModel(title: 'Stadium Quiz', imageUrl: 'asstes/images/stadium.jpg'),
   ];
 }

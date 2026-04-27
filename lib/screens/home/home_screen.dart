@@ -30,9 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (category.title == 'Stadium Quiz') {
       categoryId = 'stadium_quiz';
       firestoreName = 'Stadium Quiz';
-    } else if (category.title == 'Club Quiz') {
-      categoryId = 'club_quiz';
-      firestoreName = 'Club Quiz';
+    } else if (category.title == 'Logo Master') {
+      categoryId = 'logo_master';
+      firestoreName = 'Logo Master';
     }
 
     if (categoryId.isNotEmpty) {

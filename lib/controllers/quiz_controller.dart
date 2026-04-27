@@ -91,7 +91,7 @@ class QuizController {
         'Player Quiz',
         'Stadium Quiz',
         'Jersey Quiz',
-        'Club Quiz',
+        'Logo Master',
       ];
 
       // 2. Conditional categories (Home)
