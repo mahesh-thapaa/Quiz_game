@@ -1,5 +1,4 @@
 import 'package:quiz_game/models/home_models/home_models.dart';
-import 'package:quiz_game/models/streak_models.dart';
 
 class HomeData {
   static const DailyBonusModel bonus = DailyBonusModel(
