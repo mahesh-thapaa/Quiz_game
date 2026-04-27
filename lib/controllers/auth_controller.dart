@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
-import 'package:quiz_game/screens/streak/streak_logic.dart';
+import 'package:quiz_game/controllers/streak_controller.dart';
 
 class AuthController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -74,7 +74,7 @@ class AuthController with ChangeNotifier {
       });
 
       // Initialize streak
-      await StreakLogic.onLogin();
+      await StreakController.onLogin();
 
       setLoading(false);
       return true;

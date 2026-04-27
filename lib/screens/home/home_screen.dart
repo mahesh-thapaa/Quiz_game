@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
-import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
+// import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
 import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
 import 'package:quiz_game/screens/home/bars/quick_play_card.dart';
-import 'package:quiz_game/screens/home/bars/quiz_card.dart';
+import 'package:quiz_game/screens/home/bars/recommended_card.dart';
 import 'package:quiz_game/screens/home/bars/streak_card.dart';
 import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
@@ -84,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               // 2. XP Progress Bar
-              const XPProgressBar(),
-              const SizedBox(height: 25),
+              // const XPProgressBar(),
+              // const SizedBox(height: 25),
 
               // 3. Daily Bonus Card
               const DailyBonusCard(bonus: HomeData.bonus),
@@ -94,14 +94,13 @@ class _HomeScreenState extends State<HomeScreen> {
               // 4. Quick Play Card
               QuickPlayCard(
                 onTap: () {
-                  // Navigate to a "Random" quiz (Player Quiz as default)
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const LevelGridScreen(
-                        title: 'PLAYER QUIZ',
-                        categoryId: 'player_quiz',
-                        firestoreName: 'Player Quiz',
+                        title: 'QUICK QUIZ',
+                        categoryId: 'quick_quiz',
+                        firestoreName: 'Quick Quiz',
                       ),
                     ),
                   );
@@ -126,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 itemBuilder: (context, index) {
                   final quiz = HomeData.recommendedQuizzes[index];
-                  return QuizCard(
+                  return RecommendedCard(
                     quiz: quiz,
                     onTap: () => _onRecommendedQuizTap(quiz),
                   );
@@ -135,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 30),
 
               // 7. Streak Card
-              const StreakCard(triggerLoginOnInit: true),
+              const StreakCard(),
               const SizedBox(height: 35),
 
               // 8. Popular Categories Header

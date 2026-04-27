@@ -121,6 +121,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final top3 = lb.top3;
     final currentUserRank = lb.currentUserRank;
 
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
+
     final currentUserEntry = LeaderboardEntry(
       username: p.username.isNotEmpty ? p.username : 'You',
       name: p.username.isNotEmpty ? p.username : 'You',
@@ -365,44 +368,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
 
-              // ── Logout ──────────────────────────────────────────────────
-              ElevatedButton(
-                onPressed: _isLoggingOut ? null : _handleLogoutPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade800,
-                  disabledBackgroundColor: Colors.red.shade800.withOpacity(0.6),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // ── Auth Button (Sign In or Logout) ─────────────────────────
+              if (isGuest)
+                ElevatedButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const EmailSignup(showBackButton: true),
+                    ),
                   ),
-                ),
-                child: _isLoggingOut
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                          strokeWidth: 2,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade800,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.login_rounded, color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
                         ),
-                      )
-                    : const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.logout, color: Colors.white, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            'Logout',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
                       ),
-              ),
+                    ],
+                  ),
+                )
+              else
+                ElevatedButton(
+                  onPressed: _isLoggingOut ? null : _handleLogoutPressed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade800,
+                    disabledBackgroundColor:
+                        Colors.red.shade800.withOpacity(0.6),
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isLoggingOut
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.logout, color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Logout',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               const SizedBox(height: 24),
             ],
           ),

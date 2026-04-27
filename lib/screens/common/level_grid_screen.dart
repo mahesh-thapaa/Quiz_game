@@ -41,15 +41,24 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = LevelGridController.initial();
+    _controller = LevelGridController.initial(categoryId: widget.categoryId);
     _initializeData();
   }
 
   Future<void> _initializeData() async {
-    final data = await QuizController.loadQuizData(
-      categoryId: widget.categoryId,
-      firestoreName: widget.firestoreName,
-    );
+    final Map<String, dynamic> data;
+    if (widget.categoryId == 'quick_quiz') {
+      final p = context.read<UserProgressProvider>();
+      data = await QuizController.loadQuickQuizData(
+        userLevel: p.level,
+        userCoins: p.coins,
+      );
+    } else {
+      data = await QuizController.loadQuizData(
+        categoryId: widget.categoryId,
+        firestoreName: widget.firestoreName,
+      );
+    }
 
     if (mounted) {
       setState(() {
@@ -67,24 +76,86 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F1420),
       body: SafeArea(
-        child: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFFD700)),
-              )
-            : CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(child: _buildHeader()),
-                  _buildGrid(_controller.block1Items),
-                  SliverToBoxAdapter(
+        child: Stack(
+          children: [
+            CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: _buildHeader()),
+                SliverOpacity(
+                  opacity: _loading ? 0.2 : 1.0,
+                  sliver: _buildGrid(_controller.block1Items),
+                ),
+                SliverOpacity(
+                  opacity: _loading ? 0.2 : 1.0,
+                  sliver: SliverToBoxAdapter(
                     child: _buildSeparator(
                       'Earn at least 1 star in previous level to unlock',
                     ),
                   ),
-                  SliverToBoxAdapter(child: _buildUnlockNextHeader()),
-                  _buildGrid(_controller.block2Items),
-                  const SliverToBoxAdapter(child: SizedBox(height: 50)),
-                ],
+                ),
+                SliverOpacity(
+                  opacity: _loading ? 0.2 : 1.0,
+                  sliver: SliverToBoxAdapter(child: _buildUnlockNextHeader()),
+                ),
+                SliverOpacity(
+                  opacity: _loading ? 0.2 : 1.0,
+                  sliver: _buildGrid(_controller.block2Items),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 50)),
+              ],
+            ),
+            if (_loading)
+              IgnorePointer(
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  child: _buildLoading(),
+                ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1F2E),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                width: 2,
+              ),
+            ),
+            child: const CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 3,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'LOADING LEVELS',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Preparing your challenge...',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -103,29 +174,33 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
               size: 22,
             ),
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'GOALIQ',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white.withValues(alpha: 0.3),
-                  fontWeight: FontWeight.bold,
+          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'GOALIQ',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.white.withValues(alpha: 0.3),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           _buildChip('★', '${p.stars}'),
           const SizedBox(width: 8),
           _buildChip('🪙', '${p.coins}', suffix: ' +'),
@@ -135,30 +210,33 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   }
 
   Widget _buildChip(String icon, String value, {String? suffix}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1F2E),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-        ),
-        child: Text.rich(
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    decoration: BoxDecoration(
+      color: const Color(0xFF1A1F2E),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+    ),
+    child: Text.rich(
+      TextSpan(
+        children: [
           TextSpan(
-            children: [
-              TextSpan(
-                text: icon,
-                style: const TextStyle(color: Color(0xFFFFD700)),
-              ),
-              TextSpan(text: ' $value', style: const TextStyle(color: Colors.white)),
-              if (suffix != null)
-                TextSpan(
-                  text: suffix,
-                  style: const TextStyle(color: Color(0xFFFFD700)),
-                ),
-            ],
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            text: icon,
+            style: const TextStyle(color: Color(0xFFFFD700)),
           ),
-        ),
-      );
+          TextSpan(
+            text: ' $value',
+            style: const TextStyle(color: Colors.white),
+          ),
+          if (suffix != null)
+            TextSpan(
+              text: suffix,
+              style: const TextStyle(color: Color(0xFFFFD700)),
+            ),
+        ],
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+      ),
+    ),
+  );
 
   Widget _buildGrid(List<QuizLevelTile> items) => SliverPadding(
     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -184,13 +262,22 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       _questionsByLevel,
       _levelDocIds,
       _bonusSlotToDocId,
+      categoryId: widget.categoryId,
     );
 
     if (qs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No questions available for this level yet.'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1F2E),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(milliseconds: 1500),
+          content: const Text(
+            'No questions available for this level yet.',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
         ),
       );
       return;
@@ -223,7 +310,8 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
         builder: (_) => QuizGameplayScreen(
           questions: qs,
           levelNumber: num,
-          levelTitle: QuizController.getLevelTitle(num),
+          levelTitle:
+              QuizController.getLevelTitle(num, categoryId: widget.categoryId),
           isBonus: bonus,
           quizTitle: widget.title,
           onLevelComplete: _onLevelComplete,
@@ -232,9 +320,12 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
             _questionsByLevel,
             _levelDocIds,
             _bonusSlotToDocId,
+            categoryId: widget.categoryId,
           ),
-          getGameplayTitle: QuizController.getLevelTitle,
-          isBonusLevel: QuizController.isBonusLevel,
+          getGameplayTitle: (pos) =>
+              QuizController.getLevelTitle(pos, categoryId: widget.categoryId),
+          isBonusLevel: (pos) =>
+              QuizController.isBonusLevel(pos, categoryId: widget.categoryId),
         ),
       ),
     );

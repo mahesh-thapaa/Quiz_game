@@ -1,99 +1,53 @@
 // lib/screens/home/bars/streak_card.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/streak_model.dart';
-import 'package:quiz_game/screens/streak/streak_logic.dart';
-import 'package:quiz_game/screens/home/widgets/streak_reward_page.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/controllers/streak_controller.dart';
+import 'package:quiz_game/screens/home/widgets/streak_reward_popup.dart';
+import 'package:quiz_game/auth/email_signup.dart';
 
-class StreakCard extends StatefulWidget {
-  final StreakModel? initialStreak;
-  final bool triggerLoginOnInit;
-
-  const StreakCard({
-    super.key,
-    this.initialStreak,
-    this.triggerLoginOnInit = false,
-  });
-
-  @override
-  State<StreakCard> createState() => _StreakCardState();
-}
-
-class _StreakCardState extends State<StreakCard> {
-  StreakModel? _streak;
-
-  // ✅ fallback so shimmer never gets stuck
-  static const _defaultStreak = StreakModel(
-    title: StreakLogic.streakTitle,
-    currentDay: 0,
-    totalDays: StreakLogic.totalDaysPerCycle,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-
-    // ✅ Set default IMMEDIATELY so shimmer never shows
-    _streak = widget.initialStreak ?? _defaultStreak;
-
-    _init();
-  }
-
-  Future<void> _init() async {
-    if (widget.triggerLoginOnInit) {
-      try {
-        final result = await StreakLogic.onLogin();
-        if (!mounted) return;
-        setState(() => _streak = result.streak);
-
-        if (result.justCompletedCycle) {
-          await Future.delayed(const Duration(milliseconds: 500));
-          if (mounted) {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    const StreakRewardPage(streakDays: 7, coinsEarned: 500),
-              ),
-            );
-          }
-        }
-      } catch (e) {
-        debugPrint('⚠️ StreakCard: $e');
-        // ✅ show default card instead of stuck shimmer
-        if (mounted) setState(() => _streak = _defaultStreak);
-      }
-    } else {
-      try {
-        final streak = await StreakLogic.load();
-        if (!mounted) return;
-        setState(() => _streak = streak);
-      } catch (e) {
-        debugPrint('⚠️ StreakCard: $e');
-        // ✅ show default card instead of stuck shimmer
-        if (mounted) setState(() => _streak = _defaultStreak);
-      }
-    }
-  }
+class StreakCard extends StatelessWidget {
+  const StreakCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (_streak == null) return const _ShimmerCard();
+    final p = context.watch<UserProgressProvider>();
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
 
-    final streak = _streak!;
+    final streak =
+        p.streak ??
+        const StreakModel(
+          title: StreakController.streakTitle,
+          currentDay: 0,
+          totalDays: StreakController.totalDaysPerCycle,
+        );
+
+    // ✅ AUTOMATIC POPUP: Only for registered users
+    if (!isGuest &&
+        streak.currentDay >= streak.totalDays &&
+        !streak.rewardClaimed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showStreakRewardPopup(
+          context,
+          streakDays: streak.totalDays,
+          coinsEarned: 500,
+        );
+      });
+    }
+
+    return isGuest
+        ? _buildGuestStreak(context, streak)
+        : _buildUserStreak(streak);
+  }
+
+  Widget _buildUserStreak(StreakModel streak) {
     final isBroken = streak.isBroken;
     final isComplete = streak.isComplete;
-
-    debugPrint('════════════════════════════════════════════════');
-    debugPrint('🎨 [STREAK CARD BUILD]');
-    debugPrint(
-      '   → currentDay: ${streak.currentDay} (should be 1-7 for green bars)',
-    );
-    debugPrint('   → totalDays: ${streak.totalDays}');
-    debugPrint('   → isBroken: $isBroken (currentDay == 0)');
-    debugPrint('   → isComplete: $isComplete (currentDay >= 7)');
-    debugPrint('════════════════════════════════════════════════');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -126,13 +80,17 @@ class _StreakCardState extends State<StreakCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  streak.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      streak.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
 
@@ -140,9 +98,6 @@ class _StreakCardState extends State<StreakCard> {
                 Row(
                   children: List.generate(streak.totalDays, (i) {
                     final done = i < streak.currentDay;
-                    debugPrint(
-                      '🔍 [BAR DEBUG] i=$i | currentDay=${streak.currentDay} | done=$done',
-                    );
                     return Expanded(
                       child: Container(
                         height: 5,
@@ -161,13 +116,7 @@ class _StreakCardState extends State<StreakCard> {
                   }),
                 ),
 
-                if (isComplete) ...[
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Full week complete! Keep it going 🎉',
-                    style: TextStyle(color: AppColors.stext, fontSize: 11),
-                  ),
-                ] else if (isBroken) ...[
+                if (isBroken) ...[
                   const SizedBox(height: 6),
                   const Text(
                     'Login today to start a new streak!',
@@ -195,92 +144,129 @@ class _StreakCardState extends State<StreakCard> {
       ),
     );
   }
-}
 
-// ── Shimmer placeholder ───────────────────────────────────────────────────────
-
-class _ShimmerCard extends StatefulWidget {
-  const _ShimmerCard();
-
-  @override
-  State<_ShimmerCard> createState() => _ShimmerCardState();
-}
-
-class _ShimmerCardState extends State<_ShimmerCard>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.3, end: 0.7).animate(_ctrl);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, __) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            _block(42, 42, isCircle: true),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _block(120, 14),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: List.generate(
-                      7,
-                      (i) => Expanded(
-                        child: Container(
-                          height: 5,
-                          margin: EdgeInsets.only(right: i < 6 ? 4 : 0),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(
-                              alpha: _anim.value * 0.25,
-                            ),
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _buildGuestStreak(BuildContext context, StreakModel streak) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        children: [
+          // Fire icon (dimmed)
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppColors.deepCard.withValues(alpha: 0.5),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.local_fire_department_rounded,
+                color: Colors.blueGrey,
+                size: 22,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 14),
+
+          // Progress section
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Guest Streak',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Login to start your 7-day challenge',
+                  style: TextStyle(color: AppColors.stext, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Sign In CTA
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const EmailSignup(showBackButton: true),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'SIGN IN',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _block(double w, double h, {bool isCircle = false}) => Container(
-    width: w,
-    height: h,
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: _anim.value * 0.15),
-      borderRadius: isCircle
-          ? BorderRadius.circular(w)
-          : BorderRadius.circular(6),
-    ),
-  );
+  Widget _buildSkeleton() {
+    return Container(
+      height: 70,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: const BoxDecoration(
+              color: AppColors.deepCard,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(height: 10, width: 100, color: Colors.white10),
+                const SizedBox(height: 10),
+                Container(
+                  height: 5,
+                  width: double.infinity,
+                  color: Colors.white10,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

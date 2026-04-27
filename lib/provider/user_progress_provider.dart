@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quiz_game/models/home_models/streak_model.dart';
+import 'package:quiz_game/controllers/streak_controller.dart';
 
 class UserProgressProvider extends ChangeNotifier {
   final _db = FirebaseFirestore.instance;
@@ -14,6 +16,7 @@ class UserProgressProvider extends ChangeNotifier {
   String _username = '';
   String _bio = '';
   String _avatarPath = '';
+  StreakModel? _streak;
 
   static const int totalSections = 4;
   static const int quizLevelsPerSection = 48;
@@ -30,6 +33,7 @@ class UserProgressProvider extends ChangeNotifier {
   String get username => _username;
   String get bio => _bio;
   String get avatarPath => _avatarPath;
+  StreakModel? get streak => _streak;
 
   int get level => _completedSections + 1;
   int get currentLevelXP => _quizLevelsInSection;
@@ -67,13 +71,41 @@ class UserProgressProvider extends ChangeNotifier {
       );
 
       debugPrint(
-        '✅ loadFromFirestore → username:$_username | coins:$_coins | level:$level',
+        'loadFromFirestore → username:$_username | coins:$_coins | level:$level',
       );
     } catch (e) {
-      debugPrint('❌ loadFromFirestore: $e');
+      debugPrint('loadFromFirestore: $e');
     } finally {
       _loading = false;
       notifyListeners();
+    }
+  }
+
+  // ── Init Streak ─────────────────────────────────────────────────────────────
+  Future<void> initStreak({bool isLogin = false}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
+
+    if (isGuest) {
+      // ✅ INSTANT: For guests, don't even wait for Firestore
+      _streak = const StreakModel(
+        title: StreakController.streakTitle,
+        currentDay: 0,
+        totalDays: StreakController.totalDaysPerCycle,
+      );
+      notifyListeners();
+      return;
+    }
+
+    try {
+      if (isLogin) {
+        _streak = await StreakController.onLogin();
+      } else {
+        _streak = await StreakController.load();
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('❌ initStreak error: $e');
     }
   }
 
@@ -90,6 +122,7 @@ class UserProgressProvider extends ChangeNotifier {
     _completedSections = 0;
     _quizLevelsInSection = 0;
     _loading = false;
+    _streak = null;
     notifyListeners();
     debugPrint('🧹 clearData → all user state wiped');
   }

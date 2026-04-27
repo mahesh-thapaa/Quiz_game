@@ -1,11 +1,11 @@
-// lib/widgets/discover_widgets_card.dart
+// lib/screens/discover_screen/widgets/discover_widgets_card.dart
 
 import 'package:flutter/material.dart';
-// import 'package:quiz_game/models/discover_models.dart';
-
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/discover/discover_models.dart';
-
 import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
+import 'package:quiz_game/screens/common/level_grid_screen.dart';
 
 class DiscoverWidgetsCard extends StatelessWidget {
   final DiscoverModels model;
@@ -14,42 +14,56 @@ class DiscoverWidgetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.watch<UserProgressProvider>();
+    final userLevel = p.level;
+    final userCoins = p.coins;
+
+    bool isUnlocked = true;
+    if (model.unlockType == UnlockType.level) {
+      isUnlocked = userLevel >= (model.unlockValue ?? 0);
+    } else if (model.unlockType == UnlockType.coins) {
+      isUnlocked = userCoins >= (model.unlockValue ?? 0);
+    } else if (model.unlockType == UnlockType.comingSoon) {
+      isUnlocked = false;
+    }
+
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: model.snackbarColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            content: Row(
-              children: [
-                // Icon(
-                //   model.unlockType == UnlockType.coins
-                //       ? Icons.monetization_on
-                //       : model.unlockType == UnlockType.level
-                //       ? Icons.lock
-                //       : Icons.access_time,
-                //   color: Colors.white,
-                // ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    model.snackbarMessage,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+        if (!isUnlocked) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.blueAccent,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              duration: const Duration(milliseconds: 1500),
+              content: Text(
+                model.unlockType == UnlockType.comingSoon
+                    ? 'Coming Soon!'
+                    : model.snackbarMessage,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
+              ),
             ),
-            duration: Duration(seconds: 2),
+          );
+          return;
+        }
+
+        // ✅ Navigate immediately (Unlocked Categories)
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LevelGridScreen(
+              title: model.title.toUpperCase(),
+              categoryId: model.categoryId,
+              firestoreName: model.firestoreName,
+            ),
           ),
         );
       },
-
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Stack(
@@ -61,7 +75,6 @@ class DiscoverWidgetsCard extends StatelessWidget {
               errorBuilder: (_, __, ___) =>
                   Container(color: AppColors.deepCard),
             ),
-
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -74,28 +87,24 @@ class DiscoverWidgetsCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            if (model.unlockType == UnlockType.comingSoon)
-              Container(color: Colors.black.withValues(alpha: 0.25)),
-
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.50),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.lock_rounded,
-                  color: Colors.white70,
-                  size: 15,
+            if (!isUnlocked)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.50),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.lock_rounded,
+                    color: Colors.white70,
+                    size: 15,
+                  ),
                 ),
               ),
-            ),
-
             Positioned(
               bottom: 12,
               left: 12,

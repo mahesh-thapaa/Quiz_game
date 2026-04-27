@@ -86,7 +86,7 @@ class _RewardDialogState extends State<RewardDialog>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFFD700).withOpacity(0.5),
+                        color: const Color(0xFFFFD700).withValues(alpha: 0.5),
                         blurRadius: 24,
                         spreadRadius: 4,
                       ),

@@ -10,6 +10,7 @@ import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/widgets/reward_dialog.dart';
 import 'package:quiz_game/screens/home/bars/bonus_servies.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DailyBonusCard extends StatefulWidget {
   final DailyBonusModel bonus;
@@ -47,6 +48,12 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
 
   Future<void> _handleClaim() async {
     if (_claiming || _alreadyClaimed) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.isAnonymous) {
+      _showSnack('Login to claim reward');
+      return;
+    }
 
     setState(() => _claiming = true);
 
@@ -174,14 +181,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                   const Spacer(),
 
                   _loading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.background,
-                          ),
-                        )
+                      ? const SizedBox(width: 24, height: 24)
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _alreadyClaimed
@@ -194,14 +194,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                               ? null
                               : _handleClaim,
                           child: _claiming
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.hText,
-                                  ),
-                                )
+                              ? const Text('...')
                               : Text(
                                   _alreadyClaimed ? 'CLAIMED' : 'CLAIM REWARD',
                                   style: const TextStyle(

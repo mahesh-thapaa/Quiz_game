@@ -9,6 +9,7 @@ class LockedCategoryModel {
   final bool requiresCoins;
   final String categoryId;
   final String firestoreName;
+  final int unlockValue;
 
   LockedCategoryModel({
     required this.title,
@@ -18,6 +19,7 @@ class LockedCategoryModel {
     required this.imagePath,
     required this.categoryId,
     required this.firestoreName,
+    required this.unlockValue,
     this.requiresCoins = false,
   });
 }

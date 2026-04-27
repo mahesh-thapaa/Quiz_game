@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
 
-class QuizCard extends StatelessWidget {
+class RecommendedCard extends StatelessWidget {
   final QuizCardModel quiz;
   final VoidCallback onTap;
 
-  const QuizCard({super.key, required this.quiz, required this.onTap});
+  const RecommendedCard({super.key, required this.quiz, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class QuizCard extends StatelessWidget {
 
             // ── Text ──
             Positioned(
-              bottom: 12,
+              bottom: 18,
               left: 12,
               right: 12,
               child: Column(
@@ -62,10 +62,13 @@ class QuizCard extends StatelessWidget {
                 children: [
                   Text(
                     quiz.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20, // Reduced from 22
+                      fontSize: 20,
                       fontWeight: FontWeight.w900,
+                      height: 1.1,
                       shadows: [
                         Shadow(
                           offset: Offset(0, 1),
@@ -75,9 +78,11 @@ class QuizCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     quiz.subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.titleColor,
                       fontSize: 11,
@@ -90,8 +95,6 @@ class QuizCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

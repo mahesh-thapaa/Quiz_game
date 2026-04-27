@@ -41,7 +41,11 @@ class _EmailSignupState extends State<EmailSignup> {
     );
 
     if (success && mounted) {
-      await context.read<UserProgressProvider>().loadFromFirestore();
+      final p = context.read<UserProgressProvider>();
+      await Future.wait([
+        p.loadFromFirestore(),
+        p.initStreak(isLogin: true),
+      ]);
       if (!mounted) return;
       Navigator.pushReplacement(
         context,

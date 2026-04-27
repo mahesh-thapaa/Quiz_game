@@ -1,5 +1,11 @@
+// lib/screens/splash_screen/splash_screesn.dart
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/login.dart';
+import 'package:quiz_game/screens/main_screen/main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _progressCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 2500), // Fast loading
     );
 
     _progressAnim = CurvedAnimation(
@@ -67,12 +73,29 @@ class _SplashScreenState extends State<SplashScreen>
     _logoCtrl.forward().then((_) {
       _textCtrl.forward();
       Future.delayed(const Duration(milliseconds: 200), () {
-        _progressCtrl.forward().then((_) {
+        _progressCtrl.forward().then((_) async {
           if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => Login()),
-          );
+
+          // ✅ AUTO-LOGIN: Skip login screen if user is already authenticated
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            final p = context.read<UserProgressProvider>();
+            await Future.wait([
+              p.loadFromFirestore(),
+              p.initStreak(isLogin: true),
+            ]);
+
+            if (!mounted) return;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const Login()),
+            );
+          }
         });
       });
     });
@@ -92,7 +115,6 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: const Color(0xFF0A0E1A),
       body: Stack(
         children: [
-          // Subtle radial glow in center
           Center(
             child: Container(
               width: 300,
@@ -108,13 +130,9 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
-
-          // Main content
           Column(
             children: [
               const Spacer(flex: 2),
-
-              // Logo
               FadeTransition(
                 opacity: _logoFade,
                 child: ScaleTransition(
@@ -145,10 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 36),
-
-              // GOALIQ text
               FadeTransition(
                 opacity: _textFade,
                 child: SlideTransition(
@@ -178,10 +193,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-
               const Spacer(flex: 2),
-
-              // Progress bar section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
                 child: FadeTransition(
@@ -198,7 +210,6 @@ class _SplashScreenState extends State<SplashScreen>
                                 borderRadius: BorderRadius.circular(4),
                                 child: Stack(
                                   children: [
-                                    // Background track
                                     Container(
                                       height: 4,
                                       width: trackWidth,
@@ -206,7 +217,6 @@ class _SplashScreenState extends State<SplashScreen>
                                         alpha: 0.1,
                                       ),
                                     ),
-                                    // Filled portion
                                     Container(
                                       height: 4,
                                       width: trackWidth * _progressAnim.value,
@@ -251,7 +261,6 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-
               const SizedBox(height: 60),
             ],
           ),

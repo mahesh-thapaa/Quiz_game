@@ -1,3 +1,5 @@
+// lib/controllers/level_grid_controller.dart
+
 import 'package:quiz_game/models/quiz_level_tile.dart';
 import 'package:quiz_game/controllers/quiz_controller.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
@@ -6,26 +8,28 @@ class LevelGridController {
   final List<QuizLevelTile> block1Items;
   final List<QuizLevelTile> block2Items;
 
-  LevelGridController({
-    required this.block1Items,
-    required this.block2Items,
-  });
+  LevelGridController({required this.block1Items, required this.block2Items});
 
   /// Factory to create an initial state
-  factory LevelGridController.initial() {
+  factory LevelGridController.initial({String? categoryId}) {
     return LevelGridController(
-      block1Items: _generateLevels(start: 1, count: 24),
-      block2Items: _generateLevels(start: 25, count: 24),
+      block1Items: _generateLevels(start: 1, count: 24, categoryId: categoryId),
+      block2Items:
+          _generateLevels(start: 25, count: 24, categoryId: categoryId),
     );
   }
 
-  static List<QuizLevelTile> _generateLevels({required int start, required int count}) {
+  static List<QuizLevelTile> _generateLevels({
+    required int start,
+    required int count,
+    String? categoryId,
+  }) {
     return List.generate(count, (i) {
       int gridPos = start + i;
       return QuizLevelTile(
-        hasStar: QuizController.isBonusLevel(gridPos),
+        hasStar: QuizController.isBonusLevel(gridPos, categoryId: categoryId),
         number: gridPos,
-        isUnlocked: gridPos == 1,
+        isUnlocked: gridPos == 1, // Only first level unlocked by default
         starsEarned: 0,
       );
     });
@@ -72,9 +76,10 @@ class LevelGridController {
     int pos,
     Map<String, List<QuizQuestion>> questionsByLevel,
     Map<int, String> levelDocIds,
-    Map<int, String> bonusSlotToDocId,
-  ) {
-    String? id = QuizController.isBonusLevel(pos)
+    Map<int, String> bonusSlotToDocId, {
+    String? categoryId,
+  }) {
+    String? id = QuizController.isBonusLevel(pos, categoryId: categoryId)
         ? bonusSlotToDocId[(pos ~/ 6) - 1]
         : levelDocIds[pos - (pos ~/ 6)];
     return id != null ? (questionsByLevel[id] ?? []) : [];

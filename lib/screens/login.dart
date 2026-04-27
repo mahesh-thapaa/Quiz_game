@@ -20,7 +20,15 @@ class _LoginState extends State<Login> {
   Future<void> _goToHome() async {
     setState(() => _isLoading = true);
 
-    await context.read<UserProgressProvider>().loadFromFirestore();
+    try {
+      final p = context.read<UserProgressProvider>();
+      await Future.wait([
+        p.loadFromFirestore(),
+        p.initStreak(isLogin: true),
+      ]);
+    } catch (e) {
+      debugPrint('❌ Login _goToHome error: $e');
+    }
 
     if (!mounted) return;
     setState(() => _isLoading = false);
