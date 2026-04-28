@@ -3,6 +3,5 @@
 class SettingsModel {
   bool darkMode = false;
   bool notifications = true;
-  bool soundEffects = true;
-  String language = 'English (US)';
+  bool soundEffects = false;
 }

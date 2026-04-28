@@ -84,7 +84,16 @@ class ProfileAvatarState extends State<ProfileAvatar> {
           // If upload failed, clear preview too or keep it?
           // Usually better to keep it but show error
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to sync photo to cloud. Check your connection.')),
+            SnackBar(
+              content: const Text('Failed to sync photo to cloud. Check your connection.'),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.white24, width: 1),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       }

@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/settings_models.dart';
+import 'package:quiz_game/auth/change_password_screen.dart';
 import 'widgets/settings_toggle_tile.dart';
 import 'widgets/settings_arrow_tile.dart';
-import 'widgets/settings_dropdown_tile.dart';
+// import 'widgets/settings_dropdown_tile.dart';
 import 'widgets/settings_section_header.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,17 +18,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late SettingsModel _settings;
-
-  static const _languages = [
-    'English (US)',
-    'English (UK)',
-    'Spanish',
-    'French',
-    'German',
-    'Portuguese',
-    'Hindi',
-    'Nepali',
-  ];
 
   @override
   void initState() {
@@ -94,28 +84,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsArrowTile(
                   icon: Icons.lock_outline,
                   label: 'Change Password',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ChangePasswordScreen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
 
-            const SettingsSectionHeader(title: 'PREFERENCES'),
-            _SectionCard(
-              children: [
-                SettingsDropdownTile(
-                  icon: Icons.language_outlined,
-                  label: 'Language',
-                  value: _settings.language,
-                  options: _languages,
-                  onChanged: (v) => setState(() => _settings.language = v),
-                ),
-              ],
-            ),
-
+            // const SettingsSectionHeader(title: 'PREFERENCES'),
+            // _SectionCard(
+            //   children: [
+            //     SettingsDropdownTile(
+            //       icon: Icons.language_outlined,
+            //       label: 'Language',
+            //       value: _settings.language,
+            //       options: _languages,
+            //       onChanged: (v) => setState(() => _settings.language = v),
+            //     ),
+            // ],
+            // ),
             const SizedBox(height: 40),
             Center(
               child: Text(
-                'Version 2.4.0 (Lamino Technology)',
+                'Version 2.4.0 (Lumino Technology)',
                 style: TextStyle(color: AppColors.stext, fontSize: 12),
               ),
             ),
