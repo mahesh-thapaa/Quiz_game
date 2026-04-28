@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
 
-class ProfileAvatar extends StatelessWidget {
+class LeaderboardProfileAvatar extends StatelessWidget {
   final LeaderboardEntry user;
 
-  const ProfileAvatar({super.key, required this.user});
+  const LeaderboardProfileAvatar({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,9 @@ class ProfileAvatar extends StatelessWidget {
             CircleAvatar(
               radius: 42,
               backgroundColor: AppColors.cardBg,
-              backgroundImage: AssetImage(user.avatarAsset),
+              backgroundImage: user.avatarUrl.isNotEmpty
+                  ? NetworkImage(user.avatarUrl)
+                  : const AssetImage('assets/images/profile.png'),
               onBackgroundImageError: (_, __) {},
               child: null,
             ),

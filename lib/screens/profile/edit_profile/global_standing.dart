@@ -5,8 +5,6 @@ import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 
-
-
 class GlobalStandings extends StatelessWidget {
   final List<LeaderboardEntry> allUsers;
 
@@ -27,9 +25,9 @@ class GlobalStandings extends StatelessWidget {
 
   String _formatXP(int xp) {
     return xp.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
   }
 
   @override
@@ -60,8 +58,7 @@ class GlobalStandings extends StatelessWidget {
           // ── Column headers ────────────────────────────────────────────────
           Container(
             color: AppColors.cardBg,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: const [
                 SizedBox(
@@ -123,7 +120,9 @@ class GlobalStandings extends StatelessWidget {
                             ? AppColors.primary.withValues(alpha: 0.08)
                             : Colors.transparent,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
                         child: Row(
                           children: [
                             // ── Rank circle ───────────────────────────────
@@ -173,12 +172,10 @@ class GlobalStandings extends StatelessWidget {
                                 isMe
                                     ? '${p.username.isNotEmpty ? p.username : 'You'} (You)'
                                     : (entry.name.isNotEmpty
-                                        ? entry.name
-                                        : 'Player'),
+                                          ? entry.name
+                                          : 'Player'),
                                 style: TextStyle(
-                                  color: isMe
-                                      ? Colors.green
-                                      : AppColors.hText,
+                                  color: isMe ? Colors.green : AppColors.hText,
                                   fontSize: 14,
                                   fontWeight: isMe
                                       ? FontWeight.bold
@@ -190,8 +187,7 @@ class GlobalStandings extends StatelessWidget {
 
                             // ── XP ────────────────────────────────────────
                             Text(
-                              _formatXP(
-                                  isMe ? p.xp : entry.xpPoints),
+                              _formatXP(isMe ? p.xp : entry.xpPoints),
                               style: TextStyle(
                                 color: Colors.green.shade400,
                                 fontSize: 14,

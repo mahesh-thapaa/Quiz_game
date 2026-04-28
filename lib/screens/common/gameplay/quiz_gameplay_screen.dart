@@ -8,6 +8,7 @@ import 'package:quiz_game/screens/common/gameplay/quiz_image_card.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 import 'package:quiz_game/services/star_calculation_service.dart';
+// import 'package:quiz_game/controllers/house_ad_controller.dart';
 
 class QuizGameplayScreen extends StatefulWidget {
   final List<QuizQuestion> questions;
@@ -259,9 +260,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
 
   AnswerState _getState(int index) {
     if (!_answered) {
-      return _selectedIndex == index
-          ? AnswerState.selected
-          : AnswerState.idle;
+      return _selectedIndex == index ? AnswerState.selected : AnswerState.idle;
     }
     if (index == _questions[_currentIndex].correctIndex) {
       return AnswerState.correct;
@@ -322,17 +321,38 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            q.questionText,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColors.hText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 70,
+                              ), // Balance the PowerUp button on the right
+                              Expanded(
+                                child: Text(
+                                  q.questionText,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: AppColors.hText,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              PowerUp(
+                                icon: Icons.movie_creation_outlined,
+                                label: 'FREE',
+                                color: const Color(0xFFFFD700),
+                                isActive: true,
+                                showBadge: true,
+                                onTap: () {
+                                  // Add your Ads logic here
+                                  debugPrint('Ads Button Tapped');
+                                },
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 25),
                           if (q.imagePath != null && q.imagePath!.isNotEmpty)
                             QuizImageCard(imagePath: q.imagePath!),
                           if (q.imagePath != null && q.imagePath!.isNotEmpty)

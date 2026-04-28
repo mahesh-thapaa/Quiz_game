@@ -7,6 +7,7 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/provider/leaderBoard_provider.dart';
+import 'package:quiz_game/provider/profile_image_provider.dart';
 import 'package:quiz_game/screens/profile/edit_profile/edit_profile_screen.dart';
 import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 import 'package:quiz_game/screens/profile/seetings/settings_screen.dart';
@@ -31,6 +32,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LeaderboardProvider>().listenLeaderboard();
+      // Load avatar on screen entry
+      context.read<ProfileImageProvider>().loadAvatar();
     });
   }
 
@@ -77,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Clear user data
       debugPrint('🔄 Clearing user data...');
       context.read<UserProgressProvider>().clearData();
+      context.read<ProfileImageProvider>().clear();
       debugPrint('✅ User data cleared');
 
       // Sign out from Firebase with timeout
@@ -405,8 +409,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: _isLoggingOut ? null : _handleLogoutPressed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red.shade800,
-                    disabledBackgroundColor:
-                        Colors.red.shade800.withOpacity(0.6),
+                    disabledBackgroundColor: Colors.red.shade800.withOpacity(
+                      0.6,
+                    ),
                     minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

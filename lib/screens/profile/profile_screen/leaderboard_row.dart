@@ -74,14 +74,19 @@ class LeaderboardRow extends StatelessWidget {
               : CircleAvatar(
                   radius: 16,
                   backgroundColor: AppColors.deepCard,
-                  child: Text(
-                    entry.name.isNotEmpty ? entry.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
-                      color: AppColors.hText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  backgroundImage: entry.avatarUrl.isNotEmpty
+                      ? NetworkImage(entry.avatarUrl)
+                      : null,
+                  child: entry.avatarUrl.isEmpty
+                      ? Text(
+                          entry.name.isNotEmpty ? entry.name[0].toUpperCase() : '?',
+                          style: const TextStyle(
+                            color: AppColors.hText,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
                 ),
           const SizedBox(width: 10),
 

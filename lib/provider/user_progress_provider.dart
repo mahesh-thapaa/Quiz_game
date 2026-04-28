@@ -15,7 +15,6 @@ class UserProgressProvider extends ChangeNotifier {
 
   String _username = '';
   String _bio = '';
-  String _avatarPath = '';
   StreakModel? _streak;
 
   static const int totalSections = 4;
@@ -33,7 +32,6 @@ class UserProgressProvider extends ChangeNotifier {
 
   String get username => _username;
   String get bio => _bio;
-  String get avatarPath => _avatarPath;
   StreakModel? get streak => _streak;
   List<String> get unlockedCategories => _unlockedCategories;
 
@@ -62,10 +60,9 @@ class UserProgressProvider extends ChangeNotifier {
       _stars = data['Stars'] as int? ?? 0;
       _username = data['username'] as String? ?? '';
       _bio = data['bio'] as String? ?? '';
-      _avatarPath = data['avatarPath'] as String? ?? '';
       _completedSections = data['CompletedSections'] as int? ?? 0;
       _quizLevelsInSection = data['QuizLevelsInSection'] as int? ?? 0;
-      
+
       // Load unlocked categories
       final unlocked = data['unlockedCategories'] as List<dynamic>?;
       _unlockedCategories = unlocked?.map((e) => e.toString()).toList() ?? [];
@@ -88,7 +85,11 @@ class UserProgressProvider extends ChangeNotifier {
   }
 
   // ── Category Unlocking ──────────────────────────────────────────────────────
-  bool isCategoryUnlocked(String categoryId, bool requiresCoins, int unlockValue) {
+  bool isCategoryUnlocked(
+    String categoryId,
+    bool requiresCoins,
+    int unlockValue,
+  ) {
     if (requiresCoins) {
       return _unlockedCategories.contains(categoryId);
     } else {
@@ -103,7 +104,7 @@ class UserProgressProvider extends ChangeNotifier {
     if (!_unlockedCategories.contains(categoryId)) {
       _unlockedCategories.add(categoryId);
     }
-    
+
     notifyListeners();
     await _sync();
     return true;
@@ -145,7 +146,6 @@ class UserProgressProvider extends ChangeNotifier {
     _stars = 0;
     _username = '';
     _bio = '';
-    _avatarPath = '';
     _completedSections = 0;
     _quizLevelsInSection = 0;
     _unlockedCategories = [];
@@ -166,7 +166,6 @@ class UserProgressProvider extends ChangeNotifier {
   Future<void> updateProfile({
     required String username,
     String? bio,
-    String? avatarPath,
   }) async {
     final uid = _uid;
     if (uid == null) return;
@@ -176,7 +175,6 @@ class UserProgressProvider extends ChangeNotifier {
 
     _username = trimmed;
     if (bio != null) _bio = bio.trim();
-    if (avatarPath != null && avatarPath.isNotEmpty) _avatarPath = avatarPath;
 
     notifyListeners();
 
@@ -184,12 +182,10 @@ class UserProgressProvider extends ChangeNotifier {
       await _db.collection('user').doc(uid).set({
         'username': _username,
         if (bio != null) 'bio': _bio,
-        if (avatarPath != null && avatarPath.isNotEmpty)
-          'avatarPath': _avatarPath,
       }, SetOptions(merge: true));
 
       debugPrint(
-        '✅ updateProfile → username:$_username | bio:$_bio | avatarPath:$_avatarPath',
+        '✅ updateProfile → username:$_username | bio:$_bio',
       );
     } catch (e) {
       debugPrint('❌ updateProfile error: $e');
@@ -270,10 +266,10 @@ class UserProgressProvider extends ChangeNotifier {
       // 1. Copy user document
       final guestDoc = await _db.collection('user').doc(guestUid).get();
       if (guestDoc.exists) {
-        await _db.collection('user').doc(newUid).set(
-              guestDoc.data()!,
-              SetOptions(merge: true),
-            );
+        await _db
+            .collection('user')
+            .doc(newUid)
+            .set(guestDoc.data()!, SetOptions(merge: true));
       }
 
       // 2. Copy category progress
@@ -299,9 +295,9 @@ class UserProgressProvider extends ChangeNotifier {
 
       // 3. Delete guest data
       await _db.collection('user').doc(guestUid).delete();
-      // Note: Deleting subcollections is complex in client SDK, 
+      // Note: Deleting subcollections is complex in client SDK,
       // usually handled by Cloud Functions or just left orphaned.
-      
+
       debugPrint('🚀 Guest data migrated from $guestUid to $newUid');
     } catch (e) {
       debugPrint('❌ Migration error: $e');

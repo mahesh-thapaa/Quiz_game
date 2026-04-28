@@ -35,86 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    // Show bottom sheet to choose source
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: AppColors.cardBg,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Choose Photo',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(
-                Icons.photo_library_rounded,
-                color: AppColors.primary,
-              ),
-              title: const Text(
-                'Choose from Gallery',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.camera_alt_rounded,
-                color: AppColors.primary,
-              ),
-              title: const Text(
-                'Take a Photo',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () => Navigator.pop(ctx, ImageSource.camera),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-
-    if (source == null) return;
-
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: source,
-      imageQuality: 80,
-      maxWidth: 512,
-      maxHeight: 512,
-    );
-
-    if (picked == null) return;
-
-    // Save avatarPath immediately via provider so it shows everywhere at once
-    if (!mounted) return;
-    await context.read<UserProgressProvider>().updateProfile(
-      username: _usernameController.text.trim().isNotEmpty
-          ? _usernameController.text.trim()
-          : context.read<UserProgressProvider>().username,
-      avatarPath: picked.path,
-    );
-  }
+  final GlobalKey<ProfileAvatarState> _avatarKey = GlobalKey<ProfileAvatarState>();
 
   // ── Save username + bio ────────────────────────────────────────────────────
   Future<void> _save() async {
@@ -139,7 +60,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Profile updated ✅'),
+        content: const Text('Profile updated!'),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -186,13 +107,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       // ProfileAvatar reads from provider automatically
                       ProfileAvatar(
+                        key: _avatarKey,
                         radius: 52,
                         showCameraIcon: true,
-                        onTap: _pickImage,
                       ),
                       const SizedBox(height: 10),
                       GestureDetector(
-                        onTap: _pickImage,
+                        onTap: () => _avatarKey.currentState?.showPicker(),
                         child: const Text(
                           'Change Photo',
                           style: TextStyle(

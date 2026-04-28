@@ -9,7 +9,7 @@ class LeaderboardEntry {
   final int coins;
   final String name;
   final String bio;
-  final String avatarAsset;
+  final String avatarUrl;
   final bool isVerified;
 
   const LeaderboardEntry({
@@ -23,7 +23,7 @@ class LeaderboardEntry {
     this.coins = 0,
     this.name = '',
     this.bio = '',
-    this.avatarAsset = 'assets/avatar.png',
+    this.avatarUrl = '',
     this.isVerified = false,
   });
 
@@ -39,7 +39,7 @@ class LeaderboardEntry {
     coins: 640,
     name: 'Sushant',
     bio: 'Football fanatic 🔥',
-    avatarAsset: 'assets/images/avatar.png',
+    avatarUrl: '',
     isVerified: true,
   );
 
@@ -56,7 +56,7 @@ class LeaderboardEntry {
       coins: 640,
       name: 'Sushant',
       bio: 'Football fanatic 🔥',
-      avatarAsset: 'assets/images/avatar.png',
+      avatarUrl: '',
       isVerified: true,
     ),
     LeaderboardEntry(
@@ -69,7 +69,7 @@ class LeaderboardEntry {
       coins: 500,
       name: 'Alex',
       bio: 'Quiz master',
-      avatarAsset: 'assets/images/avatar.png',
+      avatarUrl: '',
       isVerified: false,
     ),
     LeaderboardEntry(
@@ -82,7 +82,7 @@ class LeaderboardEntry {
       coins: 420,
       name: 'Maria',
       bio: 'Sports lover',
-      avatarAsset: 'assets/images/avatar.png',
+      avatarUrl: '',
       isVerified: false,
     ),
     LeaderboardEntry(
@@ -95,7 +95,7 @@ class LeaderboardEntry {
       coins: 300,
       name: 'John',
       bio: 'Football forever',
-      avatarAsset: 'assets/images/avatar.png',
+      avatarUrl: '',
       isVerified: false,
     ),
     LeaderboardEntry(
@@ -108,7 +108,7 @@ class LeaderboardEntry {
       coins: 200,
       name: 'Sara',
       bio: 'New player',
-      avatarAsset: 'asstes/images/ronaldo.png',
+      avatarUrl: '',
       isVerified: false,
     ),
   ];
@@ -124,7 +124,7 @@ class LeaderboardEntry {
     int? coins,
     String? name,
     String? bio,
-    String? avatarAsset,
+    String? avatarUrl,
     bool? isVerified,
   }) {
     return LeaderboardEntry(
@@ -138,7 +138,7 @@ class LeaderboardEntry {
       coins: coins ?? this.coins,
       name: name ?? this.name,
       bio: bio ?? this.bio,
-      avatarAsset: avatarAsset ?? this.avatarAsset,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       isVerified: isVerified ?? this.isVerified,
     );
   }

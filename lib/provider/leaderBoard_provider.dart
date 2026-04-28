@@ -66,7 +66,7 @@ class LeaderboardProvider extends ChangeNotifier {
                 level: data['Level'] ?? 1,
                 coins: data['Coin'] ?? 0,
                 bio: data['bio'] ?? '',
-                avatarAsset: data['avatarPath'] ?? '',
+                avatarUrl: data['avatarUrl'] ?? '',
                 isCurrentUser: isMe,
                 isVerified: false,
               );
@@ -113,7 +113,7 @@ class LeaderboardProvider extends ChangeNotifier {
           level: data['Level'] ?? 1,
           coins: data['Coin'] ?? 0,
           bio: data['bio'] ?? '',
-          avatarAsset: data['avatarPath'] ?? '',
+          avatarUrl: data['avatarUrl'] ?? '',
           isCurrentUser: isMe,
           isVerified: false,
         );

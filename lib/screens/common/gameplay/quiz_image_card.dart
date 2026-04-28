@@ -8,109 +8,101 @@ class QuizImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // ── Player image ──────────────────────────────────
-        Expanded(
-          child: Container(
-            height: 200,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.outlineBorder, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.shadow,
-                  blurRadius: 16,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Image.network(
-              imagePath,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.cardBg,
-                child: const Center(
-                  child: Icon(Icons.person, color: AppColors.stext, size: 60),
-                ),
-              ),
-            ),
+    return Container(
+      width: double.infinity,
+      height: 250,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.outlineBorder, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 16,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          color: AppColors.cardBg,
+          child: const Center(
+            child: Icon(Icons.person, color: AppColors.stext, size: 60),
           ),
         ),
-        const SizedBox(width: 10),
-
-        // ── Side power-up buttons ─────────────────────────
-        Column(
-          children: [
-            _PowerUp(
-              icon: Icons.visibility_off_rounded,
-              label: 'FREE',
-              color: Colors.orange,
-              isActive: false,
-            ),
-            const SizedBox(height: 8),
-            _PowerUp(
-              icon: Icons.compare_arrows_rounded,
-              label: '40',
-              color: AppColors.primary,
-              isActive: false,
-            ),
-            const SizedBox(height: 8),
-            _PowerUp(
-              icon: Icons.check_circle_rounded,
-              label: '100',
-              color: AppColors.primary,
-              isActive: true,
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _PowerUp extends StatelessWidget {
+class PowerUp extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final bool isActive;
+  final bool showBadge;
+  final VoidCallback? onTap;
 
-  const _PowerUp({
+  const PowerUp({
+    super.key,
     required this.icon,
     required this.label,
     required this.color,
     required this.isActive,
+    this.showBadge = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 52,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? color.withOpacity(0.15) : AppColors.cardBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isActive ? color : AppColors.divider,
-          width: isActive ? 1.5 : 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 58,
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A2230),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isActive ? color : Colors.white.withOpacity(0.1),
+            width: 1.5,
           ),
-        ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, color: color, size: 22),
+                if (showBadge)
+                  Positioned(
+                    top: -2,
+                    right: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
