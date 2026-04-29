@@ -46,14 +46,30 @@ class UserProgressProvider extends ChangeNotifier {
   // ── Load from Firestore ─────────────────────────────────────────────────────
   Future<void> loadFromFirestore() async {
     final uid = _uid;
-    if (uid == null) return;
+    debugPrint('📖 loadFromFirestore starting for UID: $uid');
+
+    if (uid == null) {
+      debugPrint('⚠️ loadFromFirestore: No UID found, skipping load.');
+      return;
+    }
 
     _loading = true;
     notifyListeners();
 
     try {
       final doc = await _db.collection('user').doc(uid).get();
+
+      if (!doc.exists) {
+        debugPrint(
+          '❓ loadFromFirestore: Document does not exist for UID: $uid',
+        );
+        _loading = false;
+        notifyListeners();
+        return;
+      }
+
       final data = doc.data() ?? {};
+      debugPrint('✅ loadFromFirestore: Data fetched: $data');
 
       _coins = data['Coin'] as int? ?? 0;
       _xp = data['XP'] as int? ?? 0;
@@ -74,10 +90,10 @@ class UserProgressProvider extends ChangeNotifier {
       );
 
       debugPrint(
-        'loadFromFirestore → username:$_username | coins:$_coins | level:$level | unlocked:${_unlockedCategories.length}',
+        '✨ loadFromFirestore DONE → username:$_username | coins:$_coins | stars:$_stars | level:$level',
       );
     } catch (e) {
-      debugPrint('loadFromFirestore: $e');
+      debugPrint('❌ loadFromFirestore error: $e');
     } finally {
       _loading = false;
       notifyListeners();
@@ -158,15 +174,15 @@ class UserProgressProvider extends ChangeNotifier {
   // ── ✅ ADDED: Wipe then reload (use in HomeScreen.initState) ───────────────
   // Guarantees the screen always shows the currently logged-in user's data.
   Future<void> clearAndReload() async {
+    debugPrint('🔄 clearAndReload triggered...');
     clearData();
     await loadFromFirestore();
+    await initStreak(isLogin: true);
+    debugPrint('✅ clearAndReload complete.');
   }
 
   // ── Update profile ──────────────────────────────────────────────────────────
-  Future<void> updateProfile({
-    required String username,
-    String? bio,
-  }) async {
+  Future<void> updateProfile({required String username, String? bio}) async {
     final uid = _uid;
     if (uid == null) return;
 
@@ -184,9 +200,7 @@ class UserProgressProvider extends ChangeNotifier {
         if (bio != null) 'bio': _bio,
       }, SetOptions(merge: true));
 
-      debugPrint(
-        '✅ updateProfile → username:$_username | bio:$_bio',
-      );
+      debugPrint('✅ updateProfile → username:$_username | bio:$_bio');
     } catch (e) {
       debugPrint('❌ updateProfile error: $e');
     }
@@ -218,11 +232,23 @@ class UserProgressProvider extends ChangeNotifier {
   // ── Streak completed ────────────────────────────────────────────────────────
   Future<void> onStreakCompleted() async {
     _coins += coinsOnStreakComplete;
+
+    // Reset streak state for the next cycle
+    // Keep streak at 7/7 in memory so it doesn't show "-/7" immediately
     if (_streak != null) {
-      _streak = _streak!.copyWith(rewardClaimed: true);
+      _streak = _streak!.copyWith(
+        currentDay: _streak!.totalDays,
+        rewardClaimed: true,
+        justCompleted: false,
+      );
     }
+
     notifyListeners();
     await _sync();
+
+    // Also reset the streak document in its own collection
+    await StreakController.resetAfterCompletion();
+    debugPrint('🔥 Streak reset after completion');
   }
 
   // ── Manually update coins ───────────────────────────────────────────────────
@@ -241,7 +267,6 @@ class UserProgressProvider extends ChangeNotifier {
       await _db.collection('user').doc(uid).set({
         'Coin': _coins,
         'XP': _xp,
-        'Level': level,
         'Stars': _stars,
         'CompletedSections': _completedSections,
         'QuizLevelsInSection': _quizLevelsInSection,
@@ -289,7 +314,7 @@ class UserProgressProvider extends ChangeNotifier {
               .doc(catDoc.id)
               .collection('levels')
               .doc(lvlDoc.id)
-              .set(lvlDoc.data()!);
+              .set(lvlDoc.data());
         }
       }
 

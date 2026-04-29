@@ -23,7 +23,7 @@ class RecommendedCard extends StatelessWidget {
               child: Image.asset(
                 quiz.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+                errorBuilder: (_, _, _) => Container(
                   color: AppColors.cardBg,
                   child: const Center(
                     child: Icon(

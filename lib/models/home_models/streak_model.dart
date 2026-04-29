@@ -19,7 +19,9 @@ class StreakModel {
   bool get isComplete => currentDay >= totalDays;
 
   /// True when no streak has started (or was reset).
-  bool get isBroken => currentDay == 0;
+  /// True when the user failed to maintain their streak.
+  /// We only show this if they haven't finished today's cycle.
+  bool get isBroken => currentDay == 0 && !rewardClaimed;
 
   /// Coins awarded when the 7-day streak is completed.
   int get rewardCoins => isComplete ? 500 : 0;

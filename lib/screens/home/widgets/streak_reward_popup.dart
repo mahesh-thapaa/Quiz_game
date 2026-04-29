@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/controllers/streak_controller.dart';
-import 'package:quiz_game/models/colors.dart';
+// import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 
 /// Shows the high-fidelity Streak Reward popup.
@@ -111,7 +111,7 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                     'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Party%20Popper.png',
                     width: 80,
                     height: 80,
-                    errorBuilder: (_, __, ___) =>
+                    errorBuilder: (_, _, _) =>
                         const Text('🎉', style: TextStyle(fontSize: 60)),
                   ),
                   const SizedBox(height: 20),

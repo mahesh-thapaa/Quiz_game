@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
@@ -35,7 +34,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  final GlobalKey<ProfileAvatarState> _avatarKey = GlobalKey<ProfileAvatarState>();
+  final GlobalKey<ProfileAvatarState> _avatarKey =
+      GlobalKey<ProfileAvatarState>();
 
   // ── Save username + bio ────────────────────────────────────────────────────
   Future<void> _save() async {

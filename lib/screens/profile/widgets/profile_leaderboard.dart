@@ -156,7 +156,7 @@ class _LeaderboardRow extends StatelessWidget {
             child: isTop3
                 ? _RankBadge(rank: visualRank)
                 : Text(
-                    '#${visualRank}',
+                    '#$visualRank',
                     style: TextStyle(
                       color: entry.isCurrentUser
                           ? AppColors.primary

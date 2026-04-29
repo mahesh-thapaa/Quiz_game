@@ -35,8 +35,9 @@ class ProfileStatsRow extends StatelessWidget {
   }
 
   String _formatNumber(int n) {
-    if (n >= 1000)
+    if (n >= 1000) {
       return '${(n / 1000).toStringAsFixed(1)}K'.replaceAll('.0K', 'K');
+    }
     return '$n';
   }
 }

@@ -7,13 +7,13 @@ class Database {
   final String title;
   final List<String> options;
   final int correctAnswerIndex;
-  final String? imagePath;
+  final String? imageUrl;
 
   Database({
     required this.title,
     required this.options,
     required this.correctAnswerIndex,
-    this.imagePath,
+    this.imageUrl,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,7 +21,7 @@ class Database {
       'title': title,
       'options': options,
       'correctAnswerIndex': correctAnswerIndex,
-      'imagePath': imagePath ?? '',
+      'imageUrl': imageUrl ?? '',
     };
   }
 }
@@ -36,7 +36,7 @@ final List<Database> playerQuiz = [
       "Aaron Rodgers",
     ],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/ronaldo.png",
+    imageUrl: "asstes/images/ronaldo.png",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
@@ -47,19 +47,19 @@ final List<Database> playerQuiz = [
       "Zinedine Zidane",
     ],
     correctAnswerIndex: 2,
-    imagePath: "asstes/images/lm10.jpeg",
+    imageUrl: "asstes/images/lm10.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Sadio Mané", "Mohamed Salah", "Riyad Mahrez", "Vinicious Jr"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/vini.jpeg",
+    imageUrl: "asstes/images/vini.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Neymar Jr", "Luis Suárez", "Edinson Cavani", "Sergio Agüero"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/njr.jpeg",
+    imageUrl: "asstes/images/njr.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
@@ -71,31 +71,31 @@ final List<Database> playerQuiz = [
     ],
 
     correctAnswerIndex: 2,
-    imagePath: "asstes/images/hk.jpeg",
+    imageUrl: "asstes/images/hk.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Kevin De Bruyne", "Luka Modrić", "Romelu Lukaku", "Paul Pogba"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/kdb.jpeg",
+    imageUrl: "asstes/images/kdb.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Pelé", "Diego Maradona", "Ronaldo", "Zidane"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/zinedinezidane.jpeg",
+    imageUrl: "asstes/images/zinedinezidane.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Lionel Messi", "Cristiano Ronaldo", "Ali Daei", "Romário"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/andycole.jpeg",
+    imageUrl: "asstes/images/andycole.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Wayne Rooney", "Andrew Cole", "Alan Shearer", "Frank Lampard"],
     correctAnswerIndex: 1,
-    imagePath: '',
+    imageUrl: '',
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
@@ -106,13 +106,13 @@ final List<Database> playerQuiz = [
       "Darwin Núñez",
     ],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/martinodegaard.jpeg",
+    imageUrl: "asstes/images/martinodegaard.jpeg",
   ),
   Database(
     title: "WHO IS THIS PLAYER?",
     options: ["Lionel Messi", "Cristiano Ronaldo", "Ali Daei", "Romário"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/romario.jpeg",
+    imageUrl: "asstes/images/romario.jpeg",
   ),
 ];
 
@@ -121,38 +121,38 @@ final List<Database> stadiumQuiz = [
     title: "WHICH STADIUM IS THIS?",
     options: ["Santiago Bernabéu", "Camp Nou", "Old Trafford", "Allianz Arena"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/sb.jpeg",
+    imageUrl: "asstes/images/sb.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Anfield", "Old Trafford", "Etihad Stadium", "Emirates Stadium"],
     correctAnswerIndex: 2,
-    imagePath: "asstes/images/es.jpeg",
+    imageUrl: "asstes/images/es.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Camp Nou", "Signal Iduna Park", "Santiago Bernabéu", "San Siro"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/ss.jpeg",
+    imageUrl: "asstes/images/ss.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Anfield", "Stamford Bridge", "Tottenham Stadium", "Wembley"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/a.jpeg",
+    imageUrl: "asstes/images/a.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Allianz Arena", "Camp Nou", "Parc des Princes", "San Siro"],
 
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/cn.jpeg",
+    imageUrl: "asstes/images/cn.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["San Siro", "Old Trafford", "Signal Iduna Park", "Anfield"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/ot.jpeg",
+    imageUrl: "asstes/images/ot.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
@@ -163,19 +163,19 @@ final List<Database> stadiumQuiz = [
       "Wembley",
     ],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/aa.jpeg",
+    imageUrl: "asstes/images/aa.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Emirates Stadium", "Wembley", "Etihad Stadium", "Anfield"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/w.jpeg",
+    imageUrl: "asstes/images/w.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
     options: ["Parc des Princes", "San Siro", "Camp Nou", "Allianz Arena"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/pdl.jpeg",
+    imageUrl: "asstes/images/pdl.jpeg",
   ),
   Database(
     title: "WHICH STADIUM IS THIS?",
@@ -186,7 +186,7 @@ final List<Database> stadiumQuiz = [
       "Old Trafford",
     ],
     correctAnswerIndex: 2,
-    imagePath: "asstes/images/ts.jpeg",
+    imageUrl: "asstes/images/ts.jpeg",
   ),
 ];
 
@@ -195,61 +195,61 @@ final List<Database> jerseyQuiz = [
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Arsenal", "Liverpool", "Manchester United", "Bayern Munich"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/arsenal.jpeg",
+    imageUrl: "asstes/images/arsenal.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Liverpool", "Chelsea", "Barcelona", "Juventus"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/chelsea.jpeg",
+    imageUrl: "asstes/images/chelsea.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Real Madrid", "Tottenham", "Leeds United", "Swansea City"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/real_madrid.jpeg",
+    imageUrl: "asstes/images/real_madrid.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Chelsea", "Barcelona", "Real Madrid", "Juventus"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/barcelona.jpeg",
+    imageUrl: "asstes/images/barcelona.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Dortmund", "Juventus", "Inter Milan", "Newcast le United"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/dortmund.jpeg",
+    imageUrl: "asstes/images/dortmund.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Atletico Club", "Real Betis", "Arsenal", "Atletico"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/atletico.jpeg",
+    imageUrl: "asstes/images/atletico.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["AC Milan", "Juventus", "Atletico Madrid", "River Plate"],
     correctAnswerIndex: 1,
-    imagePath: "asstes/images/juventus.jpeg",
+    imageUrl: "asstes/images/juventus.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["West Ham", "Man United", "Liverpool", "Man City"],
     correctAnswerIndex: 2,
-    imagePath: "asstes/images/liverpool.jpeg",
+    imageUrl: "asstes/images/liverpool.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["Manchester City", "Napoli", "Argentina", "Lazio"],
     correctAnswerIndex: 0,
-    imagePath: "asstes/images/Manchester_City.jpeg",
+    imageUrl: "asstes/images/Manchester_City.jpeg",
   ),
   Database(
     title: "WHICH CLUB JERSEY IS THIS?",
     options: ["RC Lens", "Monaco", "Olympic Lyon", "PSG"],
     correctAnswerIndex: 3,
-    imagePath: "asstes/images/psg.jpeg",
+    imageUrl: "asstes/images/psg.jpeg",
   ),
 ];
 final List<Database> clubQuiz = [

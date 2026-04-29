@@ -109,7 +109,7 @@ class GlobalStandings extends StatelessWidget {
                   )
                 : ListView.separated(
                     itemCount: allUsers.length,
-                    separatorBuilder: (_, __) =>
+                    separatorBuilder: (_, _) =>
                         const Divider(color: Colors.white10, height: 1),
                     itemBuilder: (ctx, i) {
                       final entry = allUsers[i];

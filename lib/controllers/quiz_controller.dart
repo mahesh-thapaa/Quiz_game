@@ -10,6 +10,7 @@ class QuizController {
   static Future<Map<String, dynamic>> loadQuizData({
     required String categoryId,
     required String firestoreName,
+    String? quizId,
   }) async {
     final Map<String, List<QuizQuestion>> questionsByLevel = {};
     final Map<int, String> levelDocIds = {};
@@ -22,16 +23,26 @@ class QuizController {
       );
 
       // 2. Fetch Quiz Metadata from Firestore
-      final quizSnap = await _db
-          .collection('quizzes')
-          .where('category', isEqualTo: firestoreName)
-          .limit(1)
-          .get();
+      DocumentSnapshot? quizDoc;
 
-      if (quizSnap.docs.isNotEmpty) {
-        final levelsSnap = await quizSnap.docs.first.reference
-            .collection('levels')
+      if (quizId != null && quizId.isNotEmpty && quizId.length > 15) {
+        // Fetch directly by ID if it looks like a Firestore ID
+        final snap = await _db.collection('quizzes').doc(quizId).get();
+        if (snap.exists) quizDoc = snap;
+      }
+
+      if (quizDoc == null) {
+        // Fallback to category search
+        final quizSnap = await _db
+            .collection('quizzes')
+            .where('category', isEqualTo: firestoreName)
+            .limit(1)
             .get();
+        if (quizSnap.docs.isNotEmpty) quizDoc = quizSnap.docs.first;
+      }
+
+      if (quizDoc != null) {
+        final levelsSnap = await quizDoc.reference.collection('levels').get();
 
         int bonusCounter = 0;
         for (var doc in levelsSnap.docs) {
@@ -96,7 +107,7 @@ class QuizController {
 
       // 2. Conditional categories (Home)
       if (userLevel >= 5) categories.add('Legend Quiz');
-      if (userCoins >= 1000) categories.add('National QUiz');
+      if (userCoins >= 1000) categories.add('National Quiz');
       if (userLevel >= 7) categories.add('Manager Quiz');
       if (userCoins >= 5000) categories.add('Transfer Quiz');
 

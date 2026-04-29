@@ -6,8 +6,9 @@ import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/provider/profile_image_provider.dart';
 import 'package:quiz_game/provider/password_provider.dart';
-import 'package:quiz_game/screens/splash_screen/splash_screesn.dart';
-import 'package:quiz_game/provider/leaderBoard_provider.dart';
+import 'package:quiz_game/provider/daily_challenger_provider.dart';
+import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
+import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/controllers/auth_controller.dart';
 
 void main() async {
@@ -31,6 +32,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthController()),
         ChangeNotifierProvider(create: (_) => ProfileImageProvider()),
         ChangeNotifierProvider(create: (_) => PasswordProvider()),
+        ChangeNotifierProvider(create: (_) => DailyChallengerProvider()),
       ],
       child: const MyApp(),
     ),

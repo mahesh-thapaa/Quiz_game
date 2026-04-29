@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class LockedCategoryModel {
   final String title;
   final String unlockText;
-  final String imagePath;
+  final String imageUrl;
   final String snackbarMessage;
   final Color snackbarColor;
   final bool requiresCoins;
@@ -16,7 +16,7 @@ class LockedCategoryModel {
     required this.snackbarColor,
     required this.snackbarMessage,
     required this.unlockText,
-    required this.imagePath,
+    required this.imageUrl,
     required this.categoryId,
     required this.firestoreName,
     required this.unlockValue,

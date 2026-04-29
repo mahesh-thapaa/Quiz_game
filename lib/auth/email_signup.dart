@@ -44,10 +44,8 @@ class _EmailSignupState extends State<EmailSignup> {
 
     if (success && mounted) {
       final p = context.read<UserProgressProvider>();
-      await Future.wait([
-        p.loadFromFirestore(),
-        p.initStreak(isLogin: true),
-      ]);
+      await p.clearAndReload();
+
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -113,12 +111,15 @@ class _EmailSignupState extends State<EmailSignup> {
                       Icons.person_outline,
                     ),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty)
+                      if (v == null || v.trim().isEmpty) {
                         return 'Please enter a username';
-                      if (v.trim().length < 3)
+                      }
+                      if (v.trim().length < 3) {
                         return 'Username must be at least 3 characters';
-                      if (v.trim().length > 20)
+                      }
+                      if (v.trim().length > 20) {
                         return 'Username must be 20 characters or less';
+                      }
                       return null;
                     },
                   ),
@@ -130,8 +131,9 @@ class _EmailSignupState extends State<EmailSignup> {
                     style: TextStyle(color: AppColors.hText),
                     decoration: _inputDecoration('Email', Icons.email_outlined),
                     validator: (v) {
-                      if (v == null || v.trim().isEmpty)
+                      if (v == null || v.trim().isEmpty) {
                         return 'Please enter your email';
+                      }
                       if (!v.contains('@')) return 'Enter a valid email';
                       return null;
                     },
@@ -158,10 +160,12 @@ class _EmailSignupState extends State<EmailSignup> {
                           ),
                         ),
                     validator: (v) {
-                      if (v == null || v.isEmpty)
+                      if (v == null || v.isEmpty) {
                         return 'Please enter a password';
-                      if (v.length < 6)
+                      }
+                      if (v.length < 6) {
                         return 'Password must be at least 6 characters';
+                      }
                       return null;
                     },
                   ),

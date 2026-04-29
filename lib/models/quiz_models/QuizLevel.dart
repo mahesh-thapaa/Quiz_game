@@ -34,7 +34,7 @@ class QuizQuestion {
   final String title;
   final List<String> options;
   final int correctAnswerIndex;
-  final String? imagePath;
+  final String? imageUrl;
   final int order;
   final String levelId;
   final String quizId;
@@ -43,7 +43,7 @@ class QuizQuestion {
     required this.title,
     required this.options,
     required this.correctAnswerIndex,
-    this.imagePath,
+    this.imageUrl,
     required this.order,
     required this.levelId,
     required this.quizId,
@@ -63,7 +63,9 @@ class QuizQuestion {
       title: data['title'] as String? ?? '',
       options: options,
       correctAnswerIndex: data['correctAnswerIndex'] as int? ?? 0,
-      imagePath: data['imagePath'] as String?,
+      imageUrl: (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
+          ? data['imageUrl'] as String?
+          : data['imagePath'] as String?,
       order: data['order'] as int? ?? 0,
       levelId: data['levelId'] as String? ?? '',
       quizId: data['quizId'] as String? ?? '',

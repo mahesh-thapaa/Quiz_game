@@ -30,14 +30,14 @@ class ClaimRewardDialog extends StatefulWidget {
   final Widget? nextScreen; // ← pass the screen to navigate to
 
   const ClaimRewardDialog({
-    Key? key,
+    super.key,
     this.title = 'CONGRATULATIONS!',
     this.subtitle = 'REWARD CLAIMED SUCCESSFULLY',
     this.coins = 100,
     this.buttonLabel = 'AWESOME',
     this.onTap,
     this.nextScreen, // ← optional next screen
-  }) : super(key: key);
+  });
 
   @override
   State<ClaimRewardDialog> createState() => _ClaimRewardDialogState();

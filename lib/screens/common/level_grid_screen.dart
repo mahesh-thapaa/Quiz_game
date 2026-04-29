@@ -57,6 +57,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       data = await QuizController.loadQuizData(
         categoryId: widget.categoryId,
         firestoreName: widget.firestoreName,
+        quizId: widget.categoryId, // Passing categoryId as quizId (document ID)
       );
     }
 
@@ -418,17 +419,20 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Future<void> _onLevelComplete(LevelResultModels res, int gridPos) async {
     final all = [..._controller.block1Items, ..._controller.block2Items];
     int oldStars = 0;
-    for (var t in all) if (t.number == gridPos) oldStars = t.starsEarned;
+    for (var t in all) {
+      if (t.number == gridPos) oldStars = t.starsEarned;
+    }
     int delta = res.starsEarned > oldStars ? res.starsEarned - oldStars : 0;
 
     setState(() {
-      for (var t in all)
+      for (var t in all) {
         if (t.number == gridPos) {
           t.starsEarned = res.starsEarned > oldStars
               ? res.starsEarned
               : oldStars;
           if (t.starsEarned > 0) _controller.unlockNext(gridPos);
         }
+      }
       _controller.updateCurrentTile();
     });
 

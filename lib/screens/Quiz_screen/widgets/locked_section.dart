@@ -1,59 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/quiz_models/locked_category_models.dart';
+import 'package:quiz_game/models/discover/discover_models.dart';
 import 'package:quiz_game/screens/common/level_grid_screen.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
-import 'package:provider/provider.dart';
 
 class LockedSection extends StatelessWidget {
   const LockedSection({super.key});
-
-  static final List<LockedCategoryModel> _items = [
-    LockedCategoryModel(
-      title: 'Legends Quiz',
-      unlockText: '110 Star',
-      imagePath: 'asstes/images/legend.jpg',
-      requiresCoins: false,
-      snackbarMessage: '110 Star Required to unlock Legends Quiz!',
-      snackbarColor: Colors.blue,
-      categoryId: 'legends_quiz',
-      firestoreName: 'Legend Quiz',
-      unlockValue: 110,
-    ),
-    LockedCategoryModel(
-      title: 'National',
-      unlockText: '10000 Coins',
-      imagePath: 'asstes/images/national.jpg',
-      requiresCoins: true,
-      snackbarMessage: 'You need 100000 Coins to unlock National!',
-      snackbarColor: Colors.blue,
-      categoryId: 'national_quiz',
-      firestoreName: 'National QUiz',
-      unlockValue: 100000,
-    ),
-    LockedCategoryModel(
-      title: 'Manager Quiz',
-      unlockText: '160 Star',
-      imagePath: 'asstes/images/manager.jpg',
-      requiresCoins: false,
-      snackbarMessage: '160 Star Required to unlock Manager Quiz!',
-      snackbarColor: Colors.blue,
-      categoryId: 'manager_quiz',
-      firestoreName: 'Manager Quiz',
-      unlockValue: 160,
-    ),
-    LockedCategoryModel(
-      title: 'Transfer Quiz',
-      unlockText: '25000 Coins',
-      imagePath: 'asstes/images/transfer.png',
-      requiresCoins: true,
-      snackbarMessage: 'You need 25000 Coins to unlock Transfer Quiz!',
-      snackbarColor: Colors.blue,
-      categoryId: 'transfer_quiz',
-      firestoreName: 'Transfer Quiz',
-      unlockValue: 25000,
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -77,18 +31,91 @@ class LockedSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        // ── Grid ───────────────────────────────────────────────
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.0,
-          ),
-          itemBuilder: (context, index) => _LockedCard(item: _items[index]),
+        // ── Firestore Grid ─────────────────────────────────────
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('quizzes')
+              .where('isDiscover', isEqualTo: false)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            }
+
+            final docs = snapshot.data?.docs ?? [];
+
+            // Filter out the core quizzes that are always visible (not in locked section)
+            // Or only show those with specific unlock requirements
+            final List<DiscoverModels> items = docs
+                .map(
+                  (doc) => DiscoverModels.fromFirestore(
+                    doc.data() as Map<String, dynamic>,
+                    doc.id,
+                  ),
+                )
+                .where(
+                  (item) =>
+                      item.unlockValue != null &&
+                      item.unlockValue! > 0 &&
+                      item.title != 'Player Quiz' &&
+                      item.title != 'Stadium Quiz' &&
+                      item.title != 'Jersey Quiz' &&
+                      item.title != 'Logo Master',
+                )
+                .toList();
+
+            // ── CUSTOM SORTING ──────────────────────────────────
+            // Order: Legends Quiz, National Quiz, Manager Quiz, Transfer Quiz
+            final List<String> desiredOrder = [
+              'legend', // Should match "Legend Quiz" or "Legends Quiz"
+              'national',
+              'manager',
+              'transfer',
+            ];
+
+            items.sort((a, b) {
+              final titleA = a.title.toLowerCase();
+              final titleB = b.title.toLowerCase();
+
+              int indexA = desiredOrder.indexWhere(
+                (key) => titleA.contains(key),
+              );
+              int indexB = desiredOrder.indexWhere(
+                (key) => titleB.contains(key),
+              );
+
+              if (indexA == -1) indexA = 999;
+              if (indexB == -1) indexB = 999;
+
+              return indexA.compareTo(indexB);
+            });
+
+            if (items.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (context, index) => _LockedCard(item: items[index]),
+            );
+          },
         ),
       ],
     );
@@ -97,17 +124,20 @@ class LockedSection extends StatelessWidget {
 
 // ── Single card ───────────────────────────────────────────────
 class _LockedCard extends StatelessWidget {
-  final LockedCategoryModel item;
+  final DiscoverModels item;
 
   const _LockedCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
+    final bool requiresCoins = item.unlockType == UnlockType.coins;
+    final int unlockValue = item.unlockValue ?? 0;
+
     final bool isUnlocked = p.isCategoryUnlocked(
       item.categoryId,
-      item.requiresCoins,
-      item.unlockValue,
+      requiresCoins,
+      unlockValue,
     );
 
     return GestureDetector(
@@ -123,7 +153,7 @@ class _LockedCard extends StatelessWidget {
               ),
             ),
           );
-        } else if (item.requiresCoins) {
+        } else if (requiresCoins) {
           // ── Coin Purchase Dialog ───────────────────────────
           final bool? confirmed = await showDialog<bool>(
             context: context,
@@ -134,7 +164,7 @@ class _LockedCard extends StatelessWidget {
                 style: const TextStyle(color: Colors.white),
               ),
               content: Text(
-                'Unlock this category for ${item.unlockValue} coins?',
+                'Unlock this category for $unlockValue coins?',
                 style: const TextStyle(color: AppColors.stext),
               ),
               actions: [
@@ -150,7 +180,7 @@ class _LockedCard extends StatelessWidget {
                   child: Text(
                     'UNLOCK',
                     style: TextStyle(
-                      color: p.coins >= item.unlockValue
+                      color: p.coins >= unlockValue
                           ? AppColors.primary
                           : Colors.red,
                     ),
@@ -163,7 +193,7 @@ class _LockedCard extends StatelessWidget {
           if (confirmed == true) {
             final success = await p.unlockWithCoins(
               item.categoryId,
-              item.unlockValue,
+              unlockValue,
             );
             if (!context.mounted) return;
 
@@ -228,13 +258,21 @@ class _LockedCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              item.imagePath,
-              fit: BoxFit.cover,
-              opacity: AlwaysStoppedAnimation(isUnlocked ? 1.0 : 0.4),
-              errorBuilder: (_, __, ___) =>
-                  Container(color: AppColors.deepCard),
-            ),
+            item.imageUrl.startsWith('http')
+                ? Image.network(
+                    item.imageUrl,
+                    fit: BoxFit.cover,
+                    opacity: AlwaysStoppedAnimation(isUnlocked ? 1.0 : 0.4),
+                    errorBuilder: (_, _, _) =>
+                        Container(color: AppColors.deepCard),
+                  )
+                : Image.asset(
+                    item.imageUrl,
+                    fit: BoxFit.cover,
+                    opacity: AlwaysStoppedAnimation(isUnlocked ? 1.0 : 0.4),
+                    errorBuilder: (_, _, _) =>
+                        Container(color: AppColors.deepCard),
+                  ),
 
             Container(
               decoration: BoxDecoration(
@@ -292,10 +330,10 @@ class _LockedCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  item.requiresCoins
-                      ? _CoinBadge(text: item.unlockText)
+                  requiresCoins
+                      ? _CoinBadge(text: item.unlockText ?? '')
                       : Text(
-                          item.unlockText,
+                          item.unlockText ?? '',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,

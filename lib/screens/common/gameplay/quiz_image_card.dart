@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 
 class QuizImageCard extends StatelessWidget {
-  final String imagePath;
+  final String imageUrl;
 
-  const QuizImageCard({super.key, required this.imagePath});
+  const QuizImageCard({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -15,23 +15,29 @@ class QuizImageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.outlineBorder, width: 2),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 16,
-            spreadRadius: 2,
-          ),
+          BoxShadow(color: AppColors.shadow, blurRadius: 16, spreadRadius: 2),
         ],
       ),
       clipBehavior: Clip.hardEdge,
-      child: Image.network(
-        imagePath,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          color: AppColors.cardBg,
-          child: const Center(
-            child: Icon(Icons.person, color: AppColors.stext, size: 60),
-          ),
-        ),
+      child: imageUrl.startsWith('http')
+          ? Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _errorPlaceholder(),
+            )
+          : Image.asset(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _errorPlaceholder(),
+            ),
+    );
+  }
+
+  Widget _errorPlaceholder() {
+    return Container(
+      color: AppColors.cardBg,
+      child: const Center(
+        child: Icon(Icons.person, color: AppColors.stext, size: 60),
       ),
     );
   }

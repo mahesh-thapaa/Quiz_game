@@ -173,7 +173,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(width: 5),
+                  const SizedBox(width: 8),
                   SvgPicture.asset(
                     'asstes/svg/coin-svgrepo-com.svg',
                     height: 24,

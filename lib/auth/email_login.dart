@@ -39,10 +39,8 @@ class _EmailLoginState extends State<EmailLogin> {
 
     if (success && mounted) {
       final p = context.read<UserProgressProvider>();
-      await Future.wait([
-        p.loadFromFirestore(),
-        p.initStreak(isLogin: true),
-      ]);
+      await p.clearAndReload();
+
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -148,8 +146,9 @@ class _EmailLoginState extends State<EmailLogin> {
                           ),
                         ),
                     validator: (v) {
-                      if (v == null || v.isEmpty)
+                      if (v == null || v.isEmpty) {
                         return 'Please enter a password';
+                      }
                       return null;
                     },
                   ),

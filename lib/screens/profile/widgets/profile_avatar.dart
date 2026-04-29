@@ -48,7 +48,7 @@ class LeaderboardProfileAvatar extends StatelessWidget {
               backgroundImage: user.avatarUrl.isNotEmpty
                   ? NetworkImage(user.avatarUrl)
                   : const AssetImage('assets/images/profile.png'),
-              onBackgroundImageError: (_, __) {},
+              onBackgroundImageError: (_, _) {},
               child: null,
             ),
             // Verified badge

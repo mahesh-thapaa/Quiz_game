@@ -20,11 +20,11 @@ class CategoryCard extends StatelessWidget {
           children: [
             Image.asset(
               category.imageUrl,
-              height: 150,
+              height: 120,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 150,
+              errorBuilder: (_, _, _) => Container(
+                height: 120,
                 color: AppColors.cardBg,
                 child: const Center(
                   child: Icon(
@@ -37,7 +37,7 @@ class CategoryCard extends StatelessWidget {
             ),
 
             Container(
-              height: 150,
+              height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -51,7 +51,7 @@ class CategoryCard extends StatelessWidget {
             ),
 
             Positioned(
-              bottom: 10,
+              bottom: 8,
               left: 0,
               right: 0,
               child: Text(

@@ -14,8 +14,11 @@ class LevelGridController {
   factory LevelGridController.initial({String? categoryId}) {
     return LevelGridController(
       block1Items: _generateLevels(start: 1, count: 24, categoryId: categoryId),
-      block2Items:
-          _generateLevels(start: 25, count: 24, categoryId: categoryId),
+      block2Items: _generateLevels(
+        start: 25,
+        count: 24,
+        categoryId: categoryId,
+      ),
     );
   }
 
@@ -62,7 +65,9 @@ class LevelGridController {
   /// Sets the 'isCurrent' flag on the first incomplete level
   void updateCurrentTile() {
     final all = [...block1Items, ...block2Items];
-    for (var t in all) t.isCurrent = false;
+    for (var t in all) {
+      t.isCurrent = false;
+    }
     for (var t in all) {
       if (!t.hasStar && t.isUnlocked && t.starsEarned == 0) {
         t.isCurrent = true;

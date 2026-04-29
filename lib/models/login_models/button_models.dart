@@ -9,13 +9,13 @@ class ButtonModels extends StatelessWidget {
   final VoidCallback onTap;
 
   const ButtonModels({
-    Key? key,
+    super.key,
     required this.label,
     required this.gradient,
     required this.onTap,
     this.leading,
     this.trailing,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

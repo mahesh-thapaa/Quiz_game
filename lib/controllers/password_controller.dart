@@ -39,9 +39,13 @@ class PasswordController {
       // 2. Update the password
       await user.updatePassword(newPassword);
       
-      debugPrint('✅ Password updated successfully for user: ${user.uid}');
+      debugPrint('Password updated successfully for user: ${user.uid}');
     } catch (e) {
-      debugPrint('❌ changePassword error: $e');
+      if(e is FirebaseAuthException){
+       debugPrint("Code: ${e.code}");
+       debugPrint("Message: ${e.message}");
+      }
+      debugPrint('changePassword error: $e');
       rethrow;
     }
   }

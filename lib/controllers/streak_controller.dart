@@ -1,6 +1,5 @@
 // lib/controllers/streak_controller.dart
 
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quiz_game/models/home_models/streak_model.dart';
@@ -16,7 +15,9 @@ class StreakController {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return _createNewStreak();
 
-    final ref = FirebaseFirestore.instance.collection(_streakPath).doc(user.uid);
+    final ref = FirebaseFirestore.instance
+        .collection(_streakPath)
+        .doc(user.uid);
     final snapshot = await ref.get();
 
     if (!snapshot.exists) return _createNewStreak();
@@ -36,7 +37,9 @@ class StreakController {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return _createNewStreak();
 
-    final ref = FirebaseFirestore.instance.collection(_streakPath).doc(user.uid);
+    final ref = FirebaseFirestore.instance
+        .collection(_streakPath)
+        .doc(user.uid);
     final snapshot = await ref.get();
 
     final today = _dateOnly(DateTime.now());
@@ -58,10 +61,12 @@ class StreakController {
       rewardClaimed = false;
     } else if (lastDateOnly == today) {
       // Already logged in today - just return current state
+      // 🚀 BOOTSTRAP: If it's somehow 0 (new user or old reset logic), start at Day 1
+      if (currentDay == 0) currentDay = 1;
     } else if (lastDateOnly == yesterday) {
       // Consecutive day
       if (currentDay >= totalDaysPerCycle) {
-        // Reset cycle
+        // Cycle completed previously, reset for new cycle
         currentDay = 1;
         rewardClaimed = false;
       } else {
@@ -98,14 +103,34 @@ class StreakController {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final ref = FirebaseFirestore.instance.collection(_streakPath).doc(user.uid);
+    final ref = FirebaseFirestore.instance
+        .collection(_streakPath)
+        .doc(user.uid);
     await ref.update({'rewardClaimed': true});
   }
 
   static Future<void> reset() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-    await FirebaseFirestore.instance.collection(_streakPath).doc(user.uid).delete();
+    await FirebaseFirestore.instance
+        .collection(_streakPath)
+        .doc(user.uid)
+        .delete();
+  }
+
+  static Future<void> resetAfterCompletion() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final ref = FirebaseFirestore.instance
+        .collection(_streakPath)
+        .doc(user.uid);
+    await ref.set({
+      'currentDay': totalDaysPerCycle,
+      'rewardClaimed': true,
+      'lastLoginDate': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    }, SetOptions(merge: true));
   }
 
   static StreakModel _createNewStreak() {

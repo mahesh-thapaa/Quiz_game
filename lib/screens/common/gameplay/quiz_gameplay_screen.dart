@@ -92,7 +92,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
         questionText: q.title,
         options: q.options,
         correctIndex: q.correctAnswerIndex,
-        imagePath: q.imagePath,
+        imageUrl: q.imageUrl,
       );
     }).toList();
   }
@@ -353,9 +353,9 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                             ],
                           ),
                           const SizedBox(height: 25),
-                          if (q.imagePath != null && q.imagePath!.isNotEmpty)
-                            QuizImageCard(imagePath: q.imagePath!),
-                          if (q.imagePath != null && q.imagePath!.isNotEmpty)
+                          if (q.imageUrl != null && q.imageUrl!.isNotEmpty)
+                            QuizImageCard(imageUrl: q.imageUrl!),
+                          if (q.imageUrl != null && q.imageUrl!.isNotEmpty)
                             const SizedBox(height: 20),
                           ...List.generate(q.options.length, (i) {
                             return AnswerOption(

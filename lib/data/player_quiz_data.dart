@@ -8,7 +8,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 1,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/ronaldo.png",
+//         imageUrl: "asstes/images/ronaldo.png",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Tom Brady",
@@ -21,7 +21,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 2,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/lm10.jpeg",
+//         imageUrl: "asstes/images/lm10.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Cristiano Ronaldo",
@@ -34,7 +34,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 3,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/vini.jpeg",
+//         imageUrl: "asstes/images/vini.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Sadio Mané",
@@ -47,7 +47,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 4,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/njr.jpeg",
+//         imageUrl: "asstes/images/njr.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Neymar Jr",
@@ -60,7 +60,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 5,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/hk.jpeg",
+//         imageUrl: "asstes/images/hk.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Cristiano Ronaldo",
@@ -73,7 +73,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 6,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/kdb.jpeg",
+//         imageUrl: "asstes/images/kdb.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Kevin De Bruyne",
@@ -86,7 +86,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 7,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/zinedinezidane.jpeg",
+//         imageUrl: "asstes/images/zinedinezidane.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: ["Pelé", "Diego Maradona", "Ronaldo", "Zidane"],
 //         correctIndex: 3,
@@ -94,7 +94,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 8,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/andycole.jpeg",
+//         imageUrl: "asstes/images/andycole.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Wayne Rooney",
@@ -107,7 +107,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 9,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/martinodegaard.jpeg",
+//         imageUrl: "asstes/images/martinodegaard.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: [
 //           "Martin Ødegaard",
@@ -120,7 +120,7 @@
 //       PlayerQuestionModel(
 //         questionNumber: 10,
 //         totalQuestions: 10,
-//         imagePath: "asstes/images/romario.jpeg",
+//         imageUrl: "asstes/images/romario.jpeg",
 //         questionText: "WHO IS THIS PLAYER?",
 //         options: ["Lionel Messi", "Cristiano Ronaldo", "Ali Daei", "Romário"],
 //         correctIndex: 3,

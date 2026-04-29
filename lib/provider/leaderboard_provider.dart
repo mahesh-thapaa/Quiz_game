@@ -42,7 +42,12 @@ class LeaderboardProvider extends ChangeNotifier {
 
   void listenLeaderboard() {
     final uid = _uid;
-    if (uid == null) return;
+    debugPrint('📊 LeaderboardProvider: Listening for UID: $uid');
+    
+    if (uid == null) {
+      debugPrint('⚠️ LeaderboardProvider: No UID, skipping listen.');
+      return;
+    }
 
     _loading = true;
     notifyListeners();
@@ -54,6 +59,7 @@ class LeaderboardProvider extends ChangeNotifier {
         .snapshots()
         .listen(
           (snapshot) {
+            debugPrint('✅ LeaderboardProvider: Snapshot received. Docs: ${snapshot.docs.length}');
             final entries = snapshot.docs.map((doc) {
               final data = doc.data();
               final isMe = doc.id == uid;
@@ -80,10 +86,12 @@ class LeaderboardProvider extends ChangeNotifier {
               return entries[i].copyWith(rank: i + 1);
             });
 
+            debugPrint('🏆 Leaderboard updated. Current user rank: $currentUserRank');
             _loading = false;
             notifyListeners(); // 🔥 AUTO UI UPDATE
           },
           onError: (e) {
+            debugPrint('❌ LeaderboardProvider error: $e');
             _error = 'Failed to listen leaderboard';
             _loading = false;
             notifyListeners();

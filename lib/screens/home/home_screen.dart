@@ -33,6 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (category.title == 'Logo Master') {
       categoryId = 'logo_master';
       firestoreName = 'Logo Master';
+    } else if (category.title == 'Club Quiz') {
+      categoryId = 'club_quiz';
+      firestoreName = 'Club Quiz';
+    } else if (category.title == 'National Quiz') {
+      categoryId = 'national_quiz';
+      firestoreName = 'National Quiz';
     }
 
     if (categoryId.isNotEmpty) {
@@ -141,12 +147,12 @@ class _HomeScreenState extends State<HomeScreen> {
               const SectionHeader(title: 'POPULAR CATEGORIES'),
               const SizedBox(height: 15),
 
-              // 9. Popular Categories Row (Full Width)
+              // 9. Popular Categories Row (Full Width - 3 Items)
               Row(
                 children: HomeData.categories.map((category) {
                   return Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: const EdgeInsets.only(right: 8.0),
                       child: CategoryCard(
                         category: category,
                         onTap: () => _onCategoryTap(category),

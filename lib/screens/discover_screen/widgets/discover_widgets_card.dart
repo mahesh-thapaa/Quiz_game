@@ -55,7 +55,10 @@ class DiscoverWidgetsCard extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
+                  child: const Text(
+                    'CANCEL',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
@@ -142,12 +145,19 @@ class DiscoverWidgetsCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              model.imagePath,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  Container(color: AppColors.deepCard),
-            ),
+            model.imageUrl.startsWith('http')
+                ? Image.network(
+                    model.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        Container(color: AppColors.deepCard),
+                  )
+                : Image.asset(
+                    model.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        Container(color: AppColors.deepCard),
+                  ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

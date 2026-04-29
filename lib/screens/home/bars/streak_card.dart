@@ -24,7 +24,8 @@ class _StreakCardState extends State<StreakCard> {
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
     final user = FirebaseAuth.instance.currentUser;
-    final isGuest = user == null || user.isAnonymous;
+    final isGuest = user == null; // Only true if not signed in at all
+    final isAnonymous = user?.isAnonymous ?? false;
 
     final streak = p.streak ??
         const StreakModel(
@@ -127,7 +128,7 @@ class _StreakCardState extends State<StreakCard> {
                 if (isBroken) ...[
                   const SizedBox(height: 6),
                   const Text(
-                    'Login today to start a new streak!',
+                    'Come back tomorrow to continue your streak!',
                     style: TextStyle(color: AppColors.stext, fontSize: 11),
                   ),
                 ],
