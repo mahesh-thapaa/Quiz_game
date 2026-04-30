@@ -1,8 +1,10 @@
 // lib/screens/settings/settings_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/settings_models.dart';
+import 'package:quiz_game/provider/notification_provider.dart';
 import 'package:quiz_game/auth/change_password_screen.dart';
 import 'widgets/settings_toggle_tile.dart';
 import 'widgets/settings_arrow_tile.dart';
@@ -27,6 +29,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notificationProvider = context.watch<NotificationProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -65,16 +69,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsToggleTile(
                   icon: Icons.notifications_outlined,
                   label: 'Notifications',
-                  value: _settings.notifications,
-                  onChanged: (v) => setState(() => _settings.notifications = v),
+                  value: notificationProvider.notificationsEnabled,
+                  onChanged: (v) => notificationProvider.toggleNotifications(v),
                 ),
-                _TileDivider(),
-                SettingsToggleTile(
-                  icon: Icons.volume_up_outlined,
-                  label: 'Sound Effects',
-                  value: _settings.soundEffects,
-                  onChanged: (v) => setState(() => _settings.soundEffects = v),
-                ),
+                // _TileDivider(),
+                // SettingsToggleTile(
+                //   icon: Icons.volume_up_outlined,
+                //   label: 'Sound Effects',
+                //   value: _settings.soundEffects,
+                //   onChanged: (v) => setState(() => _settings.soundEffects = v),
+                // ),
               ],
             ),
 

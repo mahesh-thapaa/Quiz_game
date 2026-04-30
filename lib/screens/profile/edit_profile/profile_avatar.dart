@@ -40,7 +40,10 @@ class ProfileAvatarState extends State<ProfileAvatar> {
 
   void showPicker() => _showPickerOptions(context);
 
-  Future<void> _handleImageAction(BuildContext context, ImageSource? source) async {
+  Future<void> _handleImageAction(
+    BuildContext context,
+    ImageSource? source,
+  ) async {
     Navigator.pop(context);
 
     if (source == null) {
@@ -85,7 +88,9 @@ class ProfileAvatarState extends State<ProfileAvatar> {
           // Usually better to keep it but show error
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Failed to sync photo to cloud. Check your connection.'),
+              content: const Text(
+                'Failed to sync photo to cloud. Check your connection.',
+              ),
               backgroundColor: Colors.red.shade700,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -105,7 +110,9 @@ class ProfileAvatarState extends State<ProfileAvatar> {
   }
 
   void _showPickerOptions(BuildContext context) {
-    final hasImage = context.read<ProfileImageProvider>().avatarUrl.isNotEmpty || _previewImage != null;
+    final hasImage =
+        context.read<ProfileImageProvider>().avatarUrl.isNotEmpty ||
+        _previewImage != null;
 
     showModalBottomSheet(
       context: context,
@@ -120,18 +127,27 @@ class ProfileAvatarState extends State<ProfileAvatar> {
             const SizedBox(height: 10),
             ListTile(
               leading: const Icon(Icons.camera_alt, color: Colors.white),
-              title: const Text('Camera', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Camera',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () => _handleImageAction(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library, color: Colors.white),
-              title: const Text('Gallery', style: TextStyle(color: Colors.white)),
+              title: const Text(
+                'Gallery',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () => _handleImageAction(context, ImageSource.gallery),
             ),
             if (hasImage)
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.redAccent),
-                title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
+                title: const Text(
+                  'Remove Photo',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
                 onTap: () => _handleImageAction(context, null),
               ),
             const SizedBox(height: 10),
@@ -145,7 +161,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
     final imgProv = context.watch<ProfileImageProvider>();
-    
+
     final avatarUrl = imgProv.avatarUrl;
     final hasRemoteImage = avatarUrl.isNotEmpty;
     final hasPreview = _previewImage != null;
@@ -160,7 +176,9 @@ class ProfileAvatarState extends State<ProfileAvatar> {
     }
 
     return GestureDetector(
-      onTap: widget.onTap ?? (widget.showCameraIcon ? () => _showPickerOptions(context) : null),
+      onTap:
+          widget.onTap ??
+          (widget.showCameraIcon ? () => _showPickerOptions(context) : null),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -175,19 +193,22 @@ class ProfileAvatarState extends State<ProfileAvatar> {
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     ),
                   )
                 : (image == null
-                    ? Text(
-                        letter,
-                        style: TextStyle(
-                          color: AppColors.hText,
-                          fontSize: widget.radius * 0.7,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null),
+                      ? Text(
+                          letter,
+                          style: TextStyle(
+                            color: AppColors.hText,
+                            fontSize: widget.radius * 0.7,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null),
           ),
           if (widget.showCameraIcon)
             Positioned(

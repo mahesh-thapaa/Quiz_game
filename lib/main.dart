@@ -9,7 +9,9 @@ import 'package:quiz_game/provider/password_provider.dart';
 import 'package:quiz_game/provider/daily_challenger_provider.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 import 'package:quiz_game/provider/leaderboard_provider.dart';
+import 'package:quiz_game/provider/notification_provider.dart';
 import 'package:quiz_game/controllers/auth_controller.dart';
+import 'package:quiz_game/controllers/notification_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Initialize local notifications
+    await NotificationController().init();
   } catch (e) {
     // Firebase already initialized (common after hot reload)
     debugPrint('⚠️ Firebase init: $e');
@@ -33,6 +37,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProfileImageProvider()),
         ChangeNotifierProvider(create: (_) => PasswordProvider()),
         ChangeNotifierProvider(create: (_) => DailyChallengerProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const MyApp(),
     ),
