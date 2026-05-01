@@ -18,7 +18,7 @@ class QuizGameplayScreen extends StatefulWidget {
   final int? nextLevelNumber;
   final String quizTitle;
   final Future<void> Function(LevelResultModels, int) onLevelComplete;
-  final List<QuizQuestion> Function(int) getQuestionsForLevel;
+  final Future<List<QuizQuestion>> Function(int) getQuestionsForLevel;
   final String Function(int)? getGameplayTitle;
   final bool Function(int)? isBonusLevel;
 
@@ -136,7 +136,8 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
     // Sequential progression: 1→2→...→5→6(bonus)→7→...→12(bonus)→13...
     final int nextLevel = _currentLevelNumber + 1;
 
-    final nextQuestions = widget.getQuestionsForLevel(nextLevel);
+    // Show loading indicator or handle async fetch
+    final nextQuestions = await widget.getQuestionsForLevel(nextLevel);
 
     if (nextQuestions.isEmpty) {
       if (!mounted) return;

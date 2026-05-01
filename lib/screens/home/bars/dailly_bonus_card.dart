@@ -11,6 +11,7 @@ import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/widgets/reward_dialog.dart';
 import 'package:quiz_game/screens/home/bars/bonus_servies.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quiz_game/provider/daily_challenger_provider.dart';
 
 class DailyBonusCard extends StatefulWidget {
   final DailyBonusModel bonus;
@@ -130,7 +131,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
             top: 0,
             right: 50,
             child: SvgPicture.asset(
-              'asstes/svg/gift.svg',
+              'assets/svg/gift.svg',
               colorFilter: ColorFilter.mode(AppColors.stext, BlendMode.srcIn),
               height: 40,
               width: 40,
@@ -158,28 +159,57 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                 _alreadyClaimed
                     ? 'Come back tomorrow for your next bonus!'
                     : widget.bonus.subtitle,
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(
+                  color: _alreadyClaimed
+                      ? AppColors.stext.withValues(alpha: 0.8)
+                      : Colors.black,
+                ),
               ),
 
               const SizedBox(height: 14),
 
               Row(
                 children: [
-                  Text(
-                    '+${widget.bonus.coins}',
-                    style: const TextStyle(
-                      color: AppColors.background,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '+${widget.bonus.coins}',
+                        style: TextStyle(
+                          color: _alreadyClaimed
+                              ? AppColors.stext
+                              : AppColors.background,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      if (_alreadyClaimed)
+                        Consumer<DailyChallengerProvider>(
+                          builder: (context, provider, child) {
+                            final duration = provider.remaining;
+                            final h = duration.inHours;
+                            final m = duration.inMinutes % 60;
+                            final s = duration.inSeconds % 60;
+                            return Text(
+                              'RESETS IN ${h}H ${m}M ${s}S',
+                              style: TextStyle(
+                                color: AppColors.stext,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            );
+                          },
+                        ),
+                    ],
                   ),
                   const SizedBox(width: 8),
                   SvgPicture.asset(
-                    'asstes/svg/coin-svgrepo-com.svg',
+                    'assets/svg/coin-svgrepo-com.svg',
                     height: 24,
                     width: 24,
                     colorFilter: ColorFilter.mode(
-                      _alreadyClaimed ? Colors.grey : AppColors.doller,
+                      _alreadyClaimed ? AppColors.stext : AppColors.doller,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -191,9 +221,11 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _alreadyClaimed
-                                ? AppColors.background.withValues(alpha: 0.4)
+                                ? AppColors.background.withValues(alpha: 0.2)
                                 : AppColors.background,
-                            foregroundColor: AppColors.hText,
+                            foregroundColor: _alreadyClaimed
+                                ? AppColors.stext
+                                : AppColors.hText,
                             fixedSize: const Size.fromHeight(40),
                           ),
                           onPressed: (_alreadyClaimed || _claiming)

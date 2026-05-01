@@ -62,9 +62,11 @@ class DiscoverModels {
       title: data['title'] ?? '',
       categoryId: id,
       firestoreName: data['title'] ?? '',
-      imageUrl: (data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
-          ? data['imageUrl']
-          : (data['imagePath'] ?? ''),
+      imageUrl: ((data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
+              ? data['imageUrl']
+              : (data['imagePath'] ?? ''))
+          .toString()
+          .replaceAll('asstes/', 'assets/'),
       snackbarColor: Colors.blue,
       snackbarMessage: snackMsg,
       unlockType: type,

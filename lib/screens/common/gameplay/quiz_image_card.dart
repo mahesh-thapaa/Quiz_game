@@ -72,7 +72,7 @@ class PowerUp extends StatelessWidget {
           color: const Color(0xFF1A2230),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? color : Colors.white.withOpacity(0.1),
+            color: isActive ? color : Colors.white.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),

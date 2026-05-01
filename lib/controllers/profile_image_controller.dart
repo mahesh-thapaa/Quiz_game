@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:quiz_game/api_keys.dart';
 
 class ProfileImageController {
   final _db = FirebaseFirestore.instance;
@@ -12,8 +13,8 @@ class ProfileImageController {
   final _picker = ImagePicker();
 
   // ── Cloudinary Configuration ──────────────────────────────────────────────
-  final String _cloudName = 'daklgxzd7';
-  final String _uploadPreset = 'hyy7xldd'; 
+  final String _cloudName = ApiKeys.cloudinaryCloudName;
+  final String _uploadPreset = ApiKeys.profileUploadPreset;
 
   String? get _uid => _auth.currentUser?.uid;
 

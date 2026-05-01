@@ -81,11 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<NotificationProvider>(context, listen: false);
-
-    if (provider.notificationsEnabled) {
-      provider.toggleNotifications(true);
-    }
+    // Notification logic is now handled automatically by NotificationProvider's constructor
   }
 
   @override

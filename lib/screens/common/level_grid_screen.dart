@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/quiz_level_tile.dart';
@@ -35,8 +36,10 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Map<String, List<QuizQuestion>> _questionsByLevel = {};
   Map<int, String> _levelDocIds = {};
   Map<int, String> _bonusSlotToDocId = {};
+  DocumentReference? _quizDocRef;
 
   bool _loading = true;
+  bool _fetchingQuestions = false;
 
   @override
   void initState() {
@@ -63,9 +66,12 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
 
     if (mounted) {
       setState(() {
-        _questionsByLevel = data['questionsByLevel'];
+        if (widget.categoryId == 'quick_quiz') {
+          _questionsByLevel = data['questionsByLevel'] ?? {};
+        }
         _levelDocIds = data['levelDocIds'];
         _bonusSlotToDocId = data['bonusSlotToDocId'];
+        _quizDocRef = data['quizDocReference'];
         _controller.applyProgress(data['progress']);
         _loading = false;
       });
@@ -105,11 +111,13 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 50)),
               ],
             ),
-            if (_loading)
+            if (_loading || _fetchingQuestions)
               IgnorePointer(
                 child: Container(
                   color: Colors.black.withValues(alpha: 0.1),
-                  child: _buildLoading(),
+                  child: _buildLoading(
+                    message: _fetchingQuestions ? 'FETCHING QUESTIONS' : 'LOADING LEVELS',
+                  ),
                 ),
               ),
           ],
@@ -118,7 +126,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     );
   }
 
-  Widget _buildLoading() {
+  Widget _buildLoading({String message = 'LOADING LEVELS'}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -140,7 +148,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'LOADING LEVELS',
+            message,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.7),
               fontSize: 14,
@@ -338,15 +346,62 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     ),
   );
 
-  void _handleLevelTap(QuizLevelTile item) {
-    if (!item.isUnlocked) return;
-    final qs = _controller.getQuestionsForPos(
-      item.number!,
+  Future<List<QuizQuestion>> _getOrFetchQuestions(int pos) async {
+    List<QuizQuestion> qs = _controller.getQuestionsForPos(
+      pos,
       _questionsByLevel,
       _levelDocIds,
       _bonusSlotToDocId,
       categoryId: widget.categoryId,
     );
+
+    if (qs.isEmpty && _quizDocRef != null) {
+      String? levelDocId = QuizController.isBonusLevel(pos, categoryId: widget.categoryId)
+          ? _bonusSlotToDocId[(pos ~/ 6) - 1]
+          : _levelDocIds[pos - (pos ~/ 6)];
+
+      if (levelDocId != null) {
+        try {
+          final fetched = await QuizController.fetchQuestionsForLevelId(
+            quizDocRef: _quizDocRef!,
+            levelDocId: levelDocId,
+          );
+          _questionsByLevel[levelDocId] = fetched;
+          return fetched;
+        } catch (e) {
+          rethrow;
+        }
+      }
+    }
+    return qs;
+  }
+
+  void _handleLevelTap(QuizLevelTile item) async {
+    if (!item.isUnlocked) return;
+
+    setState(() => _fetchingQuestions = true);
+    List<QuizQuestion> qs = [];
+
+    try {
+      qs = await _getOrFetchQuestions(item.number!);
+      setState(() => _fetchingQuestions = false);
+    } catch (e) {
+      setState(() => _fetchingQuestions = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: const Text('Network error. Check your connection.'),
+            action: SnackBarAction(
+              label: 'RETRY',
+              textColor: Colors.white,
+              onPressed: () => _handleLevelTap(item),
+            ),
+          ),
+        );
+      }
+      return;
+    }
 
     if (qs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -400,13 +455,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           isBonus: bonus,
           quizTitle: widget.title,
           onLevelComplete: _onLevelComplete,
-          getQuestionsForLevel: (pos) => _controller.getQuestionsForPos(
-            pos,
-            _questionsByLevel,
-            _levelDocIds,
-            _bonusSlotToDocId,
-            categoryId: widget.categoryId,
-          ),
+          getQuestionsForLevel: (pos) => _getOrFetchQuestions(pos),
           getGameplayTitle: (pos) =>
               QuizController.getLevelTitle(pos, categoryId: widget.categoryId),
           isBonusLevel: (pos) =>

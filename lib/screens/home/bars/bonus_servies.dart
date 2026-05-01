@@ -13,7 +13,7 @@ class BonusService {
 
   static String? get _uid => _auth.currentUser?.uid;
 
-  // ── Check if today's bonus is already claimed ─────────────────────────────
+  // ── Check if today's bonus is already claimed (Resets at 7:00 AM) ──────────
   static Future<bool> hasClaimedToday() async {
     final uid = _uid;
     if (uid == null) return false;
@@ -28,10 +28,16 @@ class BonusService {
     final lastDate = (lastClaimed as Timestamp).toDate();
     final now = DateTime.now();
 
-    // Same calendar day = already claimed
-    return lastDate.year == now.year &&
-        lastDate.month == now.month &&
-        lastDate.day == now.day;
+    // Calculate the most recent 7:00 AM reset point
+    DateTime lastReset;
+    if (now.hour >= 7) {
+      lastReset = DateTime(now.year, now.month, now.day, 7);
+    } else {
+      lastReset = DateTime(now.year, now.month, now.day - 1, 7);
+    }
+
+    // If last claim was AFTER the last reset, it's already claimed for this window
+    return lastDate.isAfter(lastReset);
   }
 
   // ── Claim bonus: add coins to Firestore, return NEW total coins ───────────
@@ -41,32 +47,37 @@ class BonusService {
 
     final ref = _db.collection('user').doc(uid);
 
-    // Run inside a transaction so coins are always accurate
     final newCoins = await _db.runTransaction<int>((txn) async {
       final snap = await txn.get(ref);
       final data = snap.data() ?? {};
 
-      // Guard: double-claim check inside transaction
+      // Guard: Check reset window inside transaction
       final lastClaimed = data['lastBonusClaimed'];
       if (lastClaimed != null) {
         final lastDate = (lastClaimed as Timestamp).toDate();
         final now = DateTime.now();
-        final alreadyClaimed =
-            lastDate.year == now.year &&
-            lastDate.month == now.month &&
-            lastDate.day == now.day;
-        if (alreadyClaimed) throw AlreadyClaimedException();
+        
+        DateTime lastReset;
+        if (now.hour >= 7) {
+          lastReset = DateTime(now.year, now.month, now.day, 7);
+        } else {
+          lastReset = DateTime(now.year, now.month, now.day - 1, 7);
+        }
+
+        if (lastDate.isAfter(lastReset)) {
+          throw AlreadyClaimedException();
+        }
       }
 
       final currentCoins = data['Coin'] as int? ?? 0;
       final updated = currentCoins + bonusCoins;
 
       txn.update(ref, {
-        'Coin': updated, // ✅ adds to existing coins
-        'lastBonusClaimed': FieldValue.serverTimestamp(), // ✅ marks today
+        'Coin': updated,
+        'lastBonusClaimed': FieldValue.serverTimestamp(),
       });
 
-      return updated; // returns NEW total
+      return updated;
     });
 
     return newCoins;

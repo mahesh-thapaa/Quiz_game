@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quiz_game/models/home_models/streak_model.dart';
 
+import 'package:timezone/timezone.dart' as tz;
+
 class StreakController {
   static const String _streakPath = 'streaks';
   static const String streakTitle = '7 Day Streak';
@@ -42,7 +44,9 @@ class StreakController {
         .doc(user.uid);
     final snapshot = await ref.get();
 
-    final today = _dateOnly(DateTime.now());
+    // Use Kathmandu time for consistency with notifications
+    final now = tz.TZDateTime.now(tz.getLocation('Asia/Kathmandu'));
+    final today = _dateOnly(now);
     final yesterday = today.subtract(const Duration(days: 1));
 
     Map<String, dynamic> currentData = snapshot.data() ?? {};
@@ -60,13 +64,11 @@ class StreakController {
       currentDay = 1;
       rewardClaimed = false;
     } else if (lastDateOnly == today) {
-      // Already logged in today - just return current state
-      // 🚀 BOOTSTRAP: If it's somehow 0 (new user or old reset logic), start at Day 1
+      // Already logged in today
       if (currentDay == 0) currentDay = 1;
     } else if (lastDateOnly == yesterday) {
       // Consecutive day
       if (currentDay >= totalDaysPerCycle) {
-        // Cycle completed previously, reset for new cycle
         currentDay = 1;
         rewardClaimed = false;
       } else {
@@ -87,7 +89,7 @@ class StreakController {
       'lastLoginDate': today.toIso8601String(),
       'totalDays': totalDaysPerCycle,
       'rewardClaimed': rewardClaimed,
-      'updatedAt': DateTime.now().toIso8601String(),
+      'updatedAt': FieldValue.serverTimestamp(), // Use server time
     }, SetOptions(merge: true));
 
     return StreakModel(

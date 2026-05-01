@@ -14,13 +14,16 @@ class DiscoverWidgetsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = context.watch<UserProgressProvider>();
+    // ✅ PERFORMANCE FIX: Only listen to specific fields to prevent unnecessary rebuilds
+    final stars = context.select((UserProgressProvider p) => p.stars);
+    final unlockedCategories = context.select((UserProgressProvider p) => p.unlockedCategories);
+    final coins = context.select((UserProgressProvider p) => p.coins);
 
     bool isUnlocked = false;
     if (model.unlockType == UnlockType.level) {
-      isUnlocked = p.stars >= (model.unlockValue ?? 0);
+      isUnlocked = stars >= (model.unlockValue ?? 0);
     } else if (model.unlockType == UnlockType.coins) {
-      isUnlocked = p.unlockedCategories.contains(model.categoryId);
+      isUnlocked = unlockedCategories.contains(model.categoryId);
     } else if (model.unlockType == UnlockType.comingSoon) {
       isUnlocked = false;
     }
@@ -65,7 +68,7 @@ class DiscoverWidgetsCard extends StatelessWidget {
                   child: Text(
                     'UNLOCK',
                     style: TextStyle(
-                      color: p.coins >= (model.unlockValue ?? 0)
+                      color: coins >= (model.unlockValue ?? 0)
                           ? AppColors.primary
                           : Colors.red,
                     ),
@@ -76,7 +79,8 @@ class DiscoverWidgetsCard extends StatelessWidget {
           );
 
           if (confirmed == true) {
-            final success = await p.unlockWithCoins(
+            final provider = context.read<UserProgressProvider>();
+            final success = await provider.unlockWithCoins(
               model.categoryId,
               model.unlockValue ?? 0,
             );
@@ -140,26 +144,27 @@ class DiscoverWidgetsCard extends StatelessWidget {
           );
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: AppColors.deepCard,
+          image: DecorationImage(
+            image: model.imageUrl.startsWith('http')
+                ? NetworkImage(model.imageUrl)
+                : AssetImage(model.imageUrl) as ImageProvider,
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: 0.1),
+              BlendMode.darken,
+            ),
+          ),
+        ),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            model.imageUrl.startsWith('http')
-                ? Image.network(
-                    model.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) =>
-                        Container(color: AppColors.deepCard),
-                  )
-                : Image.asset(
-                    model.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) =>
-                        Container(color: AppColors.deepCard),
-                  ),
             Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

@@ -20,7 +20,7 @@ class ChallengeCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           image: DecorationImage(
-            image: const AssetImage("asstes/images/ucl.jpg"),
+            image: const AssetImage("assets/images/ucl.jpg"),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.black.withValues(alpha: 0.4),
@@ -35,23 +35,25 @@ class ChallengeCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "DAILY CHALLENGE",
-                    style: TextStyle(
-                      color: AppColors.hText,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black,
-                          blurRadius: 2.0,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
+                  Expanded(
+                    child: Text(
+                      "DAILY CHALLENGE",
+                      style: TextStyle(
+                        color: AppColors.hText,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                        shadows: [
+                          const Shadow(
+                            color: Colors.black,
+                            blurRadius: 2.0,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Spacer(),
+                  const SizedBox(width: 10),
                   Container(
                     height: 40,
                     width: 150,
@@ -111,7 +113,7 @@ class ChallengeCard extends StatelessWidget {
                         child: Row(
                           children: [
                             SvgPicture.asset(
-                              "asstes/svg/dot.svg",
+                              "assets/svg/dot.svg",
                               colorFilter: ColorFilter.mode(
                                 AppColors.hText,
                                 BlendMode.srcIn,

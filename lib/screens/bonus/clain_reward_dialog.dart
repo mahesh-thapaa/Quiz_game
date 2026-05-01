@@ -1,4 +1,4 @@
-// lib/widgets/claim_reward_dialog.dart
+// lib/widgets/clain_reward_dialog.dart
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';

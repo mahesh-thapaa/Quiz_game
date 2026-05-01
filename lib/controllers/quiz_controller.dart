@@ -57,28 +57,40 @@ class QuizController {
           } else if (num > 0) {
             levelDocIds[num] = doc.id;
           }
-
-          final qSnap = await doc.reference.collection('questions').get();
-          questionsByLevel[doc.id] = qSnap.docs
-              .map((q) => QuizQuestion.fromMap(q.data()))
-              .toList();
         }
       }
 
       return {
         'progress': progress,
-        'questionsByLevel': questionsByLevel,
         'levelDocIds': levelDocIds,
         'bonusSlotToDocId': bonusSlotToDocId,
+        'quizDocReference': quizDoc?.reference, // Store for future question fetching
       };
     } catch (e) {
       debugPrint('❌ QuizController Error: $e');
       return {
         'progress': {},
-        'questionsByLevel': {},
         'levelDocIds': {},
         'bonusSlotToDocId': {},
       };
+    }
+  }
+
+  /// Fetches questions for a specific level document ID on-demand
+  static Future<List<QuizQuestion>> fetchQuestionsForLevelId({
+    required DocumentReference quizDocRef,
+    required String levelDocId,
+  }) async {
+    try {
+      final qSnap = await quizDocRef
+          .collection('levels')
+          .doc(levelDocId)
+          .collection('questions')
+          .get();
+      return qSnap.docs.map((q) => QuizQuestion.fromMap(q.data())).toList();
+    } catch (e) {
+      debugPrint('❌ fetchQuestionsForLevelId Error: $e');
+      return [];
     }
   }
 

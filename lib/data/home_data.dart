@@ -11,23 +11,23 @@ class HomeData {
     QuizCardModel(
       title: 'Player Challenge',
       subtitle: 'Identify the players',
-      imageUrl: 'asstes/images/ronaldo.png',
+      imageUrl: 'assets/images/ronaldo.png',
       categoryId: 'player_quiz',
       firestoreName: 'Player Quiz',
     ),
     QuizCardModel(
       title: 'Logo Master',
       subtitle: 'Guess the club from its crest',
-      imageUrl: 'asstes/images/stadium.jpg',
+      imageUrl: 'assets/images/stadium.jpg',
       categoryId: 'logo_master',
       firestoreName: 'Logo Master',
     ),
   ];
 
   static const List<CategoryModel> categories = [
-    CategoryModel(title: 'Player Quiz', imageUrl: "asstes/images/quiz.jpg"),
-    CategoryModel(title: 'Stadium Quiz', imageUrl: 'asstes/images/stadium.jpg'),
-    CategoryModel(title: 'Club Quiz', imageUrl: 'asstes/images/club.jpg'),
-    // CategoryModel(title: 'National Quiz', imageUrl: 'asstes/images/quiz.jpg'),
+    CategoryModel(title: 'Player Quiz', imageUrl: "assets/images/quiz.jpg"),
+    CategoryModel(title: 'Stadium Quiz', imageUrl: 'assets/images/stadium.jpg'),
+    CategoryModel(title: 'Club Quiz', imageUrl: 'assets/images/club.jpg'),
+    // CategoryModel(title: 'National Quiz', imageUrl: 'assets/images/quiz.jpg'),
   ];
 }
