@@ -10,7 +10,6 @@ class QuizImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.outlineBorder, width: 2),
@@ -19,17 +18,20 @@ class QuizImageCard extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.hardEdge,
-      child: imageUrl.startsWith('http')
-          ? Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _errorPlaceholder(),
-            )
-          : Image.asset(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _errorPlaceholder(),
-            ),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: imageUrl.startsWith('http')
+            ? Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _errorPlaceholder(),
+              )
+            : Image.asset(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _errorPlaceholder(),
+              ),
+      ),
     );
   }
 

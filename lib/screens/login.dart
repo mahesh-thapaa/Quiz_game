@@ -27,10 +27,7 @@ class _LoginState extends State<Login> {
 
       if (success) {
         final p = context.read<UserProgressProvider>();
-        await Future.wait([
-          p.loadFromFirestore(),
-          p.initStreak(isLogin: true),
-        ]);
+        await Future.wait([p.loadFromFirestore(), p.initStreak(isLogin: true)]);
       }
     } catch (e) {
       debugPrint('❌ Login _goToHome error: $e');

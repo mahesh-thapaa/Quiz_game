@@ -8,6 +8,8 @@ import 'package:quiz_game/screens/common/gameplay/quiz_image_card.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 import 'package:quiz_game/controllers/star_calculation_service.dart';
+import 'package:quiz_game/services/ads/ad_service.dart';
+import 'package:quiz_game/controllers/ad_display_controller.dart';
 // import 'package:quiz_game/controllers/house_ad_controller.dart';
 
 class QuizGameplayScreen extends StatefulWidget {
@@ -257,6 +259,11 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
         _currentLevelNumber,
       );
     }
+
+    // Trigger ad logic after level completion
+    if (starsThisAttempt > 0) {
+      AdDisplayController().onLevelCompleted();
+    }
   }
 
   AnswerState _getState(int index) {
@@ -347,8 +354,25 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                                 isActive: true,
                                 showBadge: true,
                                 onTap: () {
-                                  // Add your Ads logic here
-                                  debugPrint('Ads Button Tapped');
+                                  AdService().showRewardedAd(
+                                    onRewardEarned: () {
+                                      // TODO: Implement reward logic (e.g., 50/50, hint, extra life)
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Reward Earned! You watched the ad.'),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    },
+                                    onAdFailedToShow: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Ad not ready yet. Please try again.'),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    },
+                                  );
                                 },
                               ),
                             ],

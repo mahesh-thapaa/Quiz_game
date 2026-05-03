@@ -116,7 +116,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
                 child: Container(
                   color: Colors.black.withValues(alpha: 0.1),
                   child: _buildLoading(
-                    message: _fetchingQuestions ? 'FETCHING QUESTIONS' : 'LOADING LEVELS',
+                    message: _fetchingQuestions
+                        ? 'FETCHING QUESTIONS'
+                        : 'LOADING LEVELS',
                   ),
                 ),
               ),
@@ -356,7 +358,8 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     );
 
     if (qs.isEmpty && _quizDocRef != null) {
-      String? levelDocId = QuizController.isBonusLevel(pos, categoryId: widget.categoryId)
+      String? levelDocId =
+          QuizController.isBonusLevel(pos, categoryId: widget.categoryId)
           ? _bonusSlotToDocId[(pos ~/ 6) - 1]
           : _levelDocIds[pos - (pos ~/ 6)];
 

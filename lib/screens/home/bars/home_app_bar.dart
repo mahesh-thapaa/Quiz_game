@@ -97,11 +97,7 @@ class _StarsBadge extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.star_rounded,
-            color: AppColors.doller,
-            size: 18,
-          ),
+          const Icon(Icons.star_rounded, color: AppColors.doller, size: 18),
           const SizedBox(width: 5),
           Text(
             '$stars',

@@ -27,7 +27,8 @@ class _StreakCardState extends State<StreakCard> {
     final isGuest = user == null; // Only true if not signed in at all
     final isAnonymous = user?.isAnonymous ?? false;
 
-    final streak = p.streak ??
+    final streak =
+        p.streak ??
         const StreakModel(
           title: StreakController.streakTitle,
           currentDay: 0,

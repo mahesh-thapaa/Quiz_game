@@ -49,6 +49,7 @@ dependencies:
   flutter_local_notifications: ^17.2.2
   timezone: ^0.9.4
   firebase_messaging: ^16.2.0
+  google_mobile_ads: ^8.0.0
   # google_mobile_ads: ^8.0.0
 
 dev_dependencies:
