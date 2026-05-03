@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/login.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
+import 'package:quiz_game/controllers/fcm_notification_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,6 +30,16 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
+    final notificationService = NotificationService();
+
+    notificationService.requestNotificationPermission();
+    notificationService.getFcmToken();
+
+    // _logoCtrl = AnimationController(
+    //   vsync: this,
+    //   duration: const Duration(milliseconds: 800),
+    // );
 
     _logoCtrl = AnimationController(
       vsync: this,

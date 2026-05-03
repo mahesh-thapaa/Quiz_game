@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
-import 'package:quiz_game/services/level_progess_services.dart';
+import 'package:quiz_game/controllers/level_progess_services.dart';
 
 class QuizController {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;

@@ -11,7 +11,6 @@ import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/widgets/reward_dialog.dart';
 import 'package:quiz_game/screens/home/bars/bonus_servies.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quiz_game/provider/daily_challenger_provider.dart';
 
 class DailyBonusCard extends StatefulWidget {
   final DailyBonusModel bonus;
@@ -183,24 +182,6 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      if (_alreadyClaimed)
-                        Consumer<DailyChallengerProvider>(
-                          builder: (context, provider, child) {
-                            final duration = provider.remaining;
-                            final h = duration.inHours;
-                            final m = duration.inMinutes % 60;
-                            final s = duration.inSeconds % 60;
-                            return Text(
-                              'RESETS IN ${h}H ${m}M ${s}S',
-                              style: TextStyle(
-                                color: AppColors.stext,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            );
-                          },
-                        ),
                     ],
                   ),
                   const SizedBox(width: 8),

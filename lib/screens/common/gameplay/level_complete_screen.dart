@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
-import 'package:quiz_game/services/star_calculation_service.dart';
+import 'package:quiz_game/controllers/star_calculation_service.dart';
 
 class LevelCompleteScreen extends StatefulWidget {
   final LevelResultModels result;
@@ -87,7 +87,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.15),
+                color: iconColor.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: iconColor, size: 22),

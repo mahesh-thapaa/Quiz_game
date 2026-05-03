@@ -1,4 +1,4 @@
-// lib/services/star_calculation_service.dart
+// lib/controllers/star_calculation_service.dart
 
 class StarCalculationService {
   /// Logic for star rewards (e.g. 0-3 stars based on correct answers)

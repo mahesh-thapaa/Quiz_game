@@ -1,30 +1,46 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:quiz_game/firebase_options.dart';
+
 import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/provider/profile_image_provider.dart';
 import 'package:quiz_game/provider/password_provider.dart';
 import 'package:quiz_game/provider/daily_challenger_provider.dart';
-import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
+
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
+
+import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
+
+/// Background notification handler
+Future<void> _backgroundMessageHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  debugPrint("Background Message: ${message.messageId}");
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
+    /// Initialize Firebase
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    // Initialize local notifications
+
+    /// Initialize local notifications
     await NotificationController().init();
+
+    /// Register FCM background handler
+    FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
   } catch (e) {
-    // Firebase already initialized (common after hot reload)
-    debugPrint('⚠️ Firebase init: $e');
+    debugPrint("⚠️ Firebase init error: $e");
   }
 
   runApp(
@@ -51,11 +67,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
       themeMode: context.watch<ThemeProvider>().themeMode,
+
       theme: ThemeData(brightness: Brightness.light),
+
       darkTheme: ThemeData(brightness: Brightness.dark),
+
       home: const SplashScreen(),
-      // home: AdminHomePage(),
     );
   }
 }

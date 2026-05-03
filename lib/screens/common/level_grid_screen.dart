@@ -7,7 +7,7 @@ import 'package:quiz_game/models/level_overview_model.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
-import 'package:quiz_game/services/level_progess_services.dart';
+import 'package:quiz_game/controllers/level_progess_services.dart';
 import 'package:quiz_game/controllers/quiz_controller.dart';
 import 'package:quiz_game/controllers/level_grid_controller.dart';
 import 'package:quiz_game/screens/common/widgets/quiz_sheets.dart';
