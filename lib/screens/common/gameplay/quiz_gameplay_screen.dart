@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:quiz_game/models/gameplay_question_model.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/common/gameplay/answer_option.dart';
@@ -62,6 +63,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
   late AnimationController _progressCtrl;
   late AnimationController _fadeCtrl;
   late Animation<double> _fadeAnim;
+  BannerAd? _bannerAd;
 
   static const _labels = ['A', 'B', 'C', 'D'];
 
@@ -82,6 +84,18 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
     );
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeInOut);
     _updateProgress();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    final ad = AdService().createBannerAd();
+    ad.load().then((_) {
+      if (mounted) {
+        setState(() {
+          _bannerAd = ad;
+        });
+      }
+    });
   }
 
   void _initQuestions(List<QuizQuestion> qs) {
@@ -103,6 +117,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
   void dispose() {
     _progressCtrl.dispose();
     _fadeCtrl.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -260,10 +275,6 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
       );
     }
 
-    // Trigger ad logic after level completion
-    if (starsThisAttempt > 0) {
-      AdDisplayController().onLevelCompleted();
-    }
   }
 
   AnswerState _getState(int index) {
@@ -329,53 +340,14 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 70,
-                              ), // Balance the PowerUp button on the right
-                              Expanded(
-                                child: Text(
-                                  q.questionText,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: AppColors.hText,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              PowerUp(
-                                icon: Icons.movie_creation_outlined,
-                                label: 'FREE',
-                                color: const Color(0xFFFFD700),
-                                isActive: true,
-                                showBadge: true,
-                                onTap: () {
-                                  AdService().showRewardedAd(
-                                    onRewardEarned: () {
-                                      // TODO: Implement reward logic (e.g., 50/50, hint, extra life)
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Reward Earned! You watched the ad.'),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    },
-                                    onAdFailedToShow: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Ad not ready yet. Please try again.'),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
+                          Text(
+                            q.questionText,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColors.hText,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                           const SizedBox(height: 25),
                           if (q.imageUrl != null && q.imageUrl!.isNotEmpty)
@@ -396,6 +368,13 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                     ),
                   ),
                 ),
+                if (_bannerAd != null)
+                  Container(
+                    alignment: Alignment.center,
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
               ],
             ),
           ),
@@ -405,7 +384,11 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
             LevelCompleteScreen(
               result: _result!,
               levelNumber: _currentLevelNumber,
-              onNextLevel: _goToNextLevel,
+              onNextLevel: () {
+                AdDisplayController().handleLevelTransition(
+                  onComplete: _goToNextLevel,
+                );
+              },
               onReplayLevel: _resetGame,
               onBack: () => _safePop(null),
               onClose: () => _safePop(null),

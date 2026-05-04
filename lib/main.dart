@@ -16,6 +16,7 @@ import 'package:quiz_game/provider/notification_provider.dart';
 
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
+import 'package:quiz_game/services/ads/ad_service.dart';
 
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 
@@ -34,7 +35,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await MobileAds.instance.initialize();
+    /// Initialize Ads
+    await AdService().init();
 
     /// Initialize local notifications
     await NotificationController().init();

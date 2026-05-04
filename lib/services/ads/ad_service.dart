@@ -15,17 +15,19 @@ class AdService {
   int _interstitialAdRetryAttempt = 0;
 
   // Real Ad IDs
-  static const String _realRewardedUnitId = 'ca-app-pub-7334258098187344/5521965196';
-  // Using same ID as fallback if real interstitial ID is not provided
-  static const String _realInterstitialUnitId = 'ca-app-pub-7334258098187344/5521965196';
+  static const String _realRewardedUnitId = 'ca-app-pub-7334258098187344/5521965196'; // Keep as is if user didn't specify a new one for rewarded
+  static const String _realInterstitialUnitId = 'ca-app-pub-7334258098187344/3152402820';
+  static const String _realBannerUnitId = 'ca-app-pub-7334258098187344/5521965196';
 
   // Official Google Test Ad IDs
   static const String _testRewardedUnitId = 'ca-app-pub-3940256099942544/5224354917';
   static const String _testInterstitialUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testBannerUnitId = 'ca-app-pub-3940256099942544/6300978111';
 
   /// Returns the appropriate Ad Unit ID based on debug/release mode.
   String get rewardedAdUnitId => kDebugMode ? _testRewardedUnitId : _realRewardedUnitId;
   String get interstitialAdUnitId => kDebugMode ? _testInterstitialUnitId : _realInterstitialUnitId;
+  String get bannerAdUnitId => kDebugMode ? _testBannerUnitId : _realBannerUnitId;
 
   /// Initialize the Mobile Ads SDK and load the ads.
   Future<void> init() async {
@@ -162,5 +164,21 @@ class AdService {
 
     _interstitialAd!.show();
     _interstitialAd = null;
+  }
+
+  /// Create a banner ad.
+  BannerAd createBannerAd() {
+    return BannerAd(
+      adUnitId: bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) => debugPrint('Banner Ad loaded.'),
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          debugPrint('Banner Ad failed to load: $error');
+        },
+      ),
+    );
   }
 }
