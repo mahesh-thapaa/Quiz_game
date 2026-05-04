@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_overview_model.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_game/provider/theme_provider.dart';
 
 class QuizSheets {
   /// Shows a centered Level Overview dialog
@@ -68,15 +70,19 @@ class _BaseDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Material(
       color: Colors.transparent,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.85, // Centered width
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: themeColors.cardBg,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5),
+          border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),
@@ -90,11 +96,11 @@ class _BaseDialog extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 10),
-            _buildTitle(),
+            _buildTitle(context),
             const SizedBox(height: 20),
-            _buildStars(),
+            _buildStars(context),
             const SizedBox(height: 24),
-            _buildDescription(),
+            _buildDescription(context),
             const SizedBox(height: 32),
             _buildPlayButton(context),
           ],
@@ -110,15 +116,19 @@ class _BaseDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.close, color: Colors.white54, size: 20),
+        child: Icon(
+          Icons.close,
+          color: ThemeColors.of(context).hText.withValues(alpha: 0.54),
+          size: 20,
+        ),
       ),
     ),
   );
 
-  Widget _buildTitle() => Column(
+  Widget _buildTitle(BuildContext context) => Column(
     children: [
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -128,23 +138,37 @@ class _BaseDialog extends StatelessWidget {
         ),
         child: const Text(
           "LEVEL OVERVIEW",
-          style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
         ),
       ),
       const SizedBox(height: 16),
       Text(
         title,
-        style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: ThemeColors.of(context).hText.withValues(alpha: 0.7),
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       Text(
         subtitle,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+        style: TextStyle(
+          color: ThemeColors.of(context).hText,
+          fontSize: 22,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.5,
+        ),
       ),
     ],
   );
 
-  Widget _buildStars() => Row(
+  Widget _buildStars(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: List.generate(3, (index) {
       bool isFilled = isBonus ? (index == 1) : (index < starsEarned);
@@ -153,16 +177,23 @@ class _BaseDialog extends StatelessWidget {
         child: Icon(
           isBonus ? Icons.star : Icons.star_rounded,
           size: isBonus && index == 1 ? 48 : 40,
-          color: isFilled ? AppColors.doller : Colors.white.withValues(alpha: 0.05),
+          color: isFilled
+              ? AppColors.doller
+              : ThemeColors.of(context).hText.withValues(alpha: 0.05),
         ),
       );
     }),
   );
 
-  Widget _buildDescription() => Text(
+  Widget _buildDescription(BuildContext context) => Text(
     description,
     textAlign: TextAlign.center,
-    style: const TextStyle(color: Colors.white60, fontSize: 14, height: 1.5, fontWeight: FontWeight.w500),
+    style: TextStyle(
+      color: ThemeColors.of(context).hText.withValues(alpha: 0.6),
+      fontSize: 14,
+      height: 1.5,
+      fontWeight: FontWeight.w500,
+    ),
   );
 
   Widget _buildPlayButton(BuildContext context) => GestureDetector(
@@ -187,7 +218,12 @@ class _BaseDialog extends StatelessWidget {
       child: const Center(
         child: Text(
           "PLAY",
-          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 2,
+          ),
         ),
       ),
     ),

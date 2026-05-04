@@ -42,22 +42,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.cardBg,
+        backgroundColor: ThemeColors.of(context).cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Logout',
-          style: TextStyle(color: AppColors.hText, fontWeight: FontWeight.bold),
+          style: TextStyle(color: ThemeColors.of(context).hText, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to logout?',
-          style: TextStyle(color: AppColors.stext),
+          style: TextStyle(color: ThemeColors.of(context).stext),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.stext),
+              style: TextStyle(color: ThemeColors.of(context).stext),
             ),
           ),
           TextButton(
@@ -140,8 +140,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       rank: currentUserRank,
     );
 
+    final themeColors = ThemeColors.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -154,9 +156,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.settings_outlined,
-                    color: AppColors.stext,
+                    color: themeColors.stext,
                     size: 24,
                   ),
                   onPressed: () => Navigator.push(
@@ -183,8 +185,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // ── Username ────────────────────────────────────────────────
               Text(
                 p.username.isNotEmpty ? p.username : 'Player',
-                style: const TextStyle(
-                  color: AppColors.hText,
+                style: TextStyle(
+                  color: themeColors.hText,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -195,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 4),
                 Text(
                   p.bio,
-                  style: const TextStyle(color: AppColors.stext, fontSize: 13),
+                  style: TextStyle(color: themeColors.stext, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -233,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   StatCard(
                     label: 'RANK',
                     value: lb.isLoading ? '...' : '#$currentUserRank',
-                    valueColor: AppColors.hText,
+                    valueColor: themeColors.hText,
                   ),
                   const SizedBox(width: 10),
                   StatCard(
@@ -254,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // ── Leaderboard ─────────────────────────────────────────────
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.cardBg,
+                  color: themeColors.cardBg,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -264,10 +266,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Leaderboard',
                             style: TextStyle(
-                              color: AppColors.hText,
+                              color: themeColors.hText,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -289,13 +291,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         vertical: 4,
                       ),
                       child: Row(
-                        children: const [
+                        children: [
                           SizedBox(
-                            width: 48,
+                            width: 40,
                             child: Text(
                               'RANK',
                               style: TextStyle(
-                                color: AppColors.stext,
+                                color: themeColors.stext,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.5,
@@ -306,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Text(
                               'PLAYER',
                               style: TextStyle(
-                                color: AppColors.stext,
+                                color: themeColors.stext,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.5,
@@ -316,7 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             'XP POINTS',
                             style: TextStyle(
-                              color: AppColors.stext,
+                              color: themeColors.stext,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
@@ -325,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-                    const Divider(color: Colors.white10, height: 1),
+                    Divider(color: ThemeColors.of(context).divider, height: 1),
                     if (lb.isLoading)
                       const Padding(
                         padding: EdgeInsets.all(20),
@@ -357,10 +359,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               GlobalStandings(allUsers: lb.allUsers),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'VIEW GLOBAL STANDINGS',
                         style: TextStyle(
-                          color: AppColors.stext,
+                          color: themeColors.stext,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.8,

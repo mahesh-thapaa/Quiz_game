@@ -19,10 +19,10 @@ class LockedSection extends StatelessWidget {
           children: [
             Icon(Icons.lock, color: AppColors.dShade, size: 22),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'Locked Categories',
               style: TextStyle(
-                color: AppColors.hText,
+                color: ThemeColors.of(context).hText,
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
               ),
@@ -158,35 +158,35 @@ class _LockedCard extends StatelessWidget {
           final bool? confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: AppColors.cardBg,
-              title: Text(
-                'Unlock ${item.title}',
-                style: const TextStyle(color: Colors.white),
+          backgroundColor: ThemeColors.of(context).cardBg,
+          title: Text(
+            'Unlock ${item.title}',
+            style: TextStyle(color: ThemeColors.of(context).hText),
+          ),
+          content: Text(
+            'Unlock this category for $unlockValue coins?',
+            style: TextStyle(color: ThemeColors.of(context).stext),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text(
+                'CANCEL',
+                style: TextStyle(color: Colors.grey),
               ),
-              content: Text(
-                'Unlock this category for $unlockValue coins?',
-                style: const TextStyle(color: AppColors.stext),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(
+                'UNLOCK',
+                style: TextStyle(
+                  color: p.coins >= unlockValue
+                      ? AppColors.primary
+                      : Colors.red,
+                ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text(
-                    'CANCEL',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx, true),
-                  child: Text(
-                    'UNLOCK',
-                    style: TextStyle(
-                      color: p.coins >= unlockValue
-                          ? AppColors.primary
-                          : Colors.red,
-                    ),
-                  ),
-                ),
-              ],
+            ),
+          ],
             ),
           );
 
@@ -253,35 +253,33 @@ class _LockedCard extends StatelessWidget {
           );
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: ThemeColors.of(context).deepCard,
+          image: DecorationImage(
+            image: item.imageUrl.startsWith('http')
+                ? NetworkImage(item.imageUrl)
+                : AssetImage(item.imageUrl) as ImageProvider,
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withValues(alpha: isUnlocked ? 0.1 : 0.45),
+              BlendMode.darken,
+            ),
+          ),
+        ),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            item.imageUrl.startsWith('http')
-                ? Image.network(
-                    item.imageUrl,
-                    fit: BoxFit.cover,
-                    opacity: AlwaysStoppedAnimation(isUnlocked ? 1.0 : 0.4),
-                    errorBuilder: (_, _, _) =>
-                        Container(color: AppColors.deepCard),
-                  )
-                : Image.asset(
-                    item.imageUrl,
-                    fit: BoxFit.cover,
-                    opacity: AlwaysStoppedAnimation(isUnlocked ? 1.0 : 0.4),
-                    errorBuilder: (_, _, _) =>
-                        Container(color: AppColors.deepCard),
-                  ),
-
             Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.25),
-                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withValues(alpha: 0.20),
+                    Colors.black.withValues(alpha: 0.78),
                   ],
                 ),
               ),

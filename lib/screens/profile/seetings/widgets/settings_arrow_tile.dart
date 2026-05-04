@@ -23,19 +23,20 @@ class SettingsArrowTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: iconColor ?? AppColors.stext, size: 20),
+            Icon(icon, color: iconColor ?? themeColors.stext, size: 20),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
                 label,
                 style: TextStyle(
-                  color: labelColor ?? AppColors.hText,
+                  color: labelColor ?? themeColors.hText,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -43,7 +44,7 @@ class SettingsArrowTile extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: chevronColor ?? AppColors.stext,
+              color: chevronColor ?? themeColors.stext,
               size: 20,
             ),
           ],

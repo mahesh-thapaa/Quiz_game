@@ -76,7 +76,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
       // ✅ Show reward dialog
       await showDialog(
         context: context,
-        barrierColor: AppColors.background.withValues(alpha: 0.7),
+        barrierColor: ThemeColors.of(context).background.withValues(alpha: 0.7),
         barrierDismissible: false,
         builder: (_) => RewardDialog(
           title: 'CONGRATULATIONS!',
@@ -117,11 +117,17 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       decoration: BoxDecoration(
         gradient: _alreadyClaimed
-            ? const LinearGradient(
-                colors: [Color(0xFF4A4A5A), Color(0xFF3A3A4A)],
+            ? LinearGradient(
+                colors: [
+                  ThemeColors.of(context).cardBg.withValues(alpha: 0.8),
+                  ThemeColors.of(context).cardBg,
+                ],
               )
             : AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(20),
+        border: _alreadyClaimed
+            ? Border.all(color: ThemeColors.of(context).divider, width: 1)
+            : null,
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -144,8 +150,8 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                 _alreadyClaimed ? 'Bonus Claimed' : widget.bonus.title,
                 style: TextStyle(
                   color: _alreadyClaimed
-                      ? AppColors.stext
-                      : AppColors.background,
+                      ? ThemeColors.of(context).hText.withValues(alpha: 0.5)
+                      : Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
@@ -160,8 +166,8 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     : widget.bonus.subtitle,
                 style: TextStyle(
                   color: _alreadyClaimed
-                      ? AppColors.stext.withValues(alpha: 0.8)
-                      : Colors.black,
+                      ? ThemeColors.of(context).stext
+                      : Colors.white.withValues(alpha: 0.9),
                 ),
               ),
 
@@ -176,8 +182,8 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                         '+${widget.bonus.coins}',
                         style: TextStyle(
                           color: _alreadyClaimed
-                              ? AppColors.stext
-                              : AppColors.background,
+                              ? ThemeColors.of(context).hText.withValues(alpha: 0.5)
+                              : Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
                         ),
@@ -190,7 +196,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     height: 24,
                     width: 24,
                     colorFilter: ColorFilter.mode(
-                      _alreadyClaimed ? AppColors.stext : AppColors.doller,
+                      _alreadyClaimed ? ThemeColors.of(context).stext : AppColors.doller,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -202,11 +208,11 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _alreadyClaimed
-                                ? AppColors.background.withValues(alpha: 0.2)
-                                : AppColors.background,
+                                ? ThemeColors.of(context).background.withValues(alpha: 0.2)
+                                : Colors.white,
                             foregroundColor: _alreadyClaimed
-                                ? AppColors.stext
-                                : AppColors.hText,
+                                ? ThemeColors.of(context).stext
+                                : AppColors.primary,
                             fixedSize: const Size.fromHeight(40),
                           ),
                           onPressed: (_alreadyClaimed || _claiming)

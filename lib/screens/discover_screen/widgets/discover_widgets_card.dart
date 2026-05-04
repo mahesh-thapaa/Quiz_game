@@ -46,14 +46,14 @@ class DiscoverWidgetsCard extends StatelessWidget {
           final bool? confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: AppColors.cardBg,
+              backgroundColor: ThemeColors.of(context).cardBg,
               title: Text(
                 'Unlock ${model.title}',
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: ThemeColors.of(context).hText),
               ),
               content: Text(
                 'Unlock this category for ${model.unlockValue} coins?',
-                style: const TextStyle(color: AppColors.stext),
+                style: TextStyle(color: ThemeColors.of(context).stext),
               ),
               actions: [
                 TextButton(

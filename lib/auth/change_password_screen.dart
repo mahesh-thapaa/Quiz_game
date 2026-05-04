@@ -62,18 +62,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final provider = context.watch<PasswordProvider>();
     final isLoading = provider.isLoading;
     final errorMessage = provider.errorMessage;
+    final themeColors = ThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: themeColors.background,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'Change Password',
-          style: TextStyle(color: AppColors.hText, fontWeight: FontWeight.bold),
+          style: TextStyle(color: themeColors.hText, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
+          icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
           onPressed: () {
             provider.clearState();
             Navigator.pop(context);
@@ -91,7 +92,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 Text(
                   'Update Security',
                   style: TextStyle(
-                    color: AppColors.hText,
+                    color: ThemeColors.of(context).hText,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -99,7 +100,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Verify your identity and set a new password',
-                  style: TextStyle(color: AppColors.stext, fontSize: 14),
+                  style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 14),
                 ),
                 const SizedBox(height: 32),
 
@@ -107,8 +108,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: AppColors.hText),
-                  decoration: _inputDecoration('Your Email', Icons.email_outlined),
+                  style: TextStyle(color: ThemeColors.of(context).hText),
+                  decoration: _inputDecoration('Your Email', Icons.email_outlined, context),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return 'Please enter your email';
                     if (!v.contains('@')) return 'Enter a valid email';
@@ -121,8 +122,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 TextFormField(
                   controller: _currentPasswordController,
                   obscureText: _obscureCurrent,
-                  style: const TextStyle(color: AppColors.hText),
-                  decoration: _inputDecoration('Current Password', Icons.lock_open_outlined).copyWith(
+                  style: TextStyle(color: ThemeColors.of(context).hText),
+                  decoration: _inputDecoration('Current Password', Icons.lock_open_outlined, context).copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureCurrent ? Icons.visibility_off : Icons.visibility,
@@ -143,8 +144,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 TextFormField(
                   controller: _newPasswordController,
                   obscureText: _obscureNew,
-                  style: const TextStyle(color: AppColors.hText),
-                  decoration: _inputDecoration('New Password', Icons.lock_outline).copyWith(
+                  style: TextStyle(color: ThemeColors.of(context).hText),
+                  decoration: _inputDecoration('New Password', Icons.lock_outline, context).copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureNew ? Icons.visibility_off : Icons.visibility,
@@ -223,21 +224,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(String label, IconData icon, BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: AppColors.stext, fontSize: 14),
-      prefixIcon: Icon(icon, color: AppColors.stext, size: 20),
+      labelStyle: TextStyle(color: themeColors.stext, fontSize: 14),
+      prefixIcon: Icon(icon, color: themeColors.stext, size: 20),
       filled: true,
-      fillColor: AppColors.cardBg,
+      fillColor: themeColors.cardBg,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

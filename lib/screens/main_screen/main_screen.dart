@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: ThemeColors.of(context).background,
       body: IndexedStack(
         index: _currentIndex,
         children: List.generate(screens.length, (index) {

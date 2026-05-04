@@ -97,7 +97,7 @@ class LeaderboardRow extends StatelessWidget {
                   ? '${p.username.isNotEmpty ? p.username : 'You'} (You)'
                   : entry.name,
               style: TextStyle(
-                color: isCurrentUser ? Colors.green : AppColors.hText,
+                color: isCurrentUser ? Colors.green : ThemeColors.of(context).hText,
                 fontSize: 14,
                 fontWeight: isCurrentUser ? FontWeight.bold : FontWeight.w500,
               ),

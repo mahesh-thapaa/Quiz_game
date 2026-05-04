@@ -59,16 +59,17 @@ class _EmailSignupState extends State<EmailSignup> {
     final auth = context.watch<AuthController>();
     final isLoading = auth.isLoading;
     final errorMessage = auth.errorMessage;
+    final themeColors = ThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: themeColors.background,
         elevation: 0,
         automaticallyImplyLeading: false,
         leading: widget.showBackButton
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
+                icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
                 onPressed: () {
                   auth.clearError();
                   Navigator.pop(context);
@@ -90,7 +91,7 @@ class _EmailSignupState extends State<EmailSignup> {
                     Text(
                       'Create Account',
                       style: TextStyle(
-                        color: AppColors.hText,
+                        color: themeColors.hText,
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
@@ -98,7 +99,7 @@ class _EmailSignupState extends State<EmailSignup> {
                     const SizedBox(height: 8),
                     Text(
                       'Sign up to save your progress',
-                      style: TextStyle(color: AppColors.stext, fontSize: 14),
+                      style: TextStyle(color: themeColors.stext, fontSize: 14),
                     ),
                     const SizedBox(height: 32),
 
@@ -106,10 +107,11 @@ class _EmailSignupState extends State<EmailSignup> {
                       controller: _usernameController,
                       keyboardType: TextInputType.name,
                       textCapitalization: TextCapitalization.words,
-                      style: TextStyle(color: AppColors.hText),
+                      style: TextStyle(color: themeColors.hText),
                       decoration: _inputDecoration(
                         'Username',
                         Icons.person_outline,
+                        context,
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -129,10 +131,11 @@ class _EmailSignupState extends State<EmailSignup> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(color: AppColors.hText),
+                      style: TextStyle(color: themeColors.hText),
                       decoration: _inputDecoration(
                         'Email',
                         Icons.email_outlined,
+                        context,
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -147,18 +150,19 @@ class _EmailSignupState extends State<EmailSignup> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      style: TextStyle(color: AppColors.hText),
+                      style: TextStyle(color: themeColors.hText),
                       decoration:
                           _inputDecoration(
                             'Password',
                             Icons.lock_outline,
+                            context,
                           ).copyWith(
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: AppColors.stext,
+                                color: themeColors.stext,
                                 size: 20,
                               ),
                               onPressed: () => setState(
@@ -238,7 +242,7 @@ class _EmailSignupState extends State<EmailSignup> {
                         Text(
                           'Already have an account? ',
                           style: TextStyle(
-                            color: AppColors.stext,
+                            color: themeColors.stext,
                             fontSize: 14,
                           ),
                         ),
@@ -275,20 +279,21 @@ class _EmailSignupState extends State<EmailSignup> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(String label, IconData icon, BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return InputDecoration(
       labelText: label,
-      labelStyle: TextStyle(color: AppColors.stext),
-      prefixIcon: Icon(icon, color: AppColors.stext, size: 20),
+      labelStyle: TextStyle(color: themeColors.stext),
+      prefixIcon: Icon(icon, color: themeColors.stext, size: 20),
       filled: true,
-      fillColor: AppColors.cardBg,
+      fillColor: themeColors.cardBg,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

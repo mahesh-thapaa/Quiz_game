@@ -45,8 +45,9 @@ class QuizScreen extends StatelessWidget {
       ),
     ];
 
+    final themeColors = ThemeColors.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -55,18 +56,18 @@ class QuizScreen extends StatelessWidget {
             children: [
               const Header(),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Quiz Category",
                 style: TextStyle(
-                  color: AppColors.hText,
+                  color: themeColors.hText,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 "Choose a category and test your football knowledge to climb the leaderboard.",
-                style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                style: TextStyle(color: themeColors.stext, fontSize: 14),
               ),
               const SizedBox(height: 10),
               GridView.builder(

@@ -12,6 +12,7 @@ class QuizTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // ✅ reads live values from provider — no need to pass stars/coins as params
+    final themeColors = ThemeColors.of(context);
     final p = context.watch<UserProgressProvider>();
 
     return Padding(
@@ -19,9 +20,9 @@ class QuizTopBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.chevron_left,
-              color: AppColors.hText,
+              color: themeColors.hText,
               size: 28,
             ),
             onPressed: onBack,
@@ -31,10 +32,10 @@ class QuizTopBar extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'GOALIQ',
                 style: TextStyle(
-                  color: AppColors.stext,
+                  color: themeColors.stext,
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.5,
@@ -42,8 +43,8 @@ class QuizTopBar extends StatelessWidget {
               ),
               Text(
                 title,
-                style: const TextStyle(
-                  color: AppColors.hText,
+                style: TextStyle(
+                  color: themeColors.hText,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.3,
@@ -82,12 +83,13 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: themeColors.divider),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -96,8 +98,8 @@ class _Chip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             value,
-            style: const TextStyle(
-              color: AppColors.hText,
+            style: TextStyle(
+              color: themeColors.hText,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),

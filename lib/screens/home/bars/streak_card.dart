@@ -62,7 +62,7 @@ class _StreakCardState extends State<StreakCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: ThemeColors.of(context).cardBg,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -94,8 +94,8 @@ class _StreakCardState extends State<StreakCard> {
                   children: [
                     Text(
                       streak.title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: ThemeColors.of(context).hText,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -118,7 +118,7 @@ class _StreakCardState extends State<StreakCard> {
                           gradient: done ? AppColors.primaryGradient : null,
                           color: done
                               ? null
-                              : Colors.white.withValues(alpha: 0.15),
+                              : ThemeColors.of(context).hText.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
@@ -128,9 +128,9 @@ class _StreakCardState extends State<StreakCard> {
 
                 if (isBroken) ...[
                   const SizedBox(height: 6),
-                  const Text(
+                  Text(
                     'Come back tomorrow to continue your streak!',
-                    style: TextStyle(color: AppColors.stext, fontSize: 11),
+                    style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 11),
                   ),
                 ],
               ],
@@ -144,8 +144,8 @@ class _StreakCardState extends State<StreakCard> {
             isBroken
                 ? '—/${streak.totalDays}'
                 : 'Day ${streak.currentDay}/${streak.totalDays}',
-            style: const TextStyle(
-              color: AppColors.stext,
+            style: TextStyle(
+              color: ThemeColors.of(context).stext,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -159,9 +159,9 @@ class _StreakCardState extends State<StreakCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.cardBg.withValues(alpha: 0.6),
+        color: ThemeColors.of(context).cardBg.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -170,7 +170,7 @@ class _StreakCardState extends State<StreakCard> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.deepCard.withValues(alpha: 0.5),
+              color: ThemeColors.of(context).deepCard.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: const Center(
@@ -188,18 +188,18 @@ class _StreakCardState extends State<StreakCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Guest Streak',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: ThemeColors.of(context).hText.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Login to start your 7-day challenge',
-                  style: TextStyle(color: AppColors.stext, fontSize: 11),
+                  style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 11),
                 ),
               ],
             ),

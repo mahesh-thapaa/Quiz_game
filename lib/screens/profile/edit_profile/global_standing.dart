@@ -33,20 +33,21 @@ class GlobalStandings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
+    final themeColors = ThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: themeColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
+          icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Global Standings',
           style: TextStyle(
-            color: AppColors.hText,
+            color: themeColors.hText,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -57,16 +58,16 @@ class GlobalStandings extends StatelessWidget {
         children: [
           // ── Column headers ────────────────────────────────────────────────
           Container(
-            color: AppColors.cardBg,
+            color: themeColors.cardBg,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
-              children: const [
+              children: [
                 SizedBox(
                   width: 48,
                   child: Text(
                     'RANK',
                     style: TextStyle(
-                      color: AppColors.stext,
+                      color: themeColors.stext,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -77,7 +78,7 @@ class GlobalStandings extends StatelessWidget {
                   child: Text(
                     'PLAYER',
                     style: TextStyle(
-                      color: AppColors.stext,
+                      color: themeColors.stext,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -87,7 +88,7 @@ class GlobalStandings extends StatelessWidget {
                 Text(
                   'XP POINTS',
                   style: TextStyle(
-                    color: AppColors.stext,
+                    color: themeColors.stext,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
@@ -96,21 +97,21 @@ class GlobalStandings extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(color: Colors.white10, height: 1),
+          Divider(color: themeColors.divider, height: 1),
 
           // ── All users list ────────────────────────────────────────────────
           Expanded(
             child: allUsers.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       'No players yet',
-                      style: TextStyle(color: AppColors.stext),
+                      style: TextStyle(color: themeColors.stext),
                     ),
                   )
                 : ListView.separated(
                     itemCount: allUsers.length,
                     separatorBuilder: (_, _) =>
-                        const Divider(color: Colors.white10, height: 1),
+                        Divider(color: themeColors.divider, height: 1),
                     itemBuilder: (ctx, i) {
                       final entry = allUsers[i];
                       final isMe = entry.isCurrentUser;
@@ -139,7 +140,7 @@ class GlobalStandings extends StatelessWidget {
                                 style: TextStyle(
                                   color: entry.rank <= 3
                                       ? Colors.white
-                                      : AppColors.stext,
+                                      : themeColors.stext,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -152,13 +153,13 @@ class GlobalStandings extends StatelessWidget {
                                 ? ProfileAvatar(radius: 16)
                                 : CircleAvatar(
                                     radius: 16,
-                                    backgroundColor: AppColors.deepCard,
+                                    backgroundColor: themeColors.deepCard,
                                     child: Text(
                                       entry.name.isNotEmpty
                                           ? entry.name[0].toUpperCase()
                                           : '?',
-                                      style: const TextStyle(
-                                        color: AppColors.hText,
+                                      style: TextStyle(
+                                        color: themeColors.hText,
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -175,7 +176,7 @@ class GlobalStandings extends StatelessWidget {
                                           ? entry.name
                                           : 'Player'),
                                 style: TextStyle(
-                                  color: isMe ? Colors.green : AppColors.hText,
+                                  color: isMe ? Colors.green : themeColors.hText,
                                   fontSize: 14,
                                   fontWeight: isMe
                                       ? FontWeight.bold

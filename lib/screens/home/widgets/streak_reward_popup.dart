@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/controllers/streak_controller.dart';
-// import 'package:quiz_game/models/colors.dart';
+import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 
 /// Shows the high-fidelity Streak Reward popup.
@@ -93,7 +93,7 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
               width: MediaQuery.of(context).size.width * 0.85,
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
               decoration: BoxDecoration(
-                color: const Color(0xFF1C222D), // Dark grey-blue from image
+                color: ThemeColors.of(context).cardBg,
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
@@ -102,6 +102,10 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                     offset: const Offset(0, 20),
                   ),
                 ],
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -117,10 +121,10 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                   const SizedBox(height: 20),
 
                   // Title
-                  const Text(
+                  Text(
                     'Streak Reward Claimed!',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: ThemeColors.of(context).hText,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
@@ -132,8 +136,8 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                   // Subtitle
                   Text(
                     'You completed a ${widget.streakDays}-day streak.',
-                    style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                      color: ThemeColors.of(context).stext,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -148,10 +152,10 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                       vertical: 16,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.2),
+                      color: ThemeColors.of(context).deepCard,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: ThemeColors.of(context).divider,
                       ),
                     ),
                     child: Row(
@@ -159,8 +163,8 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                       children: [
                         Text(
                           '+${widget.coinsEarned}',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: ThemeColors.of(context).hText,
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
                           ),
@@ -193,10 +197,10 @@ class _StreakRewardPopupState extends State<StreakRewardPopup>
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           'COINS',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ThemeColors.of(context).hText,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.1,
