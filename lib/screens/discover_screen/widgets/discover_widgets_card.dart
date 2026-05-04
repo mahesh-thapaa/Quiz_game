@@ -69,8 +69,8 @@ class DiscoverWidgetsCard extends StatelessWidget {
                     'UNLOCK',
                     style: TextStyle(
                       color: coins >= (model.unlockValue ?? 0)
-                          ? AppColors.primary
-                          : Colors.red,
+                        ? ThemeColors.of(context).primary
+                        : Colors.red,
                     ),
                   ),
                 ),
@@ -147,7 +147,7 @@ class DiscoverWidgetsCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: AppColors.deepCard,
+          color: ThemeColors.of(context).deepCard,
           image: DecorationImage(
             image: model.imageUrl.startsWith('http')
                 ? NetworkImage(model.imageUrl)
@@ -252,8 +252,8 @@ class _UnlockBadge extends StatelessWidget {
             Container(
               width: 16,
               height: 16,
-              decoration: const BoxDecoration(
-                color: AppColors.doller,
+              decoration: BoxDecoration(
+                color: ThemeColors.of(context).doller,
                 shape: BoxShape.circle,
               ),
               child: const Center(

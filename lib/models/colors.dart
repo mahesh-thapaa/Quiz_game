@@ -43,6 +43,8 @@ class ThemeColors {
   final Color hText;
   final Color stext;
   final Color divider;
+  final Color primary;
+  final Color doller;
 
   const ThemeColors._({
     required this.background,
@@ -52,6 +54,8 @@ class ThemeColors {
     required this.hText,
     required this.stext,
     required this.divider,
+    required this.primary,
+    required this.doller,
   });
 
   factory ThemeColors.of(BuildContext context) {
@@ -65,6 +69,8 @@ class ThemeColors {
         hText: Colors.white,
         stext: Color(0xFF94A3B8),
         divider: Color(0xFF1E2D3D),
+        primary: Color(0xFF19B357),
+        doller: Color(0xFFFFD700),
       );
     } else {
       return const ThemeColors._(
@@ -75,6 +81,8 @@ class ThemeColors {
         hText: Color(0xFF0F172A),
         stext: Color(0xFF64748B),
         divider: Color(0xFFE2E8F0),
+        primary: Color(0xFF19B357),
+        doller: Color(0xFFFFD700),
       );
     }
   }

@@ -3,9 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quiz_game/models/discover/discover_models.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/discover_screen/widgets/discover_widgets_card.dart';
-import 'package:quiz_game/controllers/notification_controller.dart';
-import 'package:quiz_game/provider/notification_provider.dart';
-import 'package:provider/provider.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
