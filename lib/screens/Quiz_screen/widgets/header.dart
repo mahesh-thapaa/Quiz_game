@@ -9,6 +9,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
+    final themeColors = ThemeColors.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -16,39 +17,38 @@ class Header extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "GoalIQ",
               style: TextStyle(
-                color: AppColors.hText,
+                color: themeColors.hText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // ✅ FIXED: was hardcoded "Sushant" — now reads from provider
             Text(
               p.username.isNotEmpty ? p.username : 'Welcome!',
-              style: const TextStyle(color: AppColors.stext),
+              style: TextStyle(color: themeColors.stext),
             ),
           ],
         ),
         Row(
           children: [
-            _xpBadge("${p.xp}"),
+            _xpBadge(themeColors, "${p.xp}"),
             const SizedBox(width: 8),
-            _starBadge("${p.stars}"),
+            _starBadge(themeColors, "${p.stars}"),
             const SizedBox(width: 8),
-            _coinBadge("${p.coins}"),
+            _coinBadge(themeColors, "${p.coins}"),
           ],
         ),
       ],
     );
   }
 
-  Widget _xpBadge(String text) {
+  Widget _xpBadge(ThemeColors themeColors, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.deepCard,
+        color: themeColors.deepCard,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -63,17 +63,17 @@ class Header extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 5),
-          Text(text, style: const TextStyle(color: AppColors.hText)),
+          Text(text, style: TextStyle(color: themeColors.hText)),
         ],
       ),
     );
   }
 
-  Widget _starBadge(String text) {
+  Widget _starBadge(ThemeColors themeColors, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.deepCard,
+        color: themeColors.deepCard,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -81,19 +81,17 @@ class Header extends StatelessWidget {
         children: [
           const Icon(Icons.star_rounded, color: AppColors.doller, size: 18),
           const SizedBox(width: 5),
-          Text(text, style: const TextStyle(color: AppColors.hText)),
+          Text(text, style: TextStyle(color: themeColors.hText)),
         ],
       ),
     );
   }
 
-
-
-  Widget _coinBadge(String text) {
+  Widget _coinBadge(ThemeColors themeColors, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.deepCard,
+        color: themeColors.deepCard,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -118,7 +116,7 @@ class Header extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(text, style: const TextStyle(color: AppColors.hText)),
+          Text(text, style: TextStyle(color: themeColors.hText)),
         ],
       ),
     );

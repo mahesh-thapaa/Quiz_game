@@ -60,7 +60,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           child: Icon(
             index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
             size: 52,
-            color: index < stars ? Colors.amber : Colors.grey[700],
+            color: index < stars ? Colors.amber : ThemeColors.of(context).stext.withValues(alpha: 0.3),
           ),
         );
       }),
@@ -77,7 +77,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A2433),
+          color: ThemeColors.of(context).cardBg,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -96,7 +96,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
             Text(
               label,
               style: TextStyle(
-                color: Colors.grey[500],
+                color: ThemeColors.of(context).stext,
                 fontSize: 10,
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.w600,
@@ -105,8 +105,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: ThemeColors.of(context).hText,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -122,7 +122,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
     return FadeTransition(
       opacity: _fadeIn,
       child: Container(
-        color: const Color(0xFF0F1923),
+        color: ThemeColors.of(context).background,
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -130,11 +130,11 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // ── LEVEL COMPLETED Title ──
-                const Text(
+                Text(
                   'LEVEL COMPLETED!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: ThemeColors.of(context).hText,
                     fontSize: 28,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.5,
@@ -155,13 +155,13 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A2433),
+                    color: ThemeColors.of(context).cardBg,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
                     'Score: ${widget.result.score}/${widget.result.totalQuestions}',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: ThemeColors.of(context).hText,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -174,7 +174,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                 Text(
                   'REWARDS EARNED',
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: ThemeColors.of(context).stext,
                     fontSize: 11,
                     letterSpacing: 2.5,
                     fontWeight: FontWeight.w600,
@@ -211,13 +211,13 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A2433),
+                    color: ThemeColors.of(context).cardBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Row(
+                      Row(
                         children: [
                           Icon(
                             Icons.check_circle,
@@ -227,7 +227,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                           SizedBox(width: 8),
                           Text(
                             'Accuracy',
-                            style: TextStyle(color: Colors.white, fontSize: 15),
+                            style: TextStyle(color: ThemeColors.of(context).hText, fontSize: 15),
                           ),
                         ],
                       ),
@@ -255,7 +255,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -288,19 +288,19 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     width: double.infinity,
                     height: 55,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A2433),
+                      color: ThemeColors.of(context).cardBg,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.replay, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
+                          Icon(Icons.replay, color: ThemeColors.of(context).hText, size: 20),
+                          const SizedBox(width: 8),
                           Text(
                             'REPLAY LEVEL',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: ThemeColors.of(context).hText,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,

@@ -29,7 +29,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: ThemeColors.of(context).background,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,17 +41,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.hText,
+                      color: ThemeColors.of(context).hText,
                       size: 20,
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Discover More Challenges',
                       style: TextStyle(
-                        color: AppColors.hText,
+                        color: ThemeColors.of(context).hText,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                       ),
@@ -81,10 +81,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
                   final docs = snapshot.data?.docs ?? [];
                   if (docs.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
                         'No upcoming challenges yet.',
-                        style: TextStyle(color: AppColors.stext),
+                        style: TextStyle(color: ThemeColors.of(context).stext),
                       ),
                     );
                   }
@@ -110,10 +110,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Explore more football quizzes. Test your expertise across these upcoming categories.',
                                 style: TextStyle(
-                                  color: AppColors.stext,
+                                  color: ThemeColors.of(context).stext,
                                   fontSize: 14,
                                   height: 1.6,
                                 ),

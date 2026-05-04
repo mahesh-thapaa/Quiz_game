@@ -10,16 +10,17 @@ class LevelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     if (level.hasStar) return _BonusTile(level: level, onTap: onTap);
 
     return GestureDetector(
       onTap: level.isUnlocked ? onTap : null,
       child: Container(
         decoration: BoxDecoration(
-          color: level.isUnlocked ? AppColors.cardBg : AppColors.deepCard,
+          color: level.isUnlocked ? themeColors.cardBg : themeColors.deepCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: level.isCurrent ? AppColors.primary : AppColors.divider,
+            color: level.isCurrent ? AppColors.primary : themeColors.divider,
             width: level.isCurrent ? 2.0 : 1.0,
           ),
           boxShadow: level.isCurrent
@@ -41,7 +42,7 @@ class LevelTile extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
-                  color: level.isCurrent ? AppColors.primary : AppColors.stext,
+                  color: level.isCurrent ? AppColors.primary : themeColors.stext,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -50,21 +51,21 @@ class LevelTile extends StatelessWidget {
                 style: TextStyle(
                   fontSize: level.isCurrent ? 24 : 20,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.hText,
+                  color: themeColors.hText,
                   height: 1.1,
                 ),
               ),
               const SizedBox(height: 4),
               _StarRow(filled: level.starsEarned),
             ] else ...[
-              const Icon(Icons.lock_rounded, color: AppColors.stext, size: 14),
+              Icon(Icons.lock_rounded, color: themeColors.stext, size: 14),
               const SizedBox(height: 4),
               Text(
                 '${level.number ?? 0}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.stext,
+                  color: themeColors.stext,
                 ),
               ),
             ],
@@ -158,9 +159,9 @@ class _BonusTile extends StatelessWidget {
                           color: const Color(0xFF3B0764).withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.lock_rounded,
-                          color: AppColors.stext,
+                          color: ThemeColors.of(context).stext,
                           size: 12,
                         ),
                       ),
@@ -178,6 +179,7 @@ class _StarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(3, (i) {
@@ -186,7 +188,7 @@ class _StarRow extends StatelessWidget {
           size: 11,
           color: i < filled
               ? AppColors.doller
-              : AppColors.stext.withValues(alpha: 0.3),
+              : themeColors.stext.withValues(alpha: 0.3),
         );
       }),
     );

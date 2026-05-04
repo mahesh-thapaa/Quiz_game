@@ -19,6 +19,7 @@ class AnswerOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     Color borderColor = Colors.transparent;
 
     if (state == AnswerState.selected) {
@@ -35,19 +36,19 @@ class AnswerOption extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.deepCard,
+          color: themeColors.deepCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: borderColor, width: 2),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: AppColors.divider,
+              backgroundColor: themeColors.divider,
               child: Text(label),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(text, style: const TextStyle(color: AppColors.hText)),
+              child: Text(text, style: TextStyle(color: themeColors.hText)),
             ),
           ],
         ),

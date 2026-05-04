@@ -12,6 +12,7 @@ class HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
+    final themeColors = ThemeColors.of(context);
 
     return Row(
       children: [
@@ -21,17 +22,17 @@ class HomeAppBar extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'GoalIQ',
               style: TextStyle(
-                color: Colors.white,
+                color: themeColors.hText,
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
             ),
             Text(
               p.username.isNotEmpty ? p.username : 'Welcome!',
-              style: const TextStyle(color: AppColors.stext, fontSize: 12),
+              style: TextStyle(color: themeColors.stext, fontSize: 12),
             ),
           ],
         ),
@@ -52,10 +53,11 @@ class _XPBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -71,8 +73,8 @@ class _XPBadge extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             '$xp',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: themeColors.hText,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -89,10 +91,11 @@ class _StarsBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -101,8 +104,8 @@ class _StarsBadge extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             '$stars',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: themeColors.hText,
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -119,6 +122,7 @@ class _CoinsBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
       transitionBuilder: (child, anim) =>
@@ -127,7 +131,7 @@ class _CoinsBadge extends StatelessWidget {
         key: ValueKey(coins),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: themeColors.cardBg,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -153,8 +157,8 @@ class _CoinsBadge extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               '$coins',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: themeColors.hText,
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),

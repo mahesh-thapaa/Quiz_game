@@ -15,7 +15,7 @@ class QuickPlayCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: ThemeColors.of(context).cardBg,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -27,36 +27,36 @@ class QuickPlayCard extends StatelessWidget {
                 gradient: AppColors.primaryGradient,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.play_arrow,
-                color: AppColors.background,
+                color: ThemeColors.of(context).background,
                 size: 22,
               ),
             ),
             const SizedBox(width: 14),
 
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Quick Play',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: ThemeColors.of(context).hText,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     'Jump into a random challenge',
-                    style: TextStyle(color: AppColors.stext, fontSize: 12),
+                    style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 12),
                   ),
                 ],
               ),
             ),
 
-            const Icon(Icons.chevron_right, color: AppColors.stext),
+            Icon(Icons.chevron_right, color: ThemeColors.of(context).stext),
           ],
         ),
       ),

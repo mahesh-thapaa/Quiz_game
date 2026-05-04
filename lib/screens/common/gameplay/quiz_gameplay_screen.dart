@@ -306,7 +306,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
     final q = _questions[_currentIndex];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: ThemeColors.of(context).background,
       body: Stack(
         children: [
           SafeArea(
@@ -322,7 +322,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                     children: [
                       Text(
                         '$_displayTitle  •  QUESTION ${q.questionNumber} OF ${q.totalQuestions}',
-                        style: const TextStyle(color: AppColors.stext),
+                        style: TextStyle(color: ThemeColors.of(context).stext),
                       ),
                       const SizedBox(height: 8),
                       LinearProgressIndicator(
@@ -343,8 +343,8 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                           Text(
                             q.questionText,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: AppColors.hText,
+                            style: TextStyle(
+                              color: ThemeColors.of(context).hText,
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                             ),

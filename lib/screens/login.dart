@@ -52,7 +52,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: ThemeColors.of(context).background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(28.0),
@@ -66,7 +66,7 @@ class _LoginState extends State<Login> {
                   Text(
                     "GoalIQ",
                     style: TextStyle(
-                      color: AppColors.titleColor,
+                      color: AppColors.primary,
                       fontSize: 21,
                       fontWeight: FontWeight.w700,
                     ),
@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                     "Play Football Quiz",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: AppColors.hText,
+                      color: ThemeColors.of(context).hText,
                       fontSize: 40,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
@@ -105,7 +105,7 @@ class _LoginState extends State<Login> {
                       "Test your knowledge against thousands of fans worldwide.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: AppColors.stext,
+                        color: ThemeColors.of(context).stext,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.5,

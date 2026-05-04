@@ -15,19 +15,20 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.cardBg,
+          color: themeColors.cardBg,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: AppColors.stext,
+              style: TextStyle(
+                color: themeColors.stext,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,

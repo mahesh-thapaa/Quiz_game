@@ -65,16 +65,17 @@ class PowerUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 58,
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A2230),
+          color: themeColors.cardBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isActive ? color : Colors.white.withValues(alpha: 0.1),
+            color: isActive ? color : themeColors.hText.withValues(alpha: 0.1),
             width: 1.5,
           ),
         ),
@@ -103,8 +104,8 @@ class PowerUp extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: themeColors.hText,
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
               ),

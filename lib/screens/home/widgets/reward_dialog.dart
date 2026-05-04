@@ -68,8 +68,9 @@ class _RewardDialogState extends State<RewardDialog>
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2B3C),
+              color: ThemeColors.of(context).cardBg,
               borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -128,8 +129,8 @@ class _RewardDialogState extends State<RewardDialog>
                 Text(
                   widget.subtitle,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.stext,
+                  style: TextStyle(
+                    color: ThemeColors.of(context).stext,
                     fontSize: 11,
                     letterSpacing: 1.2,
                   ),
@@ -144,7 +145,7 @@ class _RewardDialogState extends State<RewardDialog>
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.deepCard,
+                    color: ThemeColors.of(context).deepCard,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -152,8 +153,8 @@ class _RewardDialogState extends State<RewardDialog>
                     children: [
                       Text(
                         '+${widget.coins}',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: ThemeColors.of(context).hText,
                           fontSize: 26,
                           fontWeight: FontWeight.w800,
                         ),
@@ -180,10 +181,10 @@ class _RewardDialogState extends State<RewardDialog>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'COINS',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: ThemeColors.of(context).hText,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.5,

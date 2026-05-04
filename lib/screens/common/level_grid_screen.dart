@@ -81,7 +81,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1420),
+      backgroundColor: ThemeColors.of(context).background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -136,7 +136,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1F2E),
+              color: ThemeColors.of(context).cardBg,
               shape: BoxShape.circle,
               border: Border.all(
                 color: AppColors.primary.withValues(alpha: 0.1),
@@ -152,7 +152,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           Text(
             message,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: ThemeColors.of(context).hText.withValues(alpha: 0.7),
               fontSize: 14,
               fontWeight: FontWeight.w800,
               letterSpacing: 2,
@@ -162,7 +162,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           Text(
             'Preparing your challenge...',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: ThemeColors.of(context).hText.withValues(alpha: 0.3),
               fontSize: 12,
             ),
           ),
@@ -179,9 +179,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: Colors.white,
+              color: ThemeColors.of(context).hText,
               size: 22,
             ),
           ),
@@ -194,16 +194,16 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
                   'GOALIQ',
                   style: TextStyle(
                     fontSize: 10,
-                    color: Colors.white.withValues(alpha: 0.3),
+                    color: ThemeColors.of(context).hText.withValues(alpha: 0.3),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   widget.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: ThemeColors.of(context).hText,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -225,9 +225,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Widget _buildXPChip(String value) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: const Color(0xFF1A1F2E),
+      color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -243,8 +243,8 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
         const SizedBox(width: 5),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: ThemeColors.of(context).hText,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
@@ -256,9 +256,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Widget _buildCoinChip(String value, {String? suffix}) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: const Color(0xFF1A1F2E),
+      color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -287,7 +287,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
             children: [
               TextSpan(
                 text: value,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: ThemeColors.of(context).hText),
               ),
               if (suffix != null)
                 TextSpan(
@@ -305,9 +305,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Widget _buildChip(String icon, String value, {String? suffix}) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
     decoration: BoxDecoration(
-      color: const Color(0xFF1A1F2E),
+      color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
     ),
     child: Text.rich(
       TextSpan(
@@ -318,7 +318,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           ),
           TextSpan(
             text: ' $value',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: ThemeColors.of(context).hText),
           ),
           if (suffix != null)
             TextSpan(
@@ -508,7 +508,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       text,
       textAlign: TextAlign.center,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: ThemeColors.of(context).hText.withValues(alpha: 0.2),
         fontSize: 13,
         height: 1.5,
       ),
@@ -520,7 +520,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       child: Text(
         'Unlock Next Level with 50 ★ Stars',
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.3),
+          color: ThemeColors.of(context).hText.withValues(alpha: 0.3),
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),

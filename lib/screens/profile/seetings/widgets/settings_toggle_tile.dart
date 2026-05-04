@@ -23,17 +23,18 @@ class SettingsToggleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, color: iconColor ?? AppColors.stext, size: 20),
+          Icon(icon, color: iconColor ?? themeColors.stext, size: 20),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
               label,
               style: TextStyle(
-                color: labelColor ?? AppColors.hText,
+                color: labelColor ?? themeColors.hText,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -45,7 +46,7 @@ class SettingsToggleTile extends StatelessWidget {
 
             activeTrackColor: AppColors.primary,
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: AppColors.stext.withValues(alpha: 0.3),
+            inactiveTrackColor: themeColors.stext.withValues(alpha: 0.3),
             trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
           ),
         ],

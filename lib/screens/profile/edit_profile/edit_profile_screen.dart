@@ -74,19 +74,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: themeColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.hText),
+          icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Edit Profile',
           style: TextStyle(
-            color: AppColors.hText,
+            color: themeColors.hText,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -135,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   controller: _usernameController,
                   keyboardType: TextInputType.name,
                   textCapitalization: TextCapitalization.words,
-                  style: TextStyle(color: AppColors.hText),
+                  style: TextStyle(color: ThemeColors.of(context).hText),
                   decoration: _inputDecoration(
                     'Enter your username',
                     Icons.person_outline,
@@ -177,14 +178,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   keyboardType: TextInputType.multiline,
                   maxLines: 3,
                   maxLength: 120,
-                  style: TextStyle(color: AppColors.hText),
+                  style: TextStyle(color: ThemeColors.of(context).hText),
                   decoration:
                       _inputDecoration(
                         'Tell others a bit about yourself…',
                         Icons.edit_note_rounded,
                       ).copyWith(
                         alignLabelWithHint: true,
-                        counterStyle: TextStyle(color: AppColors.stext),
+                        counterStyle: TextStyle(color: ThemeColors.of(context).stext),
                       ),
                 ),
                 const SizedBox(height: 32),
@@ -232,27 +233,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _label(String text) => Text(
     text,
-    style: const TextStyle(
-      color: AppColors.hText,
+    style: TextStyle(
+      color: ThemeColors.of(context).hText,
       fontSize: 14,
       fontWeight: FontWeight.w600,
     ),
   );
 
   InputDecoration _inputDecoration(String hint, IconData icon) {
+    final themeColors = ThemeColors.of(context);
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColors.stext.withValues(alpha: 0.6)),
-      prefixIcon: Icon(icon, color: AppColors.stext, size: 20),
+      hintStyle: TextStyle(color: themeColors.stext.withValues(alpha: 0.6)),
+      prefixIcon: Icon(icon, color: themeColors.stext, size: 20),
       filled: true,
-      fillColor: AppColors.cardBg,
+      fillColor: themeColors.cardBg,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.divider),
+        borderSide: BorderSide(color: themeColors.divider),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),

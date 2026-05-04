@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/settings_models.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
+import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/auth/change_password_screen.dart';
 import 'widgets/settings_toggle_tile.dart';
 import 'widgets/settings_arrow_tile.dart';
@@ -30,21 +31,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final notificationProvider = context.watch<NotificationProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final themeColors = ThemeColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: themeColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: themeColors.background,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.hText, size: 22),
+          icon: Icon(Icons.arrow_back, color: themeColors.hText, size: 22),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Settings',
           style: TextStyle(
-            color: AppColors.hText,
+            color: themeColors.hText,
             fontSize: 17,
             fontWeight: FontWeight.w700,
           ),
@@ -60,9 +63,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsToggleTile(
                   icon: Icons.dark_mode_outlined,
                   label: 'Dark Mode',
-                  value: _settings.darkMode,
+                  value: themeProvider.isDark,
                   onChanged: (v) {
-                    setState(() => _settings.darkMode = v);
+                    themeProvider.toggleTheme();
                   },
                 ),
                 _TileDivider(),
@@ -116,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Center(
               child: Text(
                 'Version 2.4.0 (Lumino Technology)',
-                style: TextStyle(color: AppColors.stext, fontSize: 12),
+                style: TextStyle(color: themeColors.stext, fontSize: 12),
               ),
             ),
             const SizedBox(height: 32),
@@ -136,7 +139,7 @@ class _SectionCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: ThemeColors.of(context).cardBg,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(children: children),
@@ -152,7 +155,7 @@ class _TileDivider extends StatelessWidget {
     return Container(
       height: 1,
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      color: AppColors.divider,
+      color: ThemeColors.of(context).divider,
     );
   }
 }

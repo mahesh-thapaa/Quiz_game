@@ -28,11 +28,12 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
     return Container(
       height: 85,
-      decoration: const BoxDecoration(
-        color: AppColors.navBg,
-        border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
+      decoration: BoxDecoration(
+        color: themeColors.navBg,
+        border: Border(top: BorderSide(color: themeColors.divider, width: 1)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16), // ← equal top/bottom
@@ -48,14 +49,14 @@ class AppBottomNav extends StatelessWidget {
                 children: [
                   Icon(
                     items[i].icon,
-                    color: active ? AppColors.primary : AppColors.stext,
+                    color: active ? AppColors.primary : themeColors.stext,
                     size: 22,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     items[i].label,
                     style: TextStyle(
-                      color: active ? AppColors.primary : AppColors.stext,
+                      color: active ? AppColors.primary : themeColors.stext,
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
