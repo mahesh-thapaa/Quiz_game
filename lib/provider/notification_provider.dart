@@ -62,18 +62,12 @@ class NotificationProvider extends ChangeNotifier {
       hour: 18,
       minute: 0,
     );
-    await _controller.scheduleDailyNotification(
-      id: 3,
-      title: 'Test Notification',
-      body: 'This is a test notification.',
-      hour: 11,
-      minute: 50,
-    );
+    // await _controller.scheduleDailyNotification(
+    //   id: 3,
+    //   title: 'Test Notification',
+    //   body: 'This is a test notification.',
+    //   hour: 11,
+    //   minute: 50,
+    // );
   }
-
-  /// Explanation for adding others:
-  /// To add more notifications, simply call _controller.scheduleDailyNotification
-  /// with a unique ID and your desired time/content within the _scheduleAll method.
-  /// You can also create other methods in the controller for one-time notifications
-  /// or weekly reminders by changing the matchDateTimeComponents parameter.
 }

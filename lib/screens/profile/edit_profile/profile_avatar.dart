@@ -41,20 +41,20 @@ class ProfileAvatarState extends State<ProfileAvatar> {
   void showPicker() => _showPickerOptions(context);
 
   Future<void> _handleImageAction(
-    BuildContext context,
     ImageSource? source,
   ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final profileProvider = context.read<ProfileImageProvider>();
+    
     Navigator.pop(context);
 
     if (source == null) {
       try {
         setState(() => _isUploading = true);
         final success = await _controller.deleteProfileImage();
-        if (success) {
-          if (mounted) {
-            context.read<ProfileImageProvider>().removeAvatar();
-            setState(() => _previewImage = null);
-          }
+        if (success && mounted) {
+          profileProvider.removeAvatar();
+          setState(() => _previewImage = null);
         }
       } finally {
         if (mounted) setState(() => _isUploading = false);
@@ -77,7 +77,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
 
       if (downloadUrl != null) {
         if (mounted) {
-          context.read<ProfileImageProvider>().setAvatarUrl(downloadUrl);
+          profileProvider.setAvatarUrl(downloadUrl);
           widget.onUploadComplete?.call();
           // After remote URL is in provider, we can clear local preview
           setState(() => _previewImage = null);
@@ -86,7 +86,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
         if (mounted) {
           // If upload failed, clear preview too or keep it?
           // Usually better to keep it but show error
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: const Text(
                 'Failed to sync photo to cloud. Check your connection.',
@@ -131,7 +131,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
                 'Camera',
                 style: TextStyle(color: Colors.white),
               ),
-              onTap: () => _handleImageAction(context, ImageSource.camera),
+              onTap: () => _handleImageAction(ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library, color: Colors.white),
@@ -139,7 +139,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
                 'Gallery',
                 style: TextStyle(color: Colors.white),
               ),
-              onTap: () => _handleImageAction(context, ImageSource.gallery),
+              onTap: () => _handleImageAction(ImageSource.gallery),
             ),
             if (hasImage)
               ListTile(
@@ -148,7 +148,7 @@ class ProfileAvatarState extends State<ProfileAvatar> {
                   'Remove Photo',
                   style: TextStyle(color: Colors.redAccent),
                 ),
-                onTap: () => _handleImageAction(context, null),
+                onTap: () => _handleImageAction(null),
               ),
             const SizedBox(height: 10),
           ],
