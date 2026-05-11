@@ -46,12 +46,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _saved = false;
     });
 
-    await context.read<UserProgressProvider>().updateProfile(
+    final success = await context.read<UserProgressProvider>().updateProfile(
       username: _usernameController.text,
       bio: _bioController.text,
     );
 
     if (!mounted) return;
+
+    if (!success) {
+      setState(() {
+        _isSaving = false;
+        _saved = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Username already taken. Please try another.'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isSaving = false;

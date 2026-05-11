@@ -14,16 +14,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final _emailController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   bool _obscureCurrent = true;
   bool _obscureNew = true;
+  bool _obscureConfirm = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -160,6 +163,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     if (v.length < 6) return 'Password must be at least 6 characters';
                     if (v == _currentPasswordController.text) {
                       return 'New password cannot be same as old';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+
+                // ── Confirm Password Field ──────────────────────────────────
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirm,
+                  style: TextStyle(color: ThemeColors.of(context).hText),
+                  decoration: _inputDecoration('Confirm Password', Icons.lock_outline, context).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                        color: AppColors.stext,
+                        size: 20,
+                      ),
+                      onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    ),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Please confirm your password';
+                    if (v != _newPasswordController.text) {
+                      return 'Passwords do not match';
                     }
                     return null;
                   },

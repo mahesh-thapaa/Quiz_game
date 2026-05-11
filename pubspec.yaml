@@ -52,8 +52,10 @@ dependencies:
   timezone: ^0.9.4
   firebase_messaging: ^16.2.0
   google_mobile_ads: ^8.0.0
-  # google_mobile_ads: ^8.0.0
+  cached_network_image: ^3.4.1
+  firebase_crashlytics: ^5.2.0
 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

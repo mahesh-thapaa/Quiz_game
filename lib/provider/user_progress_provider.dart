@@ -57,7 +57,7 @@ class UserProgressProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final doc = await _db.collection('user').doc(uid).get();
+      final doc = await _db.collection('users').doc(uid).get();
 
       if (!doc.exists) {
         debugPrint(
@@ -182,27 +182,49 @@ class UserProgressProvider extends ChangeNotifier {
   }
 
   // ── Update profile ──────────────────────────────────────────────────────────
-  Future<void> updateProfile({required String username, String? bio}) async {
+  Future<bool> updateProfile({required String username, String? bio}) async {
     final uid = _uid;
-    if (uid == null) return;
+    if (uid == null) return false;
 
-    final trimmed = username.trim();
-    if (trimmed.isEmpty) return;
+    final newUsername = username.trim();
+    final cleanNewUsername = newUsername.toLowerCase();
+    final oldUsername = _username.trim().toLowerCase();
 
-    _username = trimmed;
-    if (bio != null) _bio = bio.trim();
-
-    notifyListeners();
+    if (newUsername.isEmpty) return false;
 
     try {
-      await _db.collection('user').doc(uid).set({
+      // 1. If username changed, check availability
+      if (cleanNewUsername != oldUsername) {
+        final usernameDoc = await _db.collection('usernames').doc(cleanNewUsername).get();
+        if (usernameDoc.exists) {
+          debugPrint('❌ updateProfile: Username "$cleanNewUsername" is already taken.');
+          return false;
+        }
+
+        // 2. Reserve new username
+        await _db.collection('usernames').doc(cleanNewUsername).set({'uid': uid});
+
+        // 3. Delete old username reservation (if it wasn't the default 'Guest' or empty)
+        if (oldUsername.isNotEmpty && oldUsername != 'guest') {
+          await _db.collection('usernames').doc(oldUsername).delete();
+        }
+      }
+
+      // 4. Update the user document
+      _username = newUsername;
+      if (bio != null) _bio = bio.trim();
+
+      await _db.collection('users').doc(uid).set({
         'username': _username,
         if (bio != null) 'bio': _bio,
       }, SetOptions(merge: true));
 
-      debugPrint('✅ updateProfile → username:$_username | bio:$_bio');
+      notifyListeners();
+      debugPrint('✅ updateProfile success → username:$_username | bio:$_bio');
+      return true;
     } catch (e) {
       debugPrint('❌ updateProfile error: $e');
+      return false;
     }
   }
 
@@ -264,7 +286,7 @@ class UserProgressProvider extends ChangeNotifier {
 
     try {
       debugPrint('☁️ Syncing progress to Firestore for UID: $uid');
-      await _db.collection('user').doc(uid).set({
+      await _db.collection('users').doc(uid).set({
         'Coin': _coins,
         'XP': _xp,
         'Stars': _stars,
@@ -281,7 +303,7 @@ class UserProgressProvider extends ChangeNotifier {
   // ── Data Migration ──────────────────────────────────────────────────────────
   /// Checks if a user already has data in Firestore
   Future<bool> hasExistingData(String uid) async {
-    final doc = await _db.collection('user').doc(uid).get();
+    final doc = await _db.collection('users').doc(uid).get();
     return doc.exists;
   }
 
@@ -289,10 +311,10 @@ class UserProgressProvider extends ChangeNotifier {
   Future<void> migrateGuestData(String guestUid, String newUid) async {
     try {
       // 1. Copy user document
-      final guestDoc = await _db.collection('user').doc(guestUid).get();
+      final guestDoc = await _db.collection('users').doc(guestUid).get();
       if (guestDoc.exists) {
         await _db
-            .collection('user')
+            .collection('users')
             .doc(newUid)
             .set(guestDoc.data()!, SetOptions(merge: true));
       }
@@ -319,7 +341,7 @@ class UserProgressProvider extends ChangeNotifier {
       }
 
       // 3. Delete guest data
-      await _db.collection('user').doc(guestUid).delete();
+      await _db.collection('users').doc(guestUid).delete();
       // Note: Deleting subcollections is complex in client SDK,
       // usually handled by Cloud Functions or just left orphaned.
 

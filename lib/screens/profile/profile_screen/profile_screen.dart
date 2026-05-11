@@ -101,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Replace all screens and go to login
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => const EmailSignup(showBackButton: false),
+            builder: (_) => const EmailSignup(),
           ),
           (route) => false,
         );
@@ -380,7 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const EmailSignup(showBackButton: true),
+                      builder: (_) => const EmailSignup(),
                     ),
                   ),
                   style: ElevatedButton.styleFrom(

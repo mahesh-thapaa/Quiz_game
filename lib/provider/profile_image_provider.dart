@@ -27,7 +27,7 @@ class ProfileImageProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final doc = await _db.collection('user').doc(uid).get();
+      final doc = await _db.collection('users').doc(uid).get();
       if (doc.exists) {
         _avatarUrl = doc.data()?['avatarUrl'] as String? ?? '';
       }

@@ -57,14 +57,16 @@ class QuizCard extends StatelessWidget {
             ),
             Text(
               model.subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                color: AppColors.secondary,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+                color: AppColors.titleColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
                 shadows: [
                   Shadow(
                     offset: Offset(0, 1),
-                    blurRadius: 2.0,
+                    blurRadius: 4.0,
                     color: Colors.black,
                   ),
                 ],

@@ -7,8 +7,7 @@ import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_login.dart';
 
 class EmailSignup extends StatefulWidget {
-  final bool showBackButton;
-  const EmailSignup({super.key, this.showBackButton = true});
+  const EmailSignup({super.key});
 
   @override
   State<EmailSignup> createState() => _EmailSignupState();
@@ -67,15 +66,6 @@ class _EmailSignupState extends State<EmailSignup> {
         backgroundColor: themeColors.background,
         elevation: 0,
         automaticallyImplyLeading: false,
-        leading: widget.showBackButton
-            ? IconButton(
-                icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
-                onPressed: () {
-                  auth.clearError();
-                  Navigator.pop(context);
-                },
-              )
-            : null,
       ),
       body: SafeArea(
         child: Center(
@@ -252,9 +242,7 @@ class _EmailSignupState extends State<EmailSignup> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => EmailLogin(
-                                  showBackButton: widget.showBackButton,
-                                ),
+                                builder: (_) => const EmailLogin(),
                               ),
                             );
                           },
@@ -279,7 +267,11 @@ class _EmailSignupState extends State<EmailSignup> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon, BuildContext context) {
+  InputDecoration _inputDecoration(
+    String label,
+    IconData icon,
+    BuildContext context,
+  ) {
     final themeColors = ThemeColors.of(context);
     return InputDecoration(
       labelText: label,

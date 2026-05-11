@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:quiz_game/controllers/level_progess_services.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/quiz_level_tile.dart';
 import 'package:quiz_game/models/level_overview_model.dart';
 import 'package:quiz_game/models/level_result_models.dart';
 import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
-import 'package:quiz_game/controllers/level_progess_services.dart';
 import 'package:quiz_game/controllers/quiz_controller.dart';
 import 'package:quiz_game/controllers/level_grid_controller.dart';
 import 'package:quiz_game/screens/common/widgets/quiz_sheets.dart';
@@ -227,7 +227,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     decoration: BoxDecoration(
       color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
+      border: Border.all(
+        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
+      ),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -258,7 +260,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     decoration: BoxDecoration(
       color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
+      border: Border.all(
+        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
+      ),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -307,7 +311,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     decoration: BoxDecoration(
       color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
+      border: Border.all(
+        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
+      ),
     ),
     child: Text.rich(
       TextSpan(
@@ -387,8 +393,14 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
 
     try {
       qs = await _getOrFetchQuestions(item.number!);
+      if (!mounted) return;
+
+      // Pre-cache all images for this level in the background
+      _precacheLevelImages(qs);
+
       setState(() => _fetchingQuestions = false);
     } catch (e) {
+      if (!mounted) return;
       setState(() => _fetchingQuestions = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -466,6 +478,18 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
         ),
       ),
     );
+  }
+
+  void _precacheLevelImages(List<QuizQuestion> questions) {
+    for (var q in questions) {
+      if (q.imageUrl != null && q.imageUrl!.isNotEmpty) {
+        if (q.imageUrl!.startsWith('http')) {
+          precacheImage(NetworkImage(q.imageUrl!), context);
+        } else {
+          precacheImage(AssetImage(q.imageUrl!), context);
+        }
+      }
+    }
   }
 
   Future<void> _onLevelComplete(LevelResultModels res, int gridPos) async {

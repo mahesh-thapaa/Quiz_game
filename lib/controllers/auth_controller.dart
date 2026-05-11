@@ -56,10 +56,10 @@ class AuthController with ChangeNotifier {
       debugPrint('👤 Anonymous Auth Success: UID = $uid');
 
       // Ensure a basic user document exists for the guest
-      final userDoc = await _db.collection('user').doc(uid).get();
+      final userDoc = await _db.collection('users').doc(uid).get();
       if (!userDoc.exists) {
         debugPrint('🆕 Creating new guest document in Firestore...');
-        await _db.collection('user').doc(uid).set({
+        await _db.collection('users').doc(uid).set({
           'username': 'Guest',
           'bio': 'Playing as Guest',
           'Coin': 0,
@@ -98,6 +98,20 @@ class AuthController with ChangeNotifier {
     final bool wasGuest = user != null && user.isAnonymous;
 
     try {
+      final cleanUsername = username.trim().toLowerCase();
+
+      // 1. Check if username is already taken
+      final usernameDoc = await _db.collection('usernames').doc(cleanUsername).get();
+      if (usernameDoc.exists) {
+        final existingUid = usernameDoc.data()?['uid'];
+        // If it's taken by someone ELSE, it's an error
+        if (existingUid != null && existingUid != user?.uid) {
+          _errorMessage = 'Username already taken';
+          setLoading(false);
+          return false;
+        }
+      }
+
       AuthCredential credential = EmailAuthProvider.credential(
         email: email.trim(),
         password: password.trim(),
@@ -107,8 +121,6 @@ class AuthController with ChangeNotifier {
 
       if (wasGuest) {
         debugPrint('🔗 Linking guest account to email: $email');
-        // This upgrades the anonymous account to a permanent one
-        // The UID stays the SAME, so all Firestore data stays!
         userCredential = await user.linkWithCredential(credential);
       } else {
         debugPrint('🆕 Creating new fresh account...');
@@ -121,20 +133,27 @@ class AuthController with ChangeNotifier {
       final uid = userCredential.user!.uid;
       debugPrint('✨ Account Ready: UID = $uid');
 
-      // Update or Create user record
-      await _db.collection('user').doc(uid).set({
+      // Update or Create user record in 'users' collection
+      await _db.collection('users').doc(uid).set({
+        'uid': uid,
         'username': username.trim(),
         'email': email.trim(),
         if (!wasGuest) ...{
           'bio': '',
+          'avatarUrl': '',
           'Coin': 0,
           'XP': 0,
           'Stars': 0,
           'createdAt': FieldValue.serverTimestamp(),
           'CompletedSections': 0,
           'QuizLevelsInSection': 0,
-        }
+        },
       }, SetOptions(merge: true));
+
+      // 2. Reserve the username
+      await _db.collection('usernames').doc(cleanUsername).set({
+        'uid': uid,
+      });
 
       // Initialize streak
       await StreakController.onLogin();

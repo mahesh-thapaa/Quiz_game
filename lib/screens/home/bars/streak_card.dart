@@ -213,7 +213,7 @@ class _StreakCardState extends State<StreakCard> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const EmailSignup(showBackButton: true),
+                  builder: (_) => const EmailSignup(),
                 ),
               );
             },

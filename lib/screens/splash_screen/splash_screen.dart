@@ -36,11 +36,6 @@ class _SplashScreenState extends State<SplashScreen>
     notificationService.requestNotificationPermission();
     notificationService.getFcmToken();
 
-    // _logoCtrl = AnimationController(
-    //   vsync: this,
-    //   duration: const Duration(milliseconds: 800),
-    // );
-
     _logoCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),

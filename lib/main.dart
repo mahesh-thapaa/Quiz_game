@@ -48,8 +48,15 @@ void main() async {
     debugPrint("⚠️ Firebase init error: $e");
   }
 
-  runApp(
-    MultiProvider(
+  runApp(const AppRoot());
+}
+
+class AppRoot extends StatelessWidget {
+  const AppRoot({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProgressProvider()),
@@ -61,8 +68,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const MyApp(),
-    ),
-  );
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -72,13 +79,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
       themeMode: context.watch<ThemeProvider>().themeMode,
-
       theme: ThemeData(brightness: Brightness.light),
-
       darkTheme: ThemeData(brightness: Brightness.dark),
-
       home: const SplashScreen(),
     );
   }

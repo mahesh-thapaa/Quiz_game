@@ -7,8 +7,7 @@ import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_signup.dart';
 
 class EmailLogin extends StatefulWidget {
-  final bool showBackButton;
-  const EmailLogin({super.key, this.showBackButton = true});
+  const EmailLogin({super.key});
 
   @override
   State<EmailLogin> createState() => _EmailLoginState();
@@ -55,8 +54,22 @@ class _EmailLoginState extends State<EmailLogin> {
       await auth.resetPassword(_emailController.text);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password reset email sent. Check your inbox.'),
+        SnackBar(
+          content: const Text(
+            'Password reset link has been sent to you E-mail!',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
         ),
       );
     } catch (e) {
@@ -77,15 +90,6 @@ class _EmailLoginState extends State<EmailLogin> {
         backgroundColor: themeColors.background,
         elevation: 0,
         automaticallyImplyLeading: false,
-        leading: widget.showBackButton
-            ? IconButton(
-                icon: Icon(Icons.arrow_back_ios, color: themeColors.hText),
-                onPressed: () {
-                  auth.clearError();
-                  Navigator.pop(context);
-                },
-              )
-            : null,
       ),
       body: SafeArea(
         child: Center(
@@ -272,7 +276,11 @@ class _EmailLoginState extends State<EmailLogin> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon, BuildContext context) {
+  InputDecoration _inputDecoration(
+    String label,
+    IconData icon,
+    BuildContext context,
+  ) {
     final themeColors = ThemeColors.of(context);
     return InputDecoration(
       labelText: label,

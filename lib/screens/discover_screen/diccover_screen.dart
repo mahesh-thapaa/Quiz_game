@@ -143,25 +143,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               ),
             ),
 
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await NotificationController().showInstantNotification();
-            //   },
-            //   child: const Text("Instant Test"),
-            // ),
-
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await NotificationController().scheduleTestAfter2Minutes();
-            //   },
-            //   child: const Text("Schedule 2 Min Test"),
-            // ),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     await NotificationController().printPendingNotifications();
-            //   },
-            //   child: const Text("Show Pending"),
-            // ),
           ],
         ),
       ),

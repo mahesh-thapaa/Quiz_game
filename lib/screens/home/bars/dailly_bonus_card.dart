@@ -51,7 +51,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.isAnonymous) {
-      _showSnack('Login to claim reward');
+      _showSnack('Log in to claim the reward', isError: false);
       return;
     }
 
@@ -104,9 +104,23 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
     }
   }
 
-  void _showSnack(String msg) {
+  void _showSnack(String msg, {bool isError = true}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(seconds: 6)),
+      SnackBar(
+        content: Text(
+          msg,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      ),
     );
   }
 

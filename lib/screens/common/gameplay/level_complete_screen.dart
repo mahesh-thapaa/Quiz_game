@@ -60,7 +60,9 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           child: Icon(
             index < stars ? Icons.star_rounded : Icons.star_outline_rounded,
             size: 52,
-            color: index < stars ? Colors.amber : ThemeColors.of(context).stext.withValues(alpha: 0.3),
+            color: index < stars
+                ? Colors.amber
+                : ThemeColors.of(context).stext.withValues(alpha: 0.3),
           ),
         );
       }),
@@ -130,15 +132,32 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // ── LEVEL COMPLETED Title ──
-                Text(
-                  'LEVEL COMPLETED!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: ThemeColors.of(context).hText,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
-                  ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: widget.onBack,
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: ThemeColors.of(context).hText,
+                        size: 22,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'LEVEL COMPLETED!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: ThemeColors.of(context).hText,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 48,
+                    ), // Balances the back button for centering
+                  ],
                 ),
 
                 const SizedBox(height: 28),
@@ -227,7 +246,10 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                           SizedBox(width: 8),
                           Text(
                             'Accuracy',
-                            style: TextStyle(color: ThemeColors.of(context).hText, fontSize: 15),
+                            style: TextStyle(
+                              color: ThemeColors.of(context).hText,
+                              fontSize: 15,
+                            ),
                           ),
                         ],
                       ),
@@ -295,7 +317,11 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.replay, color: ThemeColors.of(context).hText, size: 20),
+                          Icon(
+                            Icons.replay,
+                            color: ThemeColors.of(context).hText,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             'REPLAY LEVEL',

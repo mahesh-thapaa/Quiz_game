@@ -111,7 +111,7 @@ class ProfileImageController {
         final String downloadUrl = responseData['secure_url'];
 
         // Update Firestore
-        await _db.collection('user').doc(uid).set({
+        await _db.collection('users').doc(uid).set({
           'avatarUrl': downloadUrl,
         }, SetOptions(merge: true));
 
@@ -133,7 +133,7 @@ class ProfileImageController {
     if (uid == null) return false;
 
     try {
-      await _db.collection('user').doc(uid).set({
+      await _db.collection('users').doc(uid).set({
         'avatarUrl': "",
       }, SetOptions(merge: true));
       return true;

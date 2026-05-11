@@ -18,7 +18,7 @@ class BonusService {
     final uid = _uid;
     if (uid == null) return false;
 
-    final doc = await _db.collection('user').doc(uid).get();
+    final doc = await _db.collection('users').doc(uid).get();
     final data = doc.data();
     if (data == null) return false;
 
@@ -45,7 +45,7 @@ class BonusService {
     final uid = _uid;
     if (uid == null) throw Exception('User not logged in');
 
-    final ref = _db.collection('user').doc(uid);
+    final ref = _db.collection('users').doc(uid);
 
     final newCoins = await _db.runTransaction<int>((txn) async {
       final snap = await txn.get(ref);
@@ -72,10 +72,10 @@ class BonusService {
       final currentCoins = data['Coin'] as int? ?? 0;
       final updated = currentCoins + bonusCoins;
 
-      txn.update(ref, {
+      txn.set(ref, {
         'Coin': updated,
         'lastBonusClaimed': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
 
       return updated;
     });
