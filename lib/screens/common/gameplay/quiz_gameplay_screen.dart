@@ -274,7 +274,6 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
         _currentLevelNumber,
       );
     }
-
   }
 
   AnswerState _getState(int index) {
@@ -307,6 +306,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
 
     return Scaffold(
       backgroundColor: ThemeColors.of(context).background,
+      bottomNavigationBar: _buildBottomAd(),
       body: Stack(
         children: [
           SafeArea(
@@ -368,13 +368,6 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
                     ),
                   ),
                 ),
-                if (_bannerAd != null)
-                  Container(
-                    alignment: Alignment.center,
-                    width: _bannerAd!.size.width.toDouble(),
-                    height: _bannerAd!.size.height.toDouble(),
-                    child: AdWidget(ad: _bannerAd!),
-                  ),
               ],
             ),
           ),
@@ -395,6 +388,15 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
             ),
         ],
       ),
+    );
+  }
+
+  Widget? _buildBottomAd() {
+    if (_bannerAd == null) return null;
+    return SizedBox(
+      height: _bannerAd!.size.height.toDouble(),
+      width: _bannerAd!.size.width.toDouble(),
+      child: AdWidget(ad: _bannerAd!),
     );
   }
 }

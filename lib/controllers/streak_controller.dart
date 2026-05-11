@@ -1,95 +1,114 @@
 // lib/controllers/streak_controller.dart
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_game/models/home_models/streak_model.dart';
-
 import 'package:timezone/timezone.dart' as tz;
 
 class StreakController {
-  static const String _streakPath = 'streaks';
+  static const String _collection = 'streaks';
+
   static const String streakTitle = '7 Day Streak';
   static const int totalDaysPerCycle = 7;
 
-  static DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+  static tz.Location get _ktm => tz.getLocation('Asia/Kathmandu');
+
+  static DateTime _dateOnly(DateTime d) {
+    return DateTime(d.year, d.month, d.day);
+  }
 
   static Future<StreakModel> load() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return _createNewStreak();
+
+    if (user == null || user.isAnonymous) {
+      return _newStreak();
+    }
 
     final ref = FirebaseFirestore.instance
-        .collection(_streakPath)
+        .collection(_collection)
         .doc(user.uid);
-    final snapshot = await ref.get();
 
-    if (!snapshot.exists) return _createNewStreak();
+    final snap = await ref.get();
 
-    final data = snapshot.data();
-    if (data == null) return _createNewStreak();
+    if (!snap.exists) {
+      return _newStreak();
+    }
+
+    final data = snap.data() ?? {};
 
     return StreakModel(
       title: streakTitle,
       currentDay: data['currentDay'] as int? ?? 0,
       totalDays: totalDaysPerCycle,
       rewardClaimed: data['rewardClaimed'] as bool? ?? false,
+      justCompleted: false,
     );
   }
 
   static Future<StreakModel> onLogin() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return _createNewStreak();
+
+    if (user == null || user.isAnonymous) {
+      return _newStreak();
+    }
 
     final ref = FirebaseFirestore.instance
-        .collection(_streakPath)
+        .collection(_collection)
         .doc(user.uid);
-    final snapshot = await ref.get();
 
-    // Use Kathmandu time for consistency with notifications
-    final now = tz.TZDateTime.now(tz.getLocation('Asia/Kathmandu'));
+    final snap = await ref.get();
+    final data = snap.data() ?? {};
+
+    final now = tz.TZDateTime.now(_ktm);
     final today = _dateOnly(now);
     final yesterday = today.subtract(const Duration(days: 1));
 
-    Map<String, dynamic> currentData = snapshot.data() ?? {};
-    int currentDay = currentData['currentDay'] as int? ?? 0;
-    bool rewardClaimed = currentData['rewardClaimed'] as bool? ?? false;
-    final String? lastLoginDateStr = currentData['lastLoginDate'] as String?;
-
-    final DateTime? lastDateOnly = lastLoginDateStr != null
-        ? _dateOnly(DateTime.parse(lastLoginDateStr))
-        : null;
-
+    int currentDay = data['currentDay'] as int? ?? 0;
+    bool rewardClaimed = data['rewardClaimed'] as bool? ?? false;
     bool justCompleted = false;
 
-    if (lastDateOnly == null) {
+    final String? lastLoginDate = data['lastLoginDate'] as String?;
+
+    DateTime? lastDate;
+    if (lastLoginDate != null) {
+      lastDate = _dateOnly(DateTime.parse(lastLoginDate));
+    }
+
+    // First login ever
+    if (lastDate == null) {
       currentDay = 1;
       rewardClaimed = false;
-    } else if (lastDateOnly == today) {
-      // Already logged in today
+    }
+    // Already logged today
+    else if (lastDate == today) {
       if (currentDay == 0) currentDay = 1;
-    } else if (lastDateOnly == yesterday) {
-      // Consecutive day
+    }
+    // Consecutive day
+    else if (lastDate == yesterday) {
       if (currentDay >= totalDaysPerCycle) {
+        // Completed yesterday -> start new cycle today
         currentDay = 1;
         rewardClaimed = false;
       } else {
         currentDay++;
+
         if (currentDay == totalDaysPerCycle) {
           justCompleted = true;
           rewardClaimed = false;
         }
       }
-    } else {
-      // Missed days - reset
+    }
+    // Missed one or more days
+    else {
       currentDay = 1;
       rewardClaimed = false;
     }
 
     await ref.set({
       'currentDay': currentDay,
-      'lastLoginDate': today.toIso8601String(),
-      'totalDays': totalDaysPerCycle,
       'rewardClaimed': rewardClaimed,
-      'updatedAt': FieldValue.serverTimestamp(), // Use server time
+      'lastLoginDate': today.toIso8601String(),
+      'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
     return StreakModel(
@@ -103,44 +122,50 @@ class StreakController {
 
   static Future<void> claimReward() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
 
-    final ref = FirebaseFirestore.instance
-        .collection(_streakPath)
-        .doc(user.uid);
-    await ref.update({'rewardClaimed': true});
+    if (user == null || user.isAnonymous) return;
+
+    await FirebaseFirestore.instance.collection(_collection).doc(user.uid).set({
+      'rewardClaimed': true,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  // IMPORTANT: keep 7/7 today, tomorrow becomes 1 automatically
+  static Future<void> resetAfterCompletion() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || user.isAnonymous) return;
+
+    final now = tz.TZDateTime.now(_ktm);
+    final today = _dateOnly(now);
+
+    await FirebaseFirestore.instance.collection(_collection).doc(user.uid).set({
+      'currentDay': totalDaysPerCycle,
+      'rewardClaimed': true,
+      'lastLoginDate': today.toIso8601String(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   static Future<void> reset() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+
+    if (user == null || user.isAnonymous) return;
+
     await FirebaseFirestore.instance
-        .collection(_streakPath)
+        .collection(_collection)
         .doc(user.uid)
         .delete();
   }
 
-  static Future<void> resetAfterCompletion() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    final ref = FirebaseFirestore.instance
-        .collection(_streakPath)
-        .doc(user.uid);
-    await ref.set({
-      'currentDay': totalDaysPerCycle,
-      'rewardClaimed': true,
-      'lastLoginDate': DateTime.now().toIso8601String(),
-      'updatedAt': DateTime.now().toIso8601String(),
-    }, SetOptions(merge: true));
-  }
-
-  static StreakModel _createNewStreak() {
+  static StreakModel _newStreak() {
     return const StreakModel(
       title: streakTitle,
       currentDay: 0,
       totalDays: totalDaysPerCycle,
       rewardClaimed: false,
+      justCompleted: false,
     );
   }
 }

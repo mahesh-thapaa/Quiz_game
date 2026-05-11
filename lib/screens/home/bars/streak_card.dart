@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/streak_model.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
@@ -23,9 +24,10 @@ class _StreakCardState extends State<StreakCard> {
   @override
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
+
     final user = FirebaseAuth.instance.currentUser;
-    final isGuest = user == null; // Only true if not signed in at all
-    final isAnonymous = user?.isAnonymous ?? false;
+
+    final isGuest = user == null || user.isAnonymous;
 
     final streak =
         p.streak ??
@@ -35,12 +37,12 @@ class _StreakCardState extends State<StreakCard> {
           totalDays: StreakController.totalDaysPerCycle,
         );
 
-    // ✅ AUTOMATIC POPUP: Only for registered users
     if (!isGuest &&
-        streak.currentDay >= streak.totalDays &&
+        streak.isComplete &&
         !streak.rewardClaimed &&
         !_popupShown) {
       _popupShown = true;
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showStreakRewardPopup(
           context,
@@ -50,15 +52,10 @@ class _StreakCardState extends State<StreakCard> {
       });
     }
 
-    return isGuest
-        ? _buildGuestStreak(context, streak)
-        : _buildUserStreak(streak);
+    return isGuest ? _buildGuestCard(context) : _buildUserCard(context, streak);
   }
 
-  Widget _buildUserStreak(StreakModel streak) {
-    final isBroken = streak.isBroken;
-    final isComplete = streak.isComplete;
-
+  Widget _buildUserCard(BuildContext context, StreakModel streak) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -67,7 +64,6 @@ class _StreakCardState extends State<StreakCard> {
       ),
       child: Row(
         children: [
-          // Fire icon
           Container(
             width: 42,
             height: 42,
@@ -75,75 +71,61 @@ class _StreakCardState extends State<StreakCard> {
               color: AppColors.deepCard,
               shape: BoxShape.circle,
             ),
-            child: const Center(
-              child: Icon(
-                Icons.local_fire_department_rounded,
-                color: Color(0xFFFF6B35),
-                size: 22,
-              ),
+            child: const Icon(
+              Icons.local_fire_department_rounded,
+              color: Color(0xFFFF6B35),
+              size: 22,
             ),
           ),
+
           const SizedBox(width: 14),
 
-          // Progress section
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      streak.title,
-                      style: TextStyle(
-                        color: ThemeColors.of(context).hText,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+                Text(
+                  streak.title,
+                  style: TextStyle(
+                    color: ThemeColors.of(context).hText,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
+
                 const SizedBox(height: 8),
 
-                // Day segments
                 Row(
                   children: List.generate(streak.totalDays, (i) {
                     final done = i < streak.currentDay;
+
                     return Expanded(
                       child: Container(
                         height: 5,
                         margin: EdgeInsets.only(
-                          right: i < streak.totalDays - 1 ? 4 : 0,
+                          right: i == streak.totalDays - 1 ? 0 : 4,
                         ),
                         decoration: BoxDecoration(
                           gradient: done ? AppColors.primaryGradient : null,
                           color: done
                               ? null
-                              : ThemeColors.of(context).hText.withValues(alpha: 0.15),
+                              : ThemeColors.of(
+                                  context,
+                                ).hText.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
                     );
                   }),
                 ),
-
-                if (isBroken) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    'Come back tomorrow to continue your streak!',
-                    style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 11),
-                  ),
-                ],
               ],
             ),
           ),
 
           const SizedBox(width: 12),
 
-          // Day counter
           Text(
-            isBroken
-                ? '—/${streak.totalDays}'
-                : 'Day ${streak.currentDay}/${streak.totalDays}',
+            'Day ${streak.currentDay}/${streak.totalDays}',
             style: TextStyle(
               color: ThemeColors.of(context).stext,
               fontSize: 12,
@@ -155,17 +137,15 @@ class _StreakCardState extends State<StreakCard> {
     );
   }
 
-  Widget _buildGuestStreak(BuildContext context, StreakModel streak) {
+  Widget _buildGuestCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: ThemeColors.of(context).cardBg.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ThemeColors.of(context).hText.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
-          // Fire icon (dimmed)
           Container(
             width: 42,
             height: 42,
@@ -173,17 +153,15 @@ class _StreakCardState extends State<StreakCard> {
               color: ThemeColors.of(context).deepCard.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
-            child: const Center(
-              child: Icon(
-                Icons.local_fire_department_rounded,
-                color: Colors.blueGrey,
-                size: 22,
-              ),
+            child: const Icon(
+              Icons.local_fire_department_rounded,
+              color: Colors.blueGrey,
+              size: 22,
             ),
           ),
+
           const SizedBox(width: 14),
 
-          // Progress section
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,87 +170,38 @@ class _StreakCardState extends State<StreakCard> {
                   'Guest Streak',
                   style: TextStyle(
                     color: ThemeColors.of(context).hText.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
+
                 const SizedBox(height: 4),
+
                 Text(
-                  'Login to start your 7-day challenge',
-                  style: TextStyle(color: ThemeColors.of(context).stext, fontSize: 11),
+                  'Sign in to start your 7-day challenge',
+                  style: TextStyle(
+                    color: ThemeColors.of(context).stext,
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(width: 12),
-
-          // Sign In CTA
           TextButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const EmailSignup(),
-                ),
+                MaterialPageRoute(builder: (_) => const EmailSignup()),
               );
             },
-            style: TextButton.styleFrom(
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
             child: const Text(
               'SIGN IN',
               style: TextStyle(
                 color: AppColors.primary,
+                fontWeight: FontWeight.bold,
                 fontSize: 10,
-                fontWeight: FontWeight.w800,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSkeleton() {
-    return Container(
-      height: 70,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: const BoxDecoration(
-              color: AppColors.deepCard,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(height: 10, width: 100, color: Colors.white10),
-                const SizedBox(height: 10),
-                Container(
-                  height: 5,
-                  width: double.infinity,
-                  color: Colors.white10,
-                ),
-              ],
             ),
           ),
         ],

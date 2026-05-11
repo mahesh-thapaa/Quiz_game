@@ -51,7 +51,7 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.isAnonymous) {
-      _showSnack('Log in to claim the reward', isError: false);
+      _showSnack('Login to claim the reward!!', isError: false);
       return;
     }
 
@@ -196,7 +196,9 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                         '+${widget.bonus.coins}',
                         style: TextStyle(
                           color: _alreadyClaimed
-                              ? ThemeColors.of(context).hText.withValues(alpha: 0.5)
+                              ? ThemeColors.of(
+                                  context,
+                                ).hText.withValues(alpha: 0.5)
                               : Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
@@ -210,7 +212,9 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                     height: 24,
                     width: 24,
                     colorFilter: ColorFilter.mode(
-                      _alreadyClaimed ? ThemeColors.of(context).stext : AppColors.doller,
+                      _alreadyClaimed
+                          ? ThemeColors.of(context).stext
+                          : AppColors.doller,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -222,7 +226,9 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
                       : ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _alreadyClaimed
-                                ? ThemeColors.of(context).background.withValues(alpha: 0.2)
+                                ? ThemeColors.of(
+                                    context,
+                                  ).background.withValues(alpha: 0.2)
                                 : Colors.white,
                             foregroundColor: _alreadyClaimed
                                 ? ThemeColors.of(context).stext

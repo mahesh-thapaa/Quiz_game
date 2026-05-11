@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
+// import 'package:quiz_game/models/theme_colors.dart';
 import 'package:quiz_game/controllers/star_calculation_service.dart';
+import 'package:quiz_game/controllers/ad_display_controller.dart';
 
 class LevelCompleteScreen extends StatefulWidget {
   final LevelResultModels result;
@@ -37,11 +39,14 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+
     _controller.forward();
   }
 
@@ -83,7 +88,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 40,
@@ -119,6 +123,34 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
     );
   }
 
+  void _handleNextLevel() {
+    if (widget.result.score == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Please try again!!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return; // Stop here if score is 0
+    }
+
+    AdDisplayController().handleLevelTransition(onComplete: widget.onNextLevel);
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -131,7 +163,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ── LEVEL COMPLETED Title ──
+                // HEADER
                 Row(
                   children: [
                     IconButton(
@@ -139,7 +171,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       icon: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         color: ThemeColors.of(context).hText,
-                        size: 22,
                       ),
                     ),
                     Expanded(
@@ -154,20 +185,18 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      width: 48,
-                    ), // Balances the back button for centering
+                    const SizedBox(width: 48),
                   ],
                 ),
 
                 const SizedBox(height: 28),
 
-                // ── Stars ──
+                // STARS
                 _buildStars(_starsEarned),
 
                 const SizedBox(height: 24),
 
-                // ── Score Badge ──
+                // SCORE
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 28,
@@ -189,7 +218,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 32),
 
-                // ── REWARDS EARNED label ──
                 Text(
                   'REWARDS EARNED',
                   style: TextStyle(
@@ -202,7 +230,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 14),
 
-                // ── XP & Coins reward cards ──
                 Row(
                   children: [
                     _buildRewardCard(
@@ -223,7 +250,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 16),
 
-                // ── Accuracy row ──
+                // ACCURACY
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -238,12 +265,12 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.check_circle,
                             color: Colors.green,
                             size: 20,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             'Accuracy',
                             style: TextStyle(
@@ -267,9 +294,9 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 36),
 
-                // ── NEXT LEVEL button ──
+                // NEXT LEVEL BUTTON
                 GestureDetector(
-                  onTap: widget.onNextLevel,
+                  onTap: _handleNextLevel,
                   child: Container(
                     width: double.infinity,
                     height: 55,
@@ -277,7 +304,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       gradient: AppColors.primaryGradient,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -303,7 +330,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 12),
 
-                // ── REPLAY LEVEL button ──
+                // REPLAY BUTTON
                 GestureDetector(
                   onTap: widget.onReplayLevel,
                   child: Container(
@@ -320,7 +347,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                           Icon(
                             Icons.replay,
                             color: ThemeColors.of(context).hText,
-                            size: 20,
                           ),
                           const SizedBox(width: 8),
                           Text(

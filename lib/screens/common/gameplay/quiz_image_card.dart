@@ -80,6 +80,10 @@ class QuizImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
+      constraints: const BoxConstraints(
+        minHeight: 180, // Maintain a consistent minimum height
+        maxHeight: 250, // Prevent it from taking too much vertical space
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.outlineBorder, width: 2),
@@ -88,14 +92,11 @@ class QuizImageCard extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.hardEdge,
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Container(
-          color: AppColors.cardBg,
-          child: imageUrl.startsWith('http')
-              ? _SmartNetworkImage(imageUrl: imageUrl)
-              : _SmartAssetImage(imageUrl: imageUrl),
-        ),
+      child: Container(
+        color: AppColors.cardBg,
+        child: imageUrl.startsWith('http')
+            ? _SmartNetworkImage(imageUrl: imageUrl)
+            : _SmartAssetImage(imageUrl: imageUrl),
       ),
     );
   }

@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SectionHeader(title: 'RECOMMENDED FOR YOU'),
               const SizedBox(height: 15),
 
-              // 6. Recommended Grid (2 Columns)
+                // 6. Recommended Grid (2 Columns)
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
