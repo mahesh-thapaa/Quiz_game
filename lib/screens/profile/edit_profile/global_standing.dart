@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -18,8 +19,10 @@ class GlobalStandings extends StatelessWidget {
         return const Color(0xFF9E9E9E);
       case 3:
         return const Color(0xFFFF7043);
+      case 4:
+        return Colors.green.shade600;
       default:
-        return AppColors.deepCard;
+        return Colors.transparent;
     }
   }
 
@@ -101,20 +104,31 @@ class GlobalStandings extends StatelessWidget {
 
           // ── All users list ────────────────────────────────────────────────
           Expanded(
-            child: allUsers.isEmpty
-                ? Center(
-                    child: Text(
-                      'No players yet',
-                      style: TextStyle(color: themeColors.stext),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: allUsers.length,
-                    separatorBuilder: (_, _) =>
-                        Divider(color: themeColors.divider, height: 1),
-                    itemBuilder: (ctx, i) {
-                      final entry = allUsers[i];
-                      final isMe = entry.isCurrentUser;
+            child: Builder(builder: (context) {
+              final user = FirebaseAuth.instance.currentUser;
+              final isGuestUser = user == null || user.isAnonymous;
+
+              // Filter out the current user if they are a guest
+              final filteredUsers = isGuestUser
+                  ? allUsers.where((u) => !u.isCurrentUser).toList()
+                  : allUsers;
+
+              if (filteredUsers.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No players yet',
+                    style: TextStyle(color: themeColors.stext),
+                  ),
+                );
+              }
+
+              return ListView.separated(
+                itemCount: filteredUsers.length,
+                separatorBuilder: (_, _) =>
+                    Divider(color: themeColors.divider, height: 1),
+                itemBuilder: (ctx, i) {
+                  final entry = filteredUsers[i];
+                  final isMe = entry.isCurrentUser;
 
                       return Container(
                         color: isMe
@@ -128,7 +142,7 @@ class GlobalStandings extends StatelessWidget {
                           children: [
                             // ── Rank circle ───────────────────────────────
                             Container(
-                              width: 28,
+                              width: entry.rank > 4 ? 32 : 28,
                               height: 28,
                               decoration: BoxDecoration(
                                 color: _rankColor(entry.rank),
@@ -136,12 +150,12 @@ class GlobalStandings extends StatelessWidget {
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                '${entry.rank}',
+                                entry.rank > 4 ? '#${entry.rank}' : '${entry.rank}',
                                 style: TextStyle(
-                                  color: entry.rank <= 3
+                                  color: entry.rank <= 4
                                       ? Colors.white
                                       : themeColors.stext,
-                                  fontSize: 11,
+                                  fontSize: entry.rank > 4 ? 11 : 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -199,7 +213,8 @@ class GlobalStandings extends StatelessWidget {
                         ),
                       );
                     },
-                  ),
+                  );
+                }),
           ),
         ],
       ),

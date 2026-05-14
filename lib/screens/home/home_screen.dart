@@ -10,9 +10,7 @@ import 'package:quiz_game/screens/home/bars/category_card.dart';
 import 'package:quiz_game/screens/home/bars/section_header.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/screens/common/level_grid_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:quiz_game/provider/notification_provider.dart';
-import 'package:quiz_game/controllers/notification_controller.dart';
+
 import 'package:quiz_game/data/home_data.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -127,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SectionHeader(title: 'RECOMMENDED FOR YOU'),
               const SizedBox(height: 15),
 
-                // 6. Recommended Grid (2 Columns)
+              // 6. Recommended Grid (2 Columns)
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

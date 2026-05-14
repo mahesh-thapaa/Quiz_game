@@ -7,6 +7,7 @@ class QuizLevelTile {
   bool isUnlocked;
   bool isCurrent;
   int starsEarned;
+  int bestScore;
   String? bonusDocId;
 
   QuizLevelTile({
@@ -15,6 +16,7 @@ class QuizLevelTile {
     this.isUnlocked = false,
     this.isCurrent = false,
     this.starsEarned = 0,
+    this.bestScore = 0,
     this.bonusDocId,
   });
 }

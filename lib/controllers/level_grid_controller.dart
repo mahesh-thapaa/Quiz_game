@@ -39,12 +39,15 @@ class LevelGridController {
   }
 
   /// Updates all tiles based on loaded progress
-  void applyProgress(Map<int, int> stars) {
+  void applyProgress(Map<int, Map<String, int>> progress) {
     final all = [...block1Items, ...block2Items];
     for (var tile in all) {
-      if (stars.containsKey(tile.number)) {
-        tile.starsEarned = stars[tile.number]!;
-        if (tile.starsEarned > 0) {
+      if (progress.containsKey(tile.number)) {
+        final data = progress[tile.number]!;
+        tile.starsEarned = data['stars'] ?? 0;
+        tile.bestScore = data['bestScore'] ?? 0;
+
+        if (tile.starsEarned > 0 || tile.bestScore > 0) {
           tile.isUnlocked = true;
           unlockNext(tile.number!);
         }

@@ -46,7 +46,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Logout',
-          style: TextStyle(color: ThemeColors.of(context).hText, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: ThemeColors.of(context).hText,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           'Are you sure you want to logout?',
@@ -100,9 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         debugPrint('🔄 Navigating to login...');
         // Replace all screens and go to login
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => const EmailSignup(),
-          ),
+          MaterialPageRoute(builder: (_) => const EmailSignup()),
           (route) => false,
         );
         debugPrint('✅ Navigation complete');
@@ -122,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final p = context.watch<UserProgressProvider>();
     final lb = context.watch<LeaderboardProvider>();
-    final top3 = lb.top3;
+    final top4 = lb.top4;
     final currentUserRank = lb.currentUserRank;
 
     final user = FirebaseAuth.instance.currentUser;
@@ -134,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       xpPoints: p.xp,
       weeklyXP: p.xp,
       isCurrentUser: true,
-      level: p.level,
+
       coins: p.coins,
       bio: p.bio,
       rank: currentUserRank,
@@ -234,14 +235,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   StatCard(
                     label: 'RANK',
-                    value: lb.isLoading ? '...' : '#$currentUserRank',
+                    value: lb.isLoading
+                        ? '...'
+                        : (isGuest ? 'Unranked' : '#$currentUserRank'),
                     valueColor: themeColors.hText,
                   ),
                   const SizedBox(width: 10),
                   StatCard(
-                    label: 'LEVEL',
-                    value: '${p.level}',
-                    valueColor: Colors.amber,
+                    label: 'XP',
+                    value: '${p.xp}',
+                    valueColor: Colors.greenAccent,
                   ),
                   const SizedBox(width: 10),
                   StatCard(
@@ -335,15 +338,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       )
                     else ...[
                       ...List.generate(
-                        top3.length,
+                        top4.length,
                         (i) => LeaderboardRow(
-                          entry: top3[i],
-                          rank: i + 1,
-                          isCurrentUser: top3[i].isCurrentUser,
+                          entry: top4[i],
+                          rank: top4[i].rank,
+                          isCurrentUser: top4[i].isCurrentUser,
                         ),
                       ),
-                      // Show current user separately only if NOT in top 3
-                      if (!top3.any((e) => e.isCurrentUser))
+                      // Show current user separately only if NOT in top 4
+                      if (!top4.any((e) => e.isCurrentUser))
                         LeaderboardRow(
                           entry: currentUserEntry,
                           rank: currentUserRank,
@@ -379,9 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ElevatedButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const EmailSignup(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const EmailSignup()),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade800,

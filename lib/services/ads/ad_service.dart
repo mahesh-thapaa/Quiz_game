@@ -10,9 +10,19 @@ class AdService {
   bool _isInterstitialLoading = false;
   int _retryAttempt = 0;
 
-  static const String _bannerUnitId = 'ca-app-pub-7334258098187344/3053792918';
-  static const String _interstitialUnitId =
-      'ca-app-pub-7334258098187344/7625032700';
+  static String get _bannerUnitId {
+    if (kDebugMode) {
+      return 'ca-app-pub-3940256099942544/6300978111'; // Google Test Banner
+    }
+    return 'ca-app-pub-7334258098187344/3053792918';
+  }
+
+  static String get _interstitialUnitId {
+    if (kDebugMode) {
+      return 'ca-app-pub-3940256099942544/1033173712'; // Google Test Interstitial
+    }
+    return 'ca-app-pub-7334258098187344/7625032700';
+  }
 
   Future<void> init() async {
     try {

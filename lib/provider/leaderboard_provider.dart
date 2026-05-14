@@ -33,6 +33,19 @@ class LeaderboardProvider extends ChangeNotifier {
     return _allUsers.where((e) => !e.isCurrentUser).take(3).toList();
   }
 
+  List<LeaderboardEntry> get top4 {
+    // Get top 4 users overall
+    final topFour = _allUsers.take(4).toList();
+
+    // If current user is already in top 4, don't modify
+    if (topFour.any((e) => e.isCurrentUser)) {
+      return topFour;
+    }
+
+    // If current user is not in top 4, exclude them from the list
+    return _allUsers.where((e) => !e.isCurrentUser).take(4).toList();
+  }
+
   LeaderboardEntry? get currentUser =>
       _allUsers.where((e) => e.isCurrentUser).isNotEmpty
       ? _allUsers.firstWhere((e) => e.isCurrentUser)
@@ -71,7 +84,6 @@ class LeaderboardProvider extends ChangeNotifier {
                 name: data['username'] ?? 'Player',
                 xpPoints: data['XP'] ?? 0,
                 weeklyXP: data['XP'] ?? 0,
-                level: data['Level'] ?? 1,
                 coins: data['Coin'] ?? 0,
                 bio: data['bio'] ?? '',
                 avatarUrl: data['avatarUrl'] ?? '',
@@ -122,7 +134,6 @@ class LeaderboardProvider extends ChangeNotifier {
           name: data['username'] ?? 'Player',
           xpPoints: data['XP'] ?? 0,
           weeklyXP: data['XP'] ?? 0,
-          level: data['Level'] ?? 1,
           coins: data['Coin'] ?? 0,
           bio: data['bio'] ?? '',
           avatarUrl: data['avatarUrl'] ?? '',

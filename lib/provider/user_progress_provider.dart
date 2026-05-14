@@ -195,14 +195,21 @@ class UserProgressProvider extends ChangeNotifier {
     try {
       // 1. If username changed, check availability
       if (cleanNewUsername != oldUsername) {
-        final usernameDoc = await _db.collection('usernames').doc(cleanNewUsername).get();
+        final usernameDoc = await _db
+            .collection('usernames')
+            .doc(cleanNewUsername)
+            .get();
         if (usernameDoc.exists) {
-          debugPrint('❌ updateProfile: Username "$cleanNewUsername" is already taken.');
+          debugPrint(
+            '❌ updateProfile: Username "$cleanNewUsername" is already taken.',
+          );
           return false;
         }
 
         // 2. Reserve new username
-        await _db.collection('usernames').doc(cleanNewUsername).set({'uid': uid});
+        await _db.collection('usernames').doc(cleanNewUsername).set({
+          'uid': uid,
+        });
 
         // 3. Delete old username reservation (if it wasn't the default 'Guest' or empty)
         if (oldUsername.isNotEmpty && oldUsername != 'guest') {
@@ -239,7 +246,11 @@ class UserProgressProvider extends ChangeNotifier {
     _coins += customCoins;
     _xp += customXP;
     _stars += earnedStars;
-    _quizLevelsInSection++;
+
+    // Only increment level-up progress if this is a NEW level completion
+    if (earnedStars > 0) {
+      _quizLevelsInSection++;
+    }
 
     if (_quizLevelsInSection >= quizLevelsPerSection) {
       _quizLevelsInSection = 0;

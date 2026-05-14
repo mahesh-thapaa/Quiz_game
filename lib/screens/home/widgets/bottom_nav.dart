@@ -30,39 +30,71 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeColors = ThemeColors.of(context);
     return Container(
-      height: 85,
+      height: 70,
       decoration: BoxDecoration(
         color: themeColors.navBg,
         border: Border(top: BorderSide(color: themeColors.divider, width: 1)),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16), // ← equal top/bottom
+        padding: const EdgeInsets.symmetric(vertical: 6), // ← equal top/bottom
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
+          // children: List.generate(items.length, (i) {
+          //   final active = i == currentIndex;
+          //   return GestureDetector(
+          //     onTap: () => onTap(i),
+          //     child: Column(
+          //       mainAxisSize: MainAxisSize.min,
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         Icon(
+          //           items[i].icon,
+          //           color: active ? AppColors.primary : themeColors.stext,
+          //           size: 22,
+          //         ),
+          //         const SizedBox(height: 4),
+          //         Text(
+          //           items[i].label,
+          //           style: TextStyle(
+          //             color: active ? AppColors.primary : themeColors.stext,
+          //             fontSize: 10,
+          //             fontWeight: FontWeight.w700,
+          //             letterSpacing: 0.8,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   );
+          // }),
           children: List.generate(items.length, (i) {
             final active = i == currentIndex;
-            return GestureDetector(
-              onTap: () => onTap(i),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    items[i].icon,
-                    color: active ? AppColors.primary : themeColors.stext,
-                    size: 22,
+
+            return Expanded(
+              child: InkWell(
+                onTap: () => onTap(i),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        items[i].icon,
+                        color: active ? AppColors.primary : themeColors.stext,
+                        size: 22,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        items[i].label,
+                        style: TextStyle(
+                          color: active ? AppColors.primary : themeColors.stext,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    items[i].label,
-                    style: TextStyle(
-                      color: active ? AppColors.primary : themeColors.stext,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           }),

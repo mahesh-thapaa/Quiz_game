@@ -32,20 +32,42 @@ class _EmailSignupState extends State<EmailSignup> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    FocusScope.of(context).unfocus();
+
     final auth = context.read<AuthController>();
     final p = context.read<UserProgressProvider>();
+
     final success = await auth.signUp(
-      username: _usernameController.text,
-      email: _emailController.text,
-      password: _passwordController.text,
+      username: _usernameController.text.trim(),
+      email: _emailController.text.trim().toLowerCase(),
+      password: _passwordController.text.trim(),
       provider: p,
     );
 
-    if (success && mounted) {
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "Account created successfully!!",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
       final p = context.read<UserProgressProvider>();
       await p.clearAndReload();
 
       if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
@@ -98,6 +120,8 @@ class _EmailSignupState extends State<EmailSignup> {
                       keyboardType: TextInputType.name,
                       textCapitalization: TextCapitalization.words,
                       style: TextStyle(color: themeColors.hText),
+                      onChanged: (_) =>
+                          context.read<AuthController>().clearError(),
                       decoration: _inputDecoration(
                         'Username',
                         Icons.person_outline,
@@ -122,6 +146,8 @@ class _EmailSignupState extends State<EmailSignup> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       style: TextStyle(color: themeColors.hText),
+                      onChanged: (_) =>
+                          context.read<AuthController>().clearError(),
                       decoration: _inputDecoration(
                         'Email',
                         Icons.email_outlined,
@@ -141,6 +167,8 @@ class _EmailSignupState extends State<EmailSignup> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       style: TextStyle(color: themeColors.hText),
+                      onChanged: (_) =>
+                          context.read<AuthController>().clearError(),
                       decoration:
                           _inputDecoration(
                             'Password',
@@ -279,6 +307,7 @@ class _EmailSignupState extends State<EmailSignup> {
       prefixIcon: Icon(icon, color: themeColors.stext, size: 20),
       filled: true,
       fillColor: themeColors.cardBg,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: themeColors.divider),

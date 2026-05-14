@@ -1,16 +1,13 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// lib/screens/home/bars/daily_bonus_card.dart
-// ─────────────────────────────────────────────────────────────────────────────
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/widgets/reward_dialog.dart';
 import 'package:quiz_game/screens/home/bars/bonus_servies.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class DailyBonusCard extends StatefulWidget {
   final DailyBonusModel bonus;
@@ -21,28 +18,57 @@ class DailyBonusCard extends StatefulWidget {
   State<DailyBonusCard> createState() => _DailyBonusCardState();
 }
 
-class _DailyBonusCardState extends State<DailyBonusCard> {
+class _DailyBonusCardState extends State<DailyBonusCard>
+    with SingleTickerProviderStateMixin {
   bool _loading = true;
   bool _claiming = false;
   bool _alreadyClaimed = false;
 
+  late AnimationController _controller;
+  late Animation<double> _scaleAnim;
+
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+      lowerBound: 0.96,
+      upperBound: 1.0,
+      value: 1.0,
+    );
+
+    _scaleAnim = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack,
+    );
+
     _checkClaimed();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _checkClaimed() async {
     try {
       final claimed = await BonusService.hasClaimedToday();
-      if (mounted) {
-        setState(() {
-          _alreadyClaimed = claimed;
-          _loading = false;
-        });
-      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _alreadyClaimed = claimed;
+        _loading = false;
+      });
     } catch (_) {
-      if (mounted) setState(() => _loading = false);
+      if (!mounted) return;
+
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -50,22 +76,25 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
     if (_claiming || _alreadyClaimed) return;
 
     final user = FirebaseAuth.instance.currentUser;
+
     if (user == null || user.isAnonymous) {
-      _showSnack('Login to claim the reward!!', isError: false);
+      _showSnack('Login to claim the reward!', isError: true);
       return;
     }
 
-    setState(() => _claiming = true);
+    _controller.reverse().then((_) => _controller.forward());
+
+    setState(() {
+      _claiming = true;
+    });
 
     try {
-      // ✅ claimBonus writes to Firestore and returns the NEW total coins
       final newTotalCoins = await BonusService.claimBonus(
         bonusCoins: widget.bonus.coins,
       );
 
       if (!mounted) return;
 
-      // ✅ Update Provider → top bar coin count updates instantly
       context.read<UserProgressProvider>().updateCoins(newTotalCoins);
 
       setState(() {
@@ -73,34 +102,43 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
         _claiming = false;
       });
 
-      // ✅ Show reward dialog
+      await Future.delayed(const Duration(milliseconds: 180));
+
+      if (!mounted) return;
+
       await showDialog(
         context: context,
-        barrierColor: ThemeColors.of(context).background.withValues(alpha: 0.7),
         barrierDismissible: false,
-        builder: (_) => RewardDialog(
-          title: 'CONGRATULATIONS!',
-          subtitle: 'REWARD CLAIMED SUCCESSFULLY',
-          coins: widget.bonus.coins,
-          buttonLabel: 'AWESOME',
-          onTap: () => Navigator.pop(context),
-        ),
+        barrierColor: ThemeColors.of(
+          context,
+        ).background.withValues(alpha: 0.72),
+        builder: (_) {
+          return RewardDialog(
+            title: 'CONGRATULATIONS!',
+            subtitle: 'REWARD CLAIMED SUCCESSFULLY',
+            coins: widget.bonus.coins,
+            buttonLabel: 'AWESOME',
+            onTap: () => Navigator.pop(context),
+          );
+        },
       );
     } on AlreadyClaimedException {
-      if (mounted) {
-        setState(() {
-          _alreadyClaimed = true;
-          _claiming = false;
-        });
-        _showSnack('You already claimed today\'s bonus!');
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ Claim error: $e');
-      debugPrint('📍 StackTrace: $stackTrace');
-      if (mounted) {
-        setState(() => _claiming = false);
-        _showSnack('Error: $e');
-      }
+      if (!mounted) return;
+
+      setState(() {
+        _alreadyClaimed = true;
+        _claiming = false;
+      });
+
+      _showSnack('You already claimed today\'s bonus!', isError: false);
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _claiming = false;
+      });
+
+      _showSnack('Something went wrong. Please try again.', isError: true);
     }
   }
 
@@ -111,14 +149,14 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
           msg,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             fontSize: 14,
           ),
         ),
-        backgroundColor: isError ? Colors.redAccent : Colors.green,
+        backgroundColor: isError ? Colors.redAccent : Colors.green.shade600,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         duration: const Duration(seconds: 3),
       ),
     );
@@ -126,133 +164,181 @@ class _DailyBonusCardState extends State<DailyBonusCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      decoration: BoxDecoration(
-        gradient: _alreadyClaimed
-            ? LinearGradient(
-                colors: [
-                  ThemeColors.of(context).cardBg.withValues(alpha: 0.8),
-                  ThemeColors.of(context).cardBg,
+    final theme = ThemeColors.of(context);
+
+    return ScaleTransition(
+      scale: _scaleAnim,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+        decoration: BoxDecoration(
+          gradient: _alreadyClaimed
+              ? LinearGradient(
+                  colors: [theme.cardBg.withValues(alpha: 0.85), theme.cardBg],
+                )
+              : AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(20),
+          border: _alreadyClaimed
+              ? Border.all(color: theme.divider, width: 1)
+              : null,
+          boxShadow: _alreadyClaimed
+              ? []
+              : [
+                  BoxShadow(
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                    color: AppColors.primary.withValues(alpha: 0.22),
+                  ),
                 ],
-              )
-            : AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(20),
-        border: _alreadyClaimed
-            ? Border.all(color: ThemeColors.of(context).divider, width: 1)
-            : null,
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            top: 0,
-            right: 50,
-            child: SvgPicture.asset(
-              'assets/svg/gift.svg',
-              colorFilter: ColorFilter.mode(AppColors.stext, BlendMode.srcIn),
-              height: 40,
-              width: 40,
-            ),
-          ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _alreadyClaimed ? 'Bonus Claimed' : widget.bonus.title,
-                style: TextStyle(
-                  color: _alreadyClaimed
-                      ? ThemeColors.of(context).hText.withValues(alpha: 0.5)
-                      : Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.5,
-                ),
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                _alreadyClaimed
-                    ? 'Come back tomorrow for your next bonus!'
-                    : widget.bonus.subtitle,
-                style: TextStyle(
-                  color: _alreadyClaimed
-                      ? ThemeColors.of(context).stext
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              top: 0,
+              right: 46,
+              child: SvgPicture.asset(
+                'assets/svg/gift.svg',
+                height: 42,
+                width: 42,
+                colorFilter: ColorFilter.mode(
+                  _alreadyClaimed
+                      ? theme.stext
                       : Colors.white.withValues(alpha: 0.9),
+                  BlendMode.srcIn,
                 ),
               ),
+            ),
 
-              const SizedBox(height: 14),
-
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '+${widget.bonus.coins}',
-                        style: TextStyle(
-                          color: _alreadyClaimed
-                              ? ThemeColors.of(
-                                  context,
-                                ).hText.withValues(alpha: 0.5)
-                              : Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _alreadyClaimed ? 'Bonus Claimed' : widget.bonus.title,
+                  style: TextStyle(
+                    color: _alreadyClaimed
+                        ? theme.hText.withValues(alpha: 0.55)
+                        : Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.4,
                   ),
-                  const SizedBox(width: 8),
-                  SvgPicture.asset(
-                    'assets/svg/coin-svgrepo-com.svg',
-                    height: 24,
-                    width: 24,
-                    colorFilter: ColorFilter.mode(
-                      _alreadyClaimed
-                          ? ThemeColors.of(context).stext
-                          : AppColors.doller,
-                      BlendMode.srcIn,
-                    ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  _alreadyClaimed
+                      ? 'Come back tomorrow for your next bonus!'
+                      : widget.bonus.subtitle,
+                  style: TextStyle(
+                    color: _alreadyClaimed
+                        ? theme.stext
+                        : Colors.white.withValues(alpha: 0.92),
+                    fontSize: 13,
                   ),
+                ),
 
-                  const Spacer(),
+                const SizedBox(height: 14),
 
-                  _loading
-                      ? const SizedBox(width: 24, height: 24)
-                      : ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _alreadyClaimed
-                                ? ThemeColors.of(
-                                    context,
-                                  ).background.withValues(alpha: 0.2)
+                // SAME LINE FIXED
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          '+${widget.bonus.coins}',
+                          style: TextStyle(
+                            color: _alreadyClaimed
+                                ? theme.hText.withValues(alpha: 0.55)
                                 : Colors.white,
-                            foregroundColor: _alreadyClaimed
-                                ? ThemeColors.of(context).stext
-                                : AppColors.primary,
-                            fixedSize: const Size.fromHeight(40),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
                           ),
-                          onPressed: (_alreadyClaimed || _claiming)
-                              ? null
-                              : _handleClaim,
-                          child: _claiming
-                              ? const Text('...')
-                              : Text(
-                                  _alreadyClaimed ? 'CLAIMED' : 'CLAIM REWARD',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
                         ),
-                ],
-              ),
-            ],
-          ),
-        ],
+
+                        const SizedBox(width: 8),
+
+                        SvgPicture.asset(
+                          'assets/svg/coin-svgrepo-com.svg',
+                          height: 24,
+                          width: 24,
+                          colorFilter: ColorFilter.mode(
+                            _alreadyClaimed ? theme.stext : AppColors.doller,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(),
+
+                    _loading
+                        ? const SizedBox(
+                            width: 42,
+                            height: 42,
+                            child: Center(
+                              child: SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          )
+                        : SizedBox(
+                            height: 42,
+                            child: ElevatedButton(
+                              onPressed: (_alreadyClaimed || _claiming)
+                                  ? null
+                                  : _handleClaim,
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                minimumSize: const Size(145, 42),
+                                backgroundColor: _alreadyClaimed
+                                    ? theme.background.withValues(alpha: 0.25)
+                                    : Colors.white,
+                                foregroundColor: _alreadyClaimed
+                                    ? theme.stext
+                                    : AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: _claiming
+                                  ? SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.2,
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                  : Text(
+                                      _alreadyClaimed
+                                          ? 'CLAIMED'
+                                          : 'CLAIM REWARD',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

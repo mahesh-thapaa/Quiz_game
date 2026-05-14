@@ -19,11 +19,7 @@ class ProfileStatsRow extends StatelessWidget {
           valueColor: AppColors.hText,
         ),
         _Divider(),
-        _StatCell(
-          label: 'LEVEL',
-          value: '${user.level}',
-          valueColor: AppColors.dShade,
-        ),
+
         _Divider(),
         _StatCell(
           label: 'COINS',

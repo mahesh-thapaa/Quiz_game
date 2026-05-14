@@ -232,8 +232,14 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
 
     final int total = _questions.length;
     final int starsThisAttempt = StarCalculationService.calculateStars(_score);
-    final int coinsEarned = _isFirstPlay ? _score * 10 : 0;
-    final int xpEarned = _isFirstPlay ? _score * 20 : 0;
+
+    // Double rewards for bonus levels (every 6th level in the grid)
+    final bool isBonusLevel = _currentLevelNumber % 6 == 0;
+    final int multiplier = isBonusLevel ? 2 : 1;
+
+    final int coinsEarned = _isFirstPlay ? (_score * 10 * multiplier) : 0;
+    final int xpEarned = _isFirstPlay ? (_score * 20 * multiplier) : 0;
+
     final int starDelta = starsThisAttempt > _bestStarsThisLevel
         ? starsThisAttempt - _bestStarsThisLevel
         : 0;
@@ -377,11 +383,7 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
             LevelCompleteScreen(
               result: _result!,
               levelNumber: _currentLevelNumber,
-              onNextLevel: () {
-                AdDisplayController().handleLevelTransition(
-                  onComplete: _goToNextLevel,
-                );
-              },
+              onNextLevel: _goToNextLevel,
               onReplayLevel: _resetGame,
               onBack: () => _safePop(null),
               onClose: () => _safePop(null),

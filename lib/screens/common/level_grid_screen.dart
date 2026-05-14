@@ -83,45 +83,54 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
     return Scaffold(
       backgroundColor: ThemeColors.of(context).background,
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildHeader()),
-                SliverOpacity(
-                  opacity: _loading ? 0.2 : 1.0,
-                  sliver: _buildGrid(_controller.block1Items),
-                ),
-                SliverOpacity(
-                  opacity: _loading ? 0.2 : 1.0,
-                  sliver: SliverToBoxAdapter(
-                    child: _buildSeparator(
-                      'Earn at least 1 star in previous level to unlock',
+            _buildHeader(),
+            Expanded(
+              child: Stack(
+                children: [
+                  CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverOpacity(
+                        opacity: _loading ? 0.2 : 1.0,
+                        sliver: _buildGrid(_controller.block1Items),
+                      ),
+                      SliverOpacity(
+                        opacity: _loading ? 0.2 : 1.0,
+                        sliver: SliverToBoxAdapter(
+                          child: _buildSeparator(
+                            'Earn at least 1 star in previous level to unlock',
+                          ),
+                        ),
+                      ),
+                      SliverOpacity(
+                        opacity: _loading ? 0.2 : 1.0,
+                        sliver: SliverToBoxAdapter(
+                          child: _buildUnlockNextHeader(),
+                        ),
+                      ),
+                      SliverOpacity(
+                        opacity: _loading ? 0.2 : 1.0,
+                        sliver: _buildGrid(_controller.block2Items),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 50)),
+                    ],
+                  ),
+                  if (_loading || _fetchingQuestions)
+                    IgnorePointer(
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        child: _buildLoading(
+                          message: _fetchingQuestions
+                              ? 'FETCHING QUESTIONS'
+                              : 'LOADING LEVELS',
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                SliverOpacity(
-                  opacity: _loading ? 0.2 : 1.0,
-                  sliver: SliverToBoxAdapter(child: _buildUnlockNextHeader()),
-                ),
-                SliverOpacity(
-                  opacity: _loading ? 0.2 : 1.0,
-                  sliver: _buildGrid(_controller.block2Items),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 50)),
-              ],
-            ),
-            if (_loading || _fetchingQuestions)
-              IgnorePointer(
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  child: _buildLoading(
-                    message: _fetchingQuestions
-                        ? 'FETCHING QUESTIONS'
-                        : 'LOADING LEVELS',
-                  ),
-                ),
+                ],
               ),
+            ),
           ],
         ),
       ),
@@ -223,13 +232,10 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   }
 
   Widget _buildXPChip(String value) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
-      ),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -247,45 +253,85 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           value,
           style: TextStyle(
             color: ThemeColors.of(context).hText,
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
     ),
   );
 
-  Widget _buildCoinChip(String value, {String? suffix}) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+  Widget _buildCoinChip(String value, {String? suffix}) => AnimatedSwitcher(
+    duration: const Duration(milliseconds: 350),
+    transitionBuilder: (child, anim) =>
+        ScaleTransition(scale: anim, child: child),
+    child: Container(
+      key: ValueKey(value),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: ThemeColors.of(context).cardBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: const BoxDecoration(
+              color: AppColors.doller,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text(
+                'S',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: TextStyle(color: ThemeColors.of(context).hText),
+                ),
+                if (suffix != null)
+                  TextSpan(
+                    text: suffix,
+                    style: const TextStyle(color: Color(0xFFFFD700)),
+                  ),
+              ],
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _buildChip(String icon, String value, {String? suffix}) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: ThemeColors.of(context).cardBg,
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
-      ),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 18,
-          height: 18,
-          decoration: const BoxDecoration(
-            color: AppColors.doller,
-            shape: BoxShape.circle,
+        if (icon == '★')
+          const Icon(Icons.star_rounded, color: Color(0xFFFFD700), size: 18)
+        else
+          Text(
+            icon,
+            style: const TextStyle(color: Color(0xFFFFD700), fontSize: 16),
           ),
-          child: const Center(
-            child: Text(
-              'S',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 5),
         Text.rich(
           TextSpan(
             children: [
@@ -299,41 +345,10 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
                   style: const TextStyle(color: Color(0xFFFFD700)),
                 ),
             ],
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           ),
         ),
       ],
-    ),
-  );
-
-  Widget _buildChip(String icon, String value, {String? suffix}) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-    decoration: BoxDecoration(
-      color: ThemeColors.of(context).cardBg,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: ThemeColors.of(context).hText.withValues(alpha: 0.05),
-      ),
-    ),
-    child: Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(
-            text: icon,
-            style: const TextStyle(color: Color(0xFFFFD700)),
-          ),
-          TextSpan(
-            text: ' $value',
-            style: TextStyle(color: ThemeColors.of(context).hText),
-          ),
-          if (suffix != null)
-            TextSpan(
-              text: suffix,
-              style: const TextStyle(color: Color(0xFFFFD700)),
-            ),
-        ],
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-      ),
     ),
   );
 
@@ -440,6 +455,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       QuizSheets.showBonusLevel(
         context: context,
         bonusNumber: item.number! ~/ 6,
+        starsEarned: item.starsEarned,
         onPlay: () => _startQuiz(qs, item.number!, true),
       );
     } else {
@@ -495,10 +511,25 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   Future<void> _onLevelComplete(LevelResultModels res, int gridPos) async {
     final all = [..._controller.block1Items, ..._controller.block2Items];
     int oldStars = 0;
+    int oldBestScore = 0;
+
     for (var t in all) {
-      if (t.number == gridPos) oldStars = t.starsEarned;
+      if (t.number == gridPos) {
+        oldStars = t.starsEarned;
+        oldBestScore = t.bestScore;
+      }
     }
-    int delta = res.starsEarned > oldStars ? res.starsEarned - oldStars : 0;
+
+    // STRICT RULE: If already achieved 3 stars, do nothing
+    if (oldStars >= 3) return;
+
+    int starDelta = res.starsEarned > oldStars ? res.starsEarned - oldStars : 0;
+    int scoreDelta = res.score > oldBestScore ? res.score - oldBestScore : 0;
+
+    // Calculate actual incremental rewards to prevent glitch
+    int multiplier = (gridPos % 6 == 0) ? 2 : 1;
+    int incrementalCoins = scoreDelta * 10 * multiplier;
+    int incrementalXP = scoreDelta * 20 * multiplier;
 
     setState(() {
       for (var t in all) {
@@ -506,22 +537,28 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
           t.starsEarned = res.starsEarned > oldStars
               ? res.starsEarned
               : oldStars;
-          if (t.starsEarned > 0) _controller.unlockNext(gridPos);
+          t.bestScore = res.score > oldBestScore ? res.score : oldBestScore;
+          if (t.starsEarned > 0 || t.bestScore > 0)
+            _controller.unlockNext(gridPos);
         }
       }
       _controller.updateCurrentTile();
     });
 
-    if (delta > 0) {
-      await LevelProgressService.saveLevelStars(
+    if (starDelta > 0 || scoreDelta > 0) {
+      // 1. Update persistent level progress (Stars and Best Score)
+      await LevelProgressService.saveLevelProgress(
         category: widget.categoryId,
         levelNumber: gridPos,
-        starsEarned: res.starsEarned,
+        starsEarned: res.starsEarned > oldStars ? res.starsEarned : oldStars,
+        bestScore: res.score > oldBestScore ? res.score : oldBestScore,
       );
+
+      // 2. Add only the NEW rewards to user's total
       await context.read<UserProgressProvider>().onQuizLevelCompleted(
-        customCoins: res.coinsEarned,
-        customXP: res.xpEarned,
-        earnedStars: delta,
+        customCoins: incrementalCoins,
+        customXP: incrementalXP,
+        earnedStars: starDelta,
       );
     }
   }

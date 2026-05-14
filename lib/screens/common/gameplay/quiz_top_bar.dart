@@ -53,51 +53,44 @@ class QuizTopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          _Chip(
-            icon: Icons.star_rounded,
-            iconColor: AppColors.doller,
-            value: '${p.stars}',
-          ),
+          _XPBadge(xp: p.xp),
           const SizedBox(width: 8),
-          _Chip(
-            icon: Icons.monetization_on_rounded,
-            iconColor: AppColors.doller,
-            value: '${p.coins}',
-          ),
+          _StarsBadge(stars: p.stars),
+          const SizedBox(width: 8),
+          _CoinsBadge(coins: p.coins),
         ],
       ),
     );
   }
 }
 
-class _Chip extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String value;
-
-  const _Chip({
-    required this.icon,
-    required this.iconColor,
-    required this.value,
-  });
+class _XPBadge extends StatelessWidget {
+  final int xp;
+  const _XPBadge({required this.xp});
 
   @override
   Widget build(BuildContext context) {
     final themeColors = ThemeColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: themeColors.divider),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: iconColor, size: 14),
-          const SizedBox(width: 4),
+          const Text(
+            'XP',
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(width: 5),
           Text(
-            value,
+            '$xp',
             style: TextStyle(
               color: themeColors.hText,
               fontSize: 12,
@@ -105,6 +98,93 @@ class _Chip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StarsBadge extends StatelessWidget {
+  final int stars;
+  const _StarsBadge({required this.stars});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: themeColors.cardBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star_rounded, color: AppColors.doller, size: 18),
+          const SizedBox(width: 5),
+          Text(
+            '$stars',
+            style: TextStyle(
+              color: themeColors.hText,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CoinsBadge extends StatelessWidget {
+  final int coins;
+  const _CoinsBadge({required this.coins});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeColors = ThemeColors.of(context);
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (child, anim) =>
+          ScaleTransition(scale: anim, child: child),
+      child: Container(
+        key: ValueKey(coins),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: themeColors.cardBg,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 18,
+              height: 18,
+              decoration: const BoxDecoration(
+                color: AppColors.doller,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '$coins',
+              style: TextStyle(
+                color: themeColors.hText,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

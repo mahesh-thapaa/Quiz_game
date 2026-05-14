@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_overview_model.dart';
-import 'package:provider/provider.dart';
-import 'package:quiz_game/provider/theme_provider.dart';
 
 class QuizSheets {
   /// Shows a centered Level Overview dialog
@@ -31,6 +29,7 @@ class QuizSheets {
   static void showBonusLevel({
     required BuildContext context,
     required int bonusNumber,
+    required int starsEarned,
     required VoidCallback onPlay,
   }) {
     showDialog(
@@ -42,7 +41,7 @@ class QuizSheets {
           title: "BONUS LEVEL",
           subtitle: "DOUBLE XP & COINS",
           description: "Test your football knowledge and earn extra rewards!",
-          starsEarned: 0,
+          starsEarned: starsEarned,
           isBonus: true,
           onPlay: onPlay,
         ),
@@ -171,12 +170,12 @@ class _BaseDialog extends StatelessWidget {
   Widget _buildStars(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: List.generate(3, (index) {
-      bool isFilled = isBonus ? (index == 1) : (index < starsEarned);
+      bool isFilled = index < starsEarned;
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Icon(
-          isBonus ? Icons.star : Icons.star_rounded,
-          size: isBonus && index == 1 ? 48 : 40,
+          Icons.star_rounded,
+          size: index == 1 ? 48 : 40,
           color: isFilled
               ? AppColors.doller
               : ThemeColors.of(context).hText.withValues(alpha: 0.05),

@@ -36,6 +36,8 @@ class AuthController with ChangeNotifier {
       setLoading(false);
       return true;
     } on FirebaseAuthException catch (e) {
+      debugPrint("LOGIN ERROR CODE: ${e.code}");
+      debugPrint("LOGIN ERROR MSG: ${e.message}");
       _errorMessage = _friendlyError(e.code);
       setLoading(false);
       return false;
@@ -101,7 +103,10 @@ class AuthController with ChangeNotifier {
       final cleanUsername = username.trim().toLowerCase();
 
       // 1. Check if username is already taken
-      final usernameDoc = await _db.collection('usernames').doc(cleanUsername).get();
+      final usernameDoc = await _db
+          .collection('usernames')
+          .doc(cleanUsername)
+          .get();
       if (usernameDoc.exists) {
         final existingUid = usernameDoc.data()?['uid'];
         // If it's taken by someone ELSE, it's an error
@@ -151,9 +156,7 @@ class AuthController with ChangeNotifier {
       }, SetOptions(merge: true));
 
       // 2. Reserve the username
-      await _db.collection('usernames').doc(cleanUsername).set({
-        'uid': uid,
-      });
+      await _db.collection('usernames').doc(cleanUsername).set({'uid': uid});
 
       // Initialize streak
       await StreakController.onLogin();
@@ -195,19 +198,28 @@ class AuthController with ChangeNotifier {
   String _friendlyError(String code) {
     switch (code) {
       case 'user-not-found':
-        return 'No account found with this email.';
       case 'wrong-password':
-        return 'Incorrect password. Please try again.';
+      case 'invalid-credential':
+      case 'invalid-login-credentials':
+        return 'Incorrect email or password';
+
       case 'invalid-email':
         return 'Please enter a valid email address.';
+
       case 'too-many-requests':
         return 'Too many attempts. Please try again later.';
+
+      case 'network-request-failed':
+        return 'No internet connection.';
+
       case 'email-already-in-use':
         return 'An account with this email already exists.';
+
       case 'weak-password':
         return 'Password must be at least 6 characters.';
+
       default:
-        return 'Authentication failed. Please try again.';
+        return 'Incorrect email or password';
     }
   }
 }

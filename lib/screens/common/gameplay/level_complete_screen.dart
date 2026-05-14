@@ -218,6 +218,42 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
                 const SizedBox(height: 32),
 
+                if (widget.levelNumber % 6 == 0)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.stars, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'BONUS 2X REWARD!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 Text(
                   'REWARDS EARNED',
                   style: TextStyle(

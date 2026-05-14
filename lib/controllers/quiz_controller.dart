@@ -18,7 +18,7 @@ class QuizController {
 
     try {
       // 1. Load progress
-      final progress = await LevelProgressService.loadAllLevelStars(
+      final progress = await LevelProgressService.loadAllLevelProgress(
         category: categoryId,
       );
 
@@ -105,7 +105,7 @@ class QuizController {
     const String categoryId = 'quick_quiz';
 
     try {
-      final progress = await LevelProgressService.loadAllLevelStars(
+      final progress = await LevelProgressService.loadAllLevelProgress(
         category: categoryId,
       );
 
