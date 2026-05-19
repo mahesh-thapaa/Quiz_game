@@ -1,72 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:quiz_game/models/colors.dart';
-
-// class QuizImageCard extends StatelessWidget {
-//   final String imageUrl;
-
-//   const QuizImageCard({super.key, required this.imageUrl});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: double.infinity,
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(16),
-//         border: Border.all(color: AppColors.outlineBorder, width: 2),
-//         boxShadow: [
-//           BoxShadow(color: AppColors.shadow, blurRadius: 16, spreadRadius: 2),
-//         ],
-//       ),
-//       clipBehavior: Clip.hardEdge,
-//       child: AspectRatio(
-//         aspectRatio: 16 / 9,
-//         child: Container(
-//           color: AppColors.cardBg,
-//           child: imageUrl.startsWith('http')
-//               ? Image.network(
-//                   imageUrl,
-//                   fit: BoxFit.cover,
-//                   alignment: Alignment.center,
-//                   filterQuality: FilterQuality.high,
-//                   loadingBuilder: (context, child, progress) {
-//                     if (progress == null) return child;
-
-//                     return Center(
-//                       child: CircularProgressIndicator(
-//                         color: AppColors.primary,
-//                         value: progress.expectedTotalBytes != null
-//                             ? progress.cumulativeBytesLoaded /
-//                                   progress.expectedTotalBytes!
-//                             : null,
-//                       ),
-//                     );
-//                   },
-//                   errorBuilder: (_, _, _) => _errorPlaceholder(),
-//                 )
-//               : Image.asset(
-//                   imageUrl,
-//                   fit: BoxFit.contain,
-//                   errorBuilder: (_, _, _) => _errorPlaceholder(),
-//                 ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _errorPlaceholder() {
-//     return Container(
-//       color: AppColors.cardBg,
-//       child: const Center(
-//         child: Icon(
-//           Icons.image_not_supported,
-//           color: AppColors.stext,
-//           size: 60,
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -80,10 +11,7 @@ class QuizImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(
-        minHeight: 180, // Maintain a consistent minimum height
-        maxHeight: 250, // Prevent it from taking too much vertical space
-      ),
+      constraints: const BoxConstraints(minHeight: 180, maxHeight: 250),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.outlineBorder, width: 2),
@@ -97,19 +25,6 @@ class QuizImageCard extends StatelessWidget {
         child: imageUrl.startsWith('http')
             ? _SmartNetworkImage(imageUrl: imageUrl)
             : _SmartAssetImage(imageUrl: imageUrl),
-      ),
-    );
-  }
-
-  Widget _errorPlaceholder() {
-    return Container(
-      color: AppColors.cardBg,
-      child: const Center(
-        child: Icon(
-          Icons.image_not_supported,
-          color: AppColors.stext,
-          size: 60,
-        ),
       ),
     );
   }

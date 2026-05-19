@@ -12,7 +12,6 @@ class QuizController {
     required String firestoreName,
     String? quizId,
   }) async {
-    final Map<String, List<QuizQuestion>> questionsByLevel = {};
     final Map<int, String> levelDocIds = {};
     final Map<int, String> bonusSlotToDocId = {};
 
@@ -173,7 +172,6 @@ class QuizController {
       const int questionsPerLevel = 10;
       int maxGridPos = 48; // Max grid positions
 
-      int regularCounter = 1;
       int bonusCounter = 0;
 
       for (int pos = 1; pos <= maxGridPos; pos++) {

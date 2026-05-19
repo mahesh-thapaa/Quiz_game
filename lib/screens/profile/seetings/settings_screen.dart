@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/settings_models.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
 import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/auth/change_password_screen.dart';
@@ -20,14 +19,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late SettingsModel _settings;
-
-  @override
-  void initState() {
-    super.initState();
-    _settings = SettingsModel();
-  }
-
   @override
   Widget build(BuildContext context) {
     final notificationProvider = context.watch<NotificationProvider>();

@@ -95,8 +95,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
             ),
             backgroundColor: Colors.orange.shade700,
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );
@@ -127,8 +128,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
         ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -235,8 +235,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                 const SizedBox(height: 12),
 
                 Text(
-                  'Click the link in your inbox to confirm your email address. '
-                  'This screen will automatically detect when you\'ve verified.',
+                  'Click the link in your inbox to confirm your email address. ',
                   style: TextStyle(color: themeColors.stext, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -244,8 +243,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
 
                 // "Check spam" hint
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(8),
@@ -256,8 +257,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.info_outline,
-                          color: Colors.amber, size: 16),
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.amber,
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
@@ -285,8 +289,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed:
-                        _isCheckingManually ? null : () => _checkVerification(),
+                    onPressed: _isCheckingManually
+                        ? null
+                        : () => _checkVerification(),
                     child: _isCheckingManually
                         ? const SizedBox(
                             width: 22,
@@ -324,10 +329,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed:
-                        (_resendCooldown > 0 || _isSendingEmail)
-                            ? null
-                            : _resendEmail,
+                    onPressed: (_resendCooldown > 0 || _isSendingEmail)
+                        ? null
+                        : _resendEmail,
                     child: _isSendingEmail
                         ? SizedBox(
                             width: 20,
