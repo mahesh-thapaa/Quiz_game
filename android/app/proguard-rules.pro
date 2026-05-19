@@ -6,15 +6,43 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
-# Firebase
+# Firebase - Core
 -keep class com.google.firebase.** { *; }
+-keep class com.google.firebase.messaging.** { *; }
+-keep class com.google.firebase.analytics.** { *; }
 -keep class com.google.android.gms.** { *; }
+
+# Firebase Services - CRITICAL for notifications
+-keep class com.google.firebase.messaging.FirebaseMessagingService { *; }
+-keep class com.google.firebase.messaging.** { *; }
+-keepnames class com.google.firebase.** { *; }
+
+# Google Play Services
+-keepnames class com.google.android.gms.** { *; }
+-keep interface com.google.android.gms.** { *; }
 
 # Cloudinary
 -keep class com.cloudinary.** { *; }
 
-# Local Notifications
+# Local Notifications - CRITICAL for scheduled notifications
 -keep class com.dexterous.flutterlocalnotifications.** { *; }
+-keep class com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver { *; }
+-keep class com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver { *; }
+-keep class com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver { *; }
+-keep class com.dexterous.flutterlocalnotifications.ForegroundService { *; }
+
+# Timezone library - CRITICAL for scheduled notifications
+-keep class com.arthenica.ffmpeg.** { *; }
+-keep class org.joda.time.** { *; }
+
+# Alarm Manager - needed for exact alarms
+-keepnames class android.app.AlarmManager
+-keepnames class android.app.PendingIntent
+
+# Gson rules - CRITICAL for flutter_local_notifications serializing notification data
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
 # Play Core (referenced by Flutter's deferred components, not used)
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication

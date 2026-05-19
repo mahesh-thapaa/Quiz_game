@@ -99,8 +99,12 @@ class LeaderboardProvider extends ChangeNotifier {
               );
             }).toList();
 
-            // 🔥 Sort by XP
-            entries.sort((a, b) => b.xpPoints.compareTo(a.xpPoints));
+            // 🔥 Sort by XP, then alphabetically if XP is equal
+            entries.sort((a, b) {
+              final xpCompare = b.xpPoints.compareTo(a.xpPoints);
+              if (xpCompare != 0) return xpCompare;
+              return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+            });
 
             // 🔥 Assign rank
             _allUsers = List.generate(entries.length, (i) {
@@ -154,7 +158,12 @@ class LeaderboardProvider extends ChangeNotifier {
         );
       }).toList();
 
-      entries.sort((a, b) => b.xpPoints.compareTo(a.xpPoints));
+      // 🔥 Sort by XP, then alphabetically if XP is equal
+      entries.sort((a, b) {
+        final xpCompare = b.xpPoints.compareTo(a.xpPoints);
+        if (xpCompare != 0) return xpCompare;
+        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      });
 
       _allUsers = List.generate(entries.length, (i) {
         return entries[i].copyWith(rank: i + 1);

@@ -190,7 +190,8 @@ class AuthController with ChangeNotifier {
         'uid': uid,
         'username': username.trim(),
         'email': email.trim(),
-        'isGuest': false, // ✅ Convert to a fully registered user (no longer guest)
+        'isGuest':
+            false, // ✅ Convert to a fully registered user (no longer guest)
         if (!wasGuest) ...{
           'bio': '',
           'avatarUrl': '',

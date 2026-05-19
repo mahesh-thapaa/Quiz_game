@@ -71,28 +71,33 @@ class NotificationController {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    await _notificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'daily_reminders',
-          'Daily Reminders',
-          channelDescription: 'Daily challenge and streak reminders',
-          importance: Importance.max,
-          priority: Priority.high,
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'daily_reminders',
+            'Daily Reminders',
+            channelDescription: 'Daily challenge and streak reminders',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents:
-          DateTimeComponents.time, // This makes it repeat daily
-    );
-    debugPrint('Scheduled notification $id at $hour:$minute');
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, // ✅ Safe & robust (avoids SecurityException on Android 13/14+)
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents:
+            DateTimeComponents.time, // This makes it repeat daily
+      );
+      debugPrint('✅ Scheduled notification $id at $hour:$minute');
+    } catch (e, stack) {
+      debugPrint('❌ Failed to schedule notification $id: $e');
+      debugPrint('Stacktrace: $stack');
+    }
   }
 
   Future<void> cancelAllNotifications() async {
