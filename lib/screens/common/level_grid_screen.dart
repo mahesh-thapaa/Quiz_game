@@ -382,7 +382,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       String? levelDocId =
           QuizController.isBonusLevel(pos, categoryId: widget.categoryId)
           ? _bonusSlotToDocId[(pos ~/ 6) - 1]
-          : _levelDocIds[pos - (pos ~/ 6)];
+          : _levelDocIds[pos];
 
       if (levelDocId != null) {
         try {
@@ -462,7 +462,7 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
       QuizSheets.showLevelOverview(
         context: context,
         model: LevelOverviewModel(
-          levelNumber: item.number! - (item.number! ~/ 6),
+          levelNumber: item.number!,
           starsEarned: item.starsEarned,
           levelName: widget.title,
           description: 'Test your knowledge and earn 3 stars',
@@ -538,8 +538,9 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
               ? res.starsEarned
               : oldStars;
           t.bestScore = res.score > oldBestScore ? res.score : oldBestScore;
-          if (t.starsEarned > 0 || t.bestScore > 0)
+          if (t.starsEarned > 0 || t.bestScore > 0) {
             _controller.unlockNext(gridPos);
+          }
         }
       }
       _controller.updateCurrentTile();

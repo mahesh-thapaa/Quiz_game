@@ -21,6 +21,7 @@ import 'package:quiz_game/services/ads/ad_service.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 
 /// Background notification handler
+@pragma('vm:entry-point')
 Future<void> _backgroundMessageHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

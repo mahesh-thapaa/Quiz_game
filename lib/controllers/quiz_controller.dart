@@ -44,13 +44,30 @@ class QuizController {
       if (quizDoc != null) {
         final levelsSnap = await quizDoc.reference.collection('levels').get();
 
-        int bonusCounter = 0;
-        for (var doc in levelsSnap.docs) {
+        // 3. Process levels (Sort them first to ensure bonus slots align)
+        final levels = levelsSnap.docs.map((doc) {
           final data = doc.data();
+          dynamic rawNum = data['levelNumber'];
+          int num = 0;
+          if (rawNum is int) {
+            num = rawNum;
+          } else if (rawNum is String) {
+            num = int.tryParse(rawNum.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+          }
+          if (num == 0) {
+            num = int.tryParse(doc.id.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+          }
+          return {'doc': doc, 'num': num, 'isBonus': data['isBonus'] ?? false};
+        }).toList();
 
-          // Try to get level number from field, fallback to doc ID
-          int num = data['levelNumber'] ?? int.tryParse(doc.id) ?? 0;
-          final bool isBonus = data['isBonus'] ?? false;
+        // Sort by level number
+        levels.sort((a, b) => (a['num'] as int).compareTo(b['num'] as int));
+
+        int bonusCounter = 0;
+        for (var item in levels) {
+          final doc = item['doc'] as QueryDocumentSnapshot;
+          final int num = item['num'] as int;
+          final bool isBonus = item['isBonus'] as bool;
 
           if (isBonus) {
             bonusSlotToDocId[bonusCounter++] = doc.id;
@@ -64,15 +81,12 @@ class QuizController {
         'progress': progress,
         'levelDocIds': levelDocIds,
         'bonusSlotToDocId': bonusSlotToDocId,
-        'quizDocReference': quizDoc?.reference, // Store for future question fetching
+        'quizDocReference':
+            quizDoc?.reference, // Store for future question fetching
       };
     } catch (e) {
       debugPrint('❌ QuizController Error: $e');
-      return {
-        'progress': {},
-        'levelDocIds': {},
-        'bonusSlotToDocId': {},
-      };
+      return {'progress': {}, 'levelDocIds': {}, 'bonusSlotToDocId': {}};
     }
   }
 
@@ -113,7 +127,7 @@ class QuizController {
       final List<String> categories = [
         'Player Quiz',
         'Stadium Quiz',
-        'Jersey Quiz',
+        'Jursey Quiz',
         'Logo Master',
       ];
 
@@ -174,7 +188,7 @@ class QuizController {
         if (pos % 6 == 0) {
           bonusSlotToDocId[bonusCounter++] = levelId;
         } else {
-          levelDocIds[regularCounter++] = levelId;
+          levelDocIds[pos] = levelId;
         }
       }
 
@@ -200,7 +214,7 @@ class QuizController {
     if (gridPos % 6 == 0) {
       return "BONUS LEVEL ${gridPos ~/ 6}";
     } else {
-      return "LEVEL ${gridPos - (gridPos ~/ 6)}";
+      return "LEVEL $gridPos";
     }
   }
 

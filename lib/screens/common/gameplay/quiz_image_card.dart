@@ -165,7 +165,7 @@ class _SmartNetworkImageState extends State<_SmartNetworkImage> {
           ),
         );
       },
-      errorBuilder: (_, __, ___) => _errorBox(),
+      errorBuilder: (_, _, _) => _errorBox(),
     );
   }
 }
@@ -206,7 +206,7 @@ class _SmartAssetImageState extends State<_SmartAssetImage> {
       width: double.infinity,
       height: double.infinity,
       alignment: Alignment.center,
-      errorBuilder: (_, __, ___) => _errorBox(),
+      errorBuilder: (_, _, _) => _errorBox(),
     );
   }
 }
@@ -222,7 +222,7 @@ Future<ImageInfo> _getImageInfo(ImageProvider provider) {
       completer.complete(info);
       stream.removeListener(listener);
     },
-    onError: (_, __) {
+    onError: (_, _) {
       completer.completeError('Image load failed');
       stream.removeListener(listener);
     },

@@ -32,7 +32,7 @@ class LevelGridController {
       return QuizLevelTile(
         hasStar: QuizController.isBonusLevel(gridPos, categoryId: categoryId),
         number: gridPos,
-        isUnlocked: gridPos == 1, // Only first level unlocked by default
+        isUnlocked: gridPos == 1,
         starsEarned: 0,
       );
     });
@@ -89,7 +89,7 @@ class LevelGridController {
   }) {
     String? id = QuizController.isBonusLevel(pos, categoryId: categoryId)
         ? bonusSlotToDocId[(pos ~/ 6) - 1]
-        : levelDocIds[pos - (pos ~/ 6)];
+        : levelDocIds[pos];
     return id != null ? (questionsByLevel[id] ?? []) : [];
   }
 }

@@ -28,6 +28,32 @@ class _LoginState extends State<Login> {
       if (success) {
         final p = context.read<UserProgressProvider>();
         await Future.wait([p.loadFromFirestore(), p.initStreak(isLogin: true)]);
+        
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+        );
+        return;
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              auth.errorMessage.isNotEmpty 
+                  ? auth.errorMessage 
+                  : 'Guest login failed. Please try again.',
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
       }
     } catch (e) {
       debugPrint('❌ Login _goToHome error: $e');
@@ -35,11 +61,6 @@ class _LoginState extends State<Login> {
 
     if (!mounted) return;
     setState(() => _isLoading = false);
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-    );
   }
 
   void _goToEmailSignup() {

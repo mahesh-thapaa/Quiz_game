@@ -14,6 +14,35 @@ class AuthController with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
+  /// Returns true if the currently signed-in user has verified their email.
+  bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
+
+  /// Sends (or re-sends) a verification email to the current user.
+  Future<void> sendVerificationEmail() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        debugPrint('📧 Verification email sent to ${user.email}');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to send verification email: $e');
+    }
+  }
+
+  /// Reloads the Firebase user token and returns true if email is now verified.
+  Future<bool> checkEmailVerified() async {
+    try {
+      await _auth.currentUser?.reload();
+      final verified = _auth.currentUser?.emailVerified ?? false;
+      notifyListeners();
+      return verified;
+    } catch (e) {
+      debugPrint('❌ checkEmailVerified error: $e');
+      return false;
+    }
+  }
+
   void clearError() {
     _errorMessage = '';
     notifyListeners();
@@ -29,10 +58,19 @@ class AuthController with ChangeNotifier {
     _errorMessage = '';
 
     try {
-      await _auth.signInWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );
+
+      // ✅ Block unverified email users
+      if (credential.user != null && !credential.user!.emailVerified) {
+        _errorMessage =
+            'Please verify your email before logging in. Check your inbox.';
+        setLoading(false);
+        return false;
+      }
+
       setLoading(false);
       return true;
     } on FirebaseAuthException catch (e) {
@@ -76,12 +114,21 @@ class AuthController with ChangeNotifier {
       } else {
         debugPrint('🏠 Existing guest document found.');
       }
-
       setLoading(false);
       return true;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('❌ Guest login Firebase error: ${e.code} - ${e.message}');
+      if (e.code == 'admin-restricted-operation') {
+        _errorMessage =
+            'Anonymous sign-in is disabled in your Firebase console. Please enable it in: Firebase Console -> Authentication -> Sign-in method.';
+      } else {
+        _errorMessage = e.message ?? 'Guest login failed. Please try again.';
+      }
+      setLoading(false);
+      return false;
     } catch (e) {
       debugPrint('❌ Guest login failed: $e');
-      _errorMessage = 'Guest login failed. Please try again.';
+      _errorMessage = 'Guest login failed: ${e.toString()}';
       setLoading(false);
       return false;
     }
@@ -143,6 +190,7 @@ class AuthController with ChangeNotifier {
         'uid': uid,
         'username': username.trim(),
         'email': email.trim(),
+        'isGuest': false, // ✅ Convert to a fully registered user (no longer guest)
         if (!wasGuest) ...{
           'bio': '',
           'avatarUrl': '',
@@ -160,6 +208,10 @@ class AuthController with ChangeNotifier {
 
       // Initialize streak
       await StreakController.onLogin();
+
+      // 📧 Send verification email so we know the address is real
+      await userCredential.user?.sendEmailVerification();
+      debugPrint('📧 Verification email sent to ${userCredential.user?.email}');
 
       setLoading(false);
       return true;

@@ -7,6 +7,7 @@ import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/login.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/controllers/fcm_notification_controller.dart';
+import 'package:quiz_game/auth/email_verification_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -82,20 +83,33 @@ class _SplashScreenState extends State<SplashScreen>
         _progressCtrl.forward().then((_) async {
           if (!mounted) return;
 
-          // ✅ AUTO-LOGIN: Skip login screen if user is already authenticated
+          // ✅ AUTO-LOGIN: Skip login screen if user is already authenticated and verified
           final user = FirebaseAuth.instance.currentUser;
           if (user != null) {
-            final p = context.read<UserProgressProvider>();
-            await Future.wait([
-              p.loadFromFirestore(),
-              p.initStreak(isLogin: true),
-            ]);
+            // Check if user is a guest (anonymous) or has a verified email
+            final isGuest = user.isAnonymous;
+            final isVerified = user.emailVerified;
 
-            if (!mounted) return;
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const MainScreen()),
-            );
+            if (isGuest || isVerified) {
+              final p = context.read<UserProgressProvider>();
+              await Future.wait([
+                p.loadFromFirestore(),
+                p.initStreak(isLogin: true),
+              ]);
+
+              if (!mounted) return;
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MainScreen()),
+              );
+            } else {
+              // Not verified yet! Send back to verification screen.
+              if (!mounted) return;
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const EmailVerificationScreen()),
+              );
+            }
           } else {
             Navigator.pushReplacement(
               context,

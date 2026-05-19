@@ -7,6 +7,7 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_signup.dart';
+import 'package:quiz_game/auth/email_verification_screen.dart';
 
 class EmailLogin extends StatefulWidget {
   const EmailLogin({super.key});
@@ -21,6 +22,18 @@ class _EmailLoginState extends State<EmailLogin> {
   final _formKey = GlobalKey<FormState>();
 
   bool _obscurePassword = true;
+  bool _isUnverified = false; // true when login blocked by unverified email
+
+  @override
+  void initState() {
+    super.initState();
+    // Clear residual errors from previous auth attempts when entering login screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<AuthController>().clearError();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -33,6 +46,7 @@ class _EmailLoginState extends State<EmailLogin> {
     if (!_formKey.currentState!.validate()) return;
 
     FocusScope.of(context).unfocus();
+    setState(() => _isUnverified = false);
 
     final auth = context.read<AuthController>();
 
@@ -42,6 +56,13 @@ class _EmailLoginState extends State<EmailLogin> {
     );
 
     if (!mounted) return;
+
+    // Check if blocked by unverified email
+    if (!success &&
+        auth.errorMessage.contains('verify your email')) {
+      setState(() => _isUnverified = true);
+      return;
+    }
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,6 +118,69 @@ class _EmailLoginState extends State<EmailLogin> {
         ),
       );
     } catch (_) {}
+  }
+
+  /// Shown below the error box when login is blocked by unverified email.
+  List<Widget> _buildVerificationHelpers(BuildContext context) {
+    final auth = context.read<AuthController>();
+    return [
+      const SizedBox(height: 12),
+      SizedBox(
+        width: double.infinity,
+        height: 46,
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.email_outlined, size: 18),
+          label: const Text(
+            'Resend Verification Email',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: () async {
+            await auth.sendVerificationEmail();
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  '📧 Verification email sent! Check your inbox.',
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.all(16),
+              ),
+            );
+          },
+        ),
+      ),
+      const SizedBox(height: 10),
+      GestureDetector(
+        onTap: () => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const EmailVerificationScreen(),
+          ),
+        ),
+        child: const Text(
+          'Go to verification screen →',
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+      const SizedBox(height: 16),
+    ];
   }
 
   @override
@@ -243,6 +327,9 @@ class _EmailLoginState extends State<EmailLogin> {
                         style: const TextStyle(color: Colors.red, fontSize: 13),
                       ),
                     ),
+
+                  // Unverified email helpers
+                  if (_isUnverified) ..._buildVerificationHelpers(context),
 
                   /// LOGIN BUTTON
                   SizedBox(

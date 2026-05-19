@@ -34,7 +34,6 @@ class LeaderboardEntry {
     int? rank,
     int? rankChange,
     bool? isCurrentUser,
-    int? level,
     int? coins,
     String? name,
     String? bio,

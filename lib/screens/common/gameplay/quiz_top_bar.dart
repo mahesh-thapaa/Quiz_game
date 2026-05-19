@@ -20,43 +20,44 @@ class QuizTopBar extends StatelessWidget {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(
-              Icons.chevron_left,
-              color: themeColors.hText,
-              size: 28,
-            ),
+            icon: Icon(Icons.chevron_left, color: themeColors.hText, size: 28),
             onPressed: onBack,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(width: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'GOALIQ',
-                style: TextStyle(
-                  color: themeColors.stext,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'GOALIQ',
+                  style: TextStyle(
+                    color: themeColors.stext,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ),
-              Text(
-                title,
-                style: TextStyle(
-                  color: themeColors.hText,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.3,
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: themeColors.hText,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.3,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           _XPBadge(xp: p.xp),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           _StarsBadge(stars: p.stars),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           _CoinsBadge(coins: p.coins),
         ],
       ),
@@ -72,7 +73,7 @@ class _XPBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeColors = ThemeColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
@@ -111,7 +112,7 @@ class _StarsBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeColors = ThemeColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
         color: themeColors.cardBg,
         borderRadius: BorderRadius.circular(20),
@@ -148,7 +149,7 @@ class _CoinsBadge extends StatelessWidget {
           ScaleTransition(scale: anim, child: child),
       child: Container(
         key: ValueKey(coins),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: themeColors.cardBg,
           borderRadius: BorderRadius.circular(20),

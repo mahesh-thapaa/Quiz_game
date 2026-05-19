@@ -75,7 +75,14 @@ class LeaderboardProvider extends ChangeNotifier {
             debugPrint(
               '✅ LeaderboardProvider: Snapshot received. Docs: ${snapshot.docs.length}',
             );
-            final entries = snapshot.docs.map((doc) {
+            
+            // Exclude guests from the regular ranked entries
+            final docs = snapshot.docs.where((doc) {
+              final data = doc.data();
+              return data['isGuest'] != true;
+            }).toList();
+
+            final entries = docs.map((doc) {
               final data = doc.data();
               final isMe = doc.id == uid;
 
@@ -125,7 +132,12 @@ class LeaderboardProvider extends ChangeNotifier {
     try {
       final snapshot = await _db.collection('users').get();
 
-      final entries = snapshot.docs.map((doc) {
+      final docs = snapshot.docs.where((doc) {
+        final data = doc.data();
+        return data['isGuest'] != true;
+      }).toList();
+
+      final entries = docs.map((doc) {
         final data = doc.data();
         final isMe = doc.id == uid;
 

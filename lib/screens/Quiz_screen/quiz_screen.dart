@@ -34,7 +34,7 @@ class QuizScreen extends StatelessWidget {
         subtitle: "Guess the team",
         image: "assets/images/jursey.jpg",
         categoryId: 'jersey_quiz',
-        firestoreName: 'Jersey Quiz',
+        firestoreName: 'Jursey Quiz',
       ),
       QuizModel(
         title: "Logo Master",

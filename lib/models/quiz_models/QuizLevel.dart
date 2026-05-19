@@ -63,10 +63,11 @@ class QuizQuestion {
       title: data['title'] as String? ?? '',
       options: options,
       correctAnswerIndex: data['correctAnswerIndex'] as int? ?? 0,
-      imageUrl: ((data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
-              ? data['imageUrl'] as String?
-              : data['imagePath'] as String?)
-          ?.replaceAll('asstes/', 'assets/'),
+      imageUrl:
+          ((data['imageUrl'] != null && data['imageUrl'].toString().isNotEmpty)
+                  ? data['imageUrl'] as String?
+                  : data['imagePath'] as String?)
+              ?.replaceAll('asstes/', 'assets/'),
       order: data['order'] as int? ?? 0,
       levelId: data['levelId'] as String? ?? '',
       quizId: data['quizId'] as String? ?? '',

@@ -4,6 +4,7 @@ import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
+import 'package:quiz_game/auth/email_verification_screen.dart';
 import 'package:quiz_game/auth/email_login.dart';
 
 class EmailSignup extends StatefulWidget {
@@ -20,6 +21,18 @@ class _EmailSignupState extends State<EmailSignup> {
   final _formKey = GlobalKey<FormState>();
 
   bool _obscurePassword = true;
+  bool _isGuestLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Clear residual errors from previous auth attempts when entering signup screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<AuthController>().clearError();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -27,6 +40,34 @@ class _EmailSignupState extends State<EmailSignup> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _goToGuest() async {
+    setState(() => _isGuestLoading = true);
+
+    try {
+      final auth = context.read<AuthController>();
+      final success = await auth.signInAnonymously();
+
+      if (success) {
+        final p = context.read<UserProgressProvider>();
+        await Future.wait([p.loadFromFirestore(), p.initStreak(isLogin: true)]);
+        
+        if (!mounted) return;
+        setState(() => _isGuestLoading = false);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainScreen()),
+        );
+        return;
+      }
+    } catch (e) {
+      debugPrint('❌ Signup _goToGuest error: $e');
+    }
+
+    if (!mounted) return;
+    setState(() => _isGuestLoading = false);
   }
 
   Future<void> _submit() async {
@@ -47,10 +88,12 @@ class _EmailSignupState extends State<EmailSignup> {
     if (!mounted) return;
 
     if (success) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
-            "Account created successfully!!",
+            "Account created! Check your email to verify your address.",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           ),
           backgroundColor: Colors.green,
@@ -59,18 +102,14 @@ class _EmailSignupState extends State<EmailSignup> {
             borderRadius: BorderRadius.circular(14),
           ),
           margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 3),
         ),
       );
 
-      final p = context.read<UserProgressProvider>();
-      await p.clearAndReload();
-
-      if (!mounted) return;
-
+      // Navigate to email verification screen — NOT main screen yet
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
+        MaterialPageRoute(builder: (_) => const EmailVerificationScreen()),
       );
     }
   }
@@ -284,6 +323,38 @@ class _EmailSignupState extends State<EmailSignup> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: themeColors.divider),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: (_isGuestLoading || isLoading) ? null : _goToGuest,
+                        child: _isGuestLoading
+                            ? SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: themeColors.hText,
+                                ),
+                              )
+                            : Text(
+                                'Continue as Guest',
+                                style: TextStyle(
+                                  color: themeColors.hText,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
                     ),
                   ],
                 ),
