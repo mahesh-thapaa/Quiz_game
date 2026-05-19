@@ -14,15 +14,15 @@ class AuthController with ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  /// Returns true if the currently signed-in user has verified their email.
   bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
 
-  /// Sends (or re-sends) a verification email to the current user.
   Future<void> sendVerificationEmail() async {
     try {
       final user = _auth.currentUser;
+
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
+
         debugPrint('📧 Verification email sent to ${user.email}');
       }
     } catch (e) {
@@ -30,15 +30,18 @@ class AuthController with ChangeNotifier {
     }
   }
 
-  /// Reloads the Firebase user token and returns true if email is now verified.
   Future<bool> checkEmailVerified() async {
     try {
       await _auth.currentUser?.reload();
+
       final verified = _auth.currentUser?.emailVerified ?? false;
+
       notifyListeners();
+
       return verified;
     } catch (e) {
       debugPrint('❌ checkEmailVerified error: $e');
+
       return false;
     }
   }
@@ -55,6 +58,7 @@ class AuthController with ChangeNotifier {
 
   Future<bool> signIn({required String email, required String password}) async {
     setLoading(true);
+
     _errorMessage = '';
 
     try {
@@ -63,43 +67,62 @@ class AuthController with ChangeNotifier {
         password: password.trim(),
       );
 
-      // ✅ Block unverified email users
-      if (credential.user != null && !credential.user!.emailVerified) {
-        _errorMessage =
-            'Please verify your email before logging in. Check your inbox.';
+      // Reload user
+      await credential.user?.reload();
+
+      final freshUser = _auth.currentUser;
+
+      if (freshUser != null && !freshUser.emailVerified) {
+        await _auth.signOut();
+
+        _errorMessage = 'Please verify your email before logging in.';
+
         setLoading(false);
+
         return false;
       }
 
       setLoading(false);
+
       return true;
     } on FirebaseAuthException catch (e) {
       debugPrint("LOGIN ERROR CODE: ${e.code}");
+
       debugPrint("LOGIN ERROR MSG: ${e.message}");
+
       _errorMessage = _friendlyError(e.code);
+
       setLoading(false);
+
       return false;
     } catch (e) {
       _errorMessage = 'Something went wrong. Please try again.';
+
       setLoading(false);
+
       return false;
     }
   }
 
-  /// Guest Login: Persistent anonymous session
   Future<bool> signInAnonymously() async {
     setLoading(true);
+
     _errorMessage = '';
+
     try {
       final credential = await _auth.signInAnonymously();
+
       final uid = credential.user!.uid;
+
       debugPrint('👤 Anonymous Auth Success: UID = $uid');
 
-      // Ensure a basic user document exists for the guest
       final userDoc = await _db.collection('users').doc(uid).get();
+
       if (!userDoc.exists) {
-        debugPrint('🆕 Creating new guest document in Firestore...');
+        debugPrint('🆕 Creating new guest document...');
+
         await _db.collection('users').doc(uid).set({
+          'uid': uid,
           'username': 'Guest',
           'bio': 'Playing as Guest',
           'Coin': 0,
@@ -110,26 +133,34 @@ class AuthController with ChangeNotifier {
           'QuizLevelsInSection': 0,
           'isGuest': true,
         });
+
         debugPrint('✅ Guest document created successfully.');
       } else {
         debugPrint('🏠 Existing guest document found.');
       }
+
       setLoading(false);
+
       return true;
     } on FirebaseAuthException catch (e) {
-      debugPrint('❌ Guest login Firebase error: ${e.code} - ${e.message}');
+      debugPrint('❌ Guest login Firebase error: ${e.code}');
+
       if (e.code == 'admin-restricted-operation') {
-        _errorMessage =
-            'Anonymous sign-in is disabled in your Firebase console. Please enable it in: Firebase Console -> Authentication -> Sign-in method.';
+        _errorMessage = 'Anonymous sign-in is disabled in Firebase Console.';
       } else {
         _errorMessage = e.message ?? 'Guest login failed. Please try again.';
       }
+
       setLoading(false);
+
       return false;
     } catch (e) {
       debugPrint('❌ Guest login failed: $e');
+
       _errorMessage = 'Guest login failed: ${e.toString()}';
+
       setLoading(false);
+
       return false;
     }
   }
@@ -141,25 +172,29 @@ class AuthController with ChangeNotifier {
     required UserProgressProvider provider,
   }) async {
     setLoading(true);
+
     _errorMessage = '';
 
     final user = _auth.currentUser;
+
     final bool wasGuest = user != null && user.isAnonymous;
 
     try {
       final cleanUsername = username.trim().toLowerCase();
 
-      // 1. Check if username is already taken
       final usernameDoc = await _db
           .collection('usernames')
           .doc(cleanUsername)
           .get();
+
       if (usernameDoc.exists) {
         final existingUid = usernameDoc.data()?['uid'];
-        // If it's taken by someone ELSE, it's an error
+
         if (existingUid != null && existingUid != user?.uid) {
           _errorMessage = 'Username already taken';
+
           setLoading(false);
+
           return false;
         }
       }
@@ -172,26 +207,42 @@ class AuthController with ChangeNotifier {
       UserCredential userCredential;
 
       if (wasGuest) {
-        debugPrint('🔗 Linking guest account to email: $email');
+        debugPrint('🔗 Linking guest account...');
+
         userCredential = await user.linkWithCredential(credential);
       } else {
-        debugPrint('🆕 Creating new fresh account...');
+        debugPrint('🆕 Creating new account...');
+
         userCredential = await _auth.createUserWithEmailAndPassword(
           email: email.trim(),
           password: password.trim(),
         );
       }
 
-      final uid = userCredential.user!.uid;
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser == null) {
+        _errorMessage = 'Failed to create account.';
+
+        setLoading(false);
+
+        return false;
+      }
+
+      final uid = firebaseUser.uid;
+
+      await firebaseUser.updateDisplayName(username.trim());
+
+      await firebaseUser.reload();
+
       debugPrint('✨ Account Ready: UID = $uid');
 
-      // Update or Create user record in 'users' collection
       await _db.collection('users').doc(uid).set({
         'uid': uid,
         'username': username.trim(),
         'email': email.trim(),
-        'isGuest':
-            false, // ✅ Convert to a fully registered user (no longer guest)
+        'isGuest': false,
+
         if (!wasGuest) ...{
           'bio': '',
           'avatarUrl': '',
@@ -204,34 +255,46 @@ class AuthController with ChangeNotifier {
         },
       }, SetOptions(merge: true));
 
-      // 2. Reserve the username
       await _db.collection('usernames').doc(cleanUsername).set({'uid': uid});
 
-      // Initialize streak
       await StreakController.onLogin();
 
-      // 📧 Send verification email so we know the address is real
-      await userCredential.user?.sendEmailVerification();
-      debugPrint('📧 Verification email sent to ${userCredential.user?.email}');
+      await firebaseUser.sendEmailVerification();
+
+      debugPrint('📧 Verification email sent to ${firebaseUser.email}');
+
+      await _auth.signOut();
 
       setLoading(false);
+
       return true;
     } on FirebaseAuthException catch (e) {
+      debugPrint('❌ SIGNUP ERROR: ${e.code}');
+
       _errorMessage = _friendlyError(e.code);
+
       setLoading(false);
+
       return false;
     } catch (e) {
+      debugPrint('❌ SIGNUP ERROR: $e');
+
       _errorMessage = 'Something went wrong. Please try again.';
+
       setLoading(false);
+
       return false;
     }
   }
 
   Future<void> resetPassword(String email) async {
     _errorMessage = '';
+
     if (email.isEmpty || !email.contains('@')) {
       _errorMessage = 'Enter your email above to reset password.';
+
       notifyListeners();
+
       return;
     }
 
@@ -239,11 +302,15 @@ class AuthController with ChangeNotifier {
       await _auth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
       _errorMessage = _friendlyError(e.code);
+
       notifyListeners();
+
       rethrow;
     } catch (e) {
       _errorMessage = 'Something went wrong.';
+
       notifyListeners();
+
       rethrow;
     }
   }

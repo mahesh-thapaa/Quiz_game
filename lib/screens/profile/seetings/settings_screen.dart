@@ -1,5 +1,3 @@
-// lib/screens/settings/settings_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -8,7 +6,6 @@ import 'package:quiz_game/provider/theme_provider.dart';
 import 'package:quiz_game/auth/change_password_screen.dart';
 import 'widgets/settings_toggle_tile.dart';
 import 'widgets/settings_arrow_tile.dart';
-// import 'widgets/settings_dropdown_tile.dart';
 import 'widgets/settings_section_header.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -66,13 +63,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: notificationProvider.notificationsEnabled,
                   onChanged: (v) => notificationProvider.toggleNotifications(v),
                 ),
-                // _TileDivider(),
-                // SettingsToggleTile(
-                //   icon: Icons.volume_up_outlined,
-                //   label: 'Sound Effects',
-                //   value: _settings.soundEffects,
-                //   onChanged: (v) => setState(() => _settings.soundEffects = v),
-                // ),
               ],
             ),
 
@@ -94,18 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
 
-            // const SettingsSectionHeader(title: 'PREFERENCES'),
-            // _SectionCard(
-            //   children: [
-            //     SettingsDropdownTile(
-            //       icon: Icons.language_outlined,
-            //       label: 'Language',
-            //       value: _settings.language,
-            //       options: _languages,
-            //       onChanged: (v) => setState(() => _settings.language = v),
-            //     ),
-            // ],
-            // ),
             const SizedBox(height: 40),
             Center(
               child: Text(
