@@ -2,13 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-
-class BottomNavItemModel {
-  final IconData icon;
-  final String label;
-
-  const BottomNavItemModel({required this.icon, required this.label});
-}
+import 'package:quiz_game/models/home_models/button_nav_bar_models.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -39,33 +33,7 @@ class AppBottomNav extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 6), // ← equal top/bottom
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          // children: List.generate(items.length, (i) {
-          //   final active = i == currentIndex;
-          //   return GestureDetector(
-          //     onTap: () => onTap(i),
-          //     child: Column(
-          //       mainAxisSize: MainAxisSize.min,
-          //       mainAxisAlignment: MainAxisAlignment.center,
-          //       children: [
-          //         Icon(
-          //           items[i].icon,
-          //           color: active ? AppColors.primary : themeColors.stext,
-          //           size: 22,
-          //         ),
-          //         const SizedBox(height: 4),
-          //         Text(
-          //           items[i].label,
-          //           style: TextStyle(
-          //             color: active ? AppColors.primary : themeColors.stext,
-          //             fontSize: 10,
-          //             fontWeight: FontWeight.w700,
-          //             letterSpacing: 0.8,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   );
-          // }),
+
           children: List.generate(items.length, (i) {
             final active = i == currentIndex;
 
