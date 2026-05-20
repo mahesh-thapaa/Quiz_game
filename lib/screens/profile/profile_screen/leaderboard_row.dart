@@ -121,15 +121,14 @@ class LeaderboardRow extends StatelessWidget {
                   isGuest
                       ? 'Guest (You)'
                       : (isCurrentUser
-                          ? '${p.username.isNotEmpty ? p.username : 'You'} (You)'
-                          : entry.name),
+                            ? '${p.username.isNotEmpty ? p.username : 'You'} (You)'
+                            : entry.name),
                   style: TextStyle(
-                    color: isCurrentUser
-                        ? Colors.green
-                        : themeColors.hText,
+                    color: isCurrentUser ? Colors.green : themeColors.hText,
                     fontSize: 14,
-                    fontWeight:
-                        isCurrentUser ? FontWeight.bold : FontWeight.w500,
+                    fontWeight: isCurrentUser
+                        ? FontWeight.bold
+                        : FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

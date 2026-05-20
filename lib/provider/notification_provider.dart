@@ -44,8 +44,11 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   Future<void> _scheduleAll() async {
+    // Remove old notifications first
+    await _controller.cancelAllNotifications();
+
     debugPrint('⏰ Scheduling all daily notifications...');
-    // 7:00 AM Daily Challenge
+
     await _controller.scheduleDailyNotification(
       id: 1,
       title: 'Daily Challenge Started',
@@ -54,7 +57,6 @@ class NotificationProvider extends ChangeNotifier {
       minute: 0,
     );
 
-    // 6:00 PM Keep Streak Alive
     await _controller.scheduleDailyNotification(
       id: 2,
       title: 'Keep Streak Alive',
@@ -62,12 +64,5 @@ class NotificationProvider extends ChangeNotifier {
       hour: 18,
       minute: 0,
     );
-    // await _controller.scheduleDailyNotification(
-    //   id: 3,
-    //   title: 'Test Notification',
-    //   body: 'This is a test notification.',
-    //   hour: 11,
-    //   minute: 50,
-    // );
   }
 }

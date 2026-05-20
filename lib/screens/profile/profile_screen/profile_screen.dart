@@ -307,13 +307,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 44), // Alignment spacing
                           Expanded(
                             child: Text(
                               'PLAYER',
                               style: TextStyle(
                                 color: themeColors.stext,
                                 fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 letterSpacing: 0.5,
                               ),
                             ),

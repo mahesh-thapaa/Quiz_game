@@ -77,6 +77,7 @@ class GlobalStandings extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 36), // Alignment spacing
                 Expanded(
                   child: Text(
                     'PLAYER',

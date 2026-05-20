@@ -197,17 +197,20 @@ class _DailyBonusCardState extends State<DailyBonusCard>
           clipBehavior: Clip.none,
           children: [
             Positioned(
-              top: 0,
-              right: 46,
-              child: SvgPicture.asset(
-                'assets/svg/gift.svg',
-                height: 42,
-                width: 42,
-                colorFilter: ColorFilter.mode(
-                  _alreadyClaimed
-                      ? theme.stext
-                      : Colors.white.withValues(alpha: 0.9),
-                  BlendMode.srcIn,
+              top: -8,
+              right: 6,
+              child: Transform.rotate(
+                angle: -0.26, // Tilted counter-clockwise by approx 15 degrees
+                child: SvgPicture.asset(
+                  'assets/svg/gift.svg',
+                  height: 76,
+                  width: 76,
+                  colorFilter: ColorFilter.mode(
+                    _alreadyClaimed
+                        ? theme.stext.withValues(alpha: 0.12)
+                        : const Color(0xFF0F172A).withValues(alpha: 0.08),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -220,7 +223,7 @@ class _DailyBonusCardState extends State<DailyBonusCard>
                   style: TextStyle(
                     color: _alreadyClaimed
                         ? theme.hText.withValues(alpha: 0.55)
-                        : Colors.white,
+                        : const Color(0xFF0F172A),
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.4,
@@ -236,8 +239,9 @@ class _DailyBonusCardState extends State<DailyBonusCard>
                   style: TextStyle(
                     color: _alreadyClaimed
                         ? theme.stext
-                        : Colors.white.withValues(alpha: 0.92),
+                        : const Color(0xFF0F172A).withValues(alpha: 0.8),
                     fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
 
@@ -256,7 +260,7 @@ class _DailyBonusCardState extends State<DailyBonusCard>
                           style: TextStyle(
                             color: _alreadyClaimed
                                 ? theme.hText.withValues(alpha: 0.55)
-                                : Colors.white,
+                                : const Color(0xFF0F172A),
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
                             height: 1,
@@ -265,15 +269,67 @@ class _DailyBonusCardState extends State<DailyBonusCard>
 
                         const SizedBox(width: 8),
 
-                        SvgPicture.asset(
-                          'assets/svg/coin-svgrepo-com.svg',
-                          height: 24,
-                          width: 24,
-                          colorFilter: ColorFilter.mode(
-                            _alreadyClaimed ? theme.stext : AppColors.doller,
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                        _alreadyClaimed
+                            ? SvgPicture.asset(
+                                'assets/svg/coin-svgrepo-com.svg',
+                                height: 24,
+                                width: 24,
+                                colorFilter: ColorFilter.mode(
+                                  theme.stext,
+                                  BlendMode.srcIn,
+                                ),
+                              )
+                            : SizedBox(
+                                width: 34,
+                                height: 24,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    // Coin 1 (bottom/back)
+                                    Positioned(
+                                      left: 0,
+                                      bottom: 0,
+                                      child: SvgPicture.asset(
+                                        'assets/svg/coin-svgrepo-com.svg',
+                                        height: 18,
+                                        width: 18,
+                                        colorFilter: const ColorFilter.mode(
+                                          AppColors.doller,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                    // Coin 2 (middle)
+                                    Positioned(
+                                      left: 8,
+                                      bottom: 3,
+                                      child: SvgPicture.asset(
+                                        'assets/svg/coin-svgrepo-com.svg',
+                                        height: 18,
+                                        width: 18,
+                                        colorFilter: const ColorFilter.mode(
+                                          AppColors.doller,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                    // Coin 3 (top/front)
+                                    Positioned(
+                                      left: 4,
+                                      top: 0,
+                                      child: SvgPicture.asset(
+                                        'assets/svg/coin-svgrepo-com.svg',
+                                        height: 18,
+                                        width: 18,
+                                        colorFilter: const ColorFilter.mode(
+                                          AppColors.doller,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                       ],
                     ),
 
@@ -305,21 +361,21 @@ class _DailyBonusCardState extends State<DailyBonusCard>
                                 minimumSize: const Size(145, 42),
                                 backgroundColor: _alreadyClaimed
                                     ? theme.background.withValues(alpha: 0.25)
-                                    : Colors.white,
+                                    : const Color(0xFF0B141E),
                                 foregroundColor: _alreadyClaimed
                                     ? theme.stext
-                                    : AppColors.primary,
+                                    : Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(100),
                                 ),
                               ),
                               child: _claiming
-                                  ? SizedBox(
+                                  ? const SizedBox(
                                       width: 18,
                                       height: 18,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.2,
-                                        color: AppColors.primary,
+                                        color: Colors.white,
                                       ),
                                     )
                                   : Text(
