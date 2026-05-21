@@ -144,9 +144,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // 7. Streak Card
+              Text(
+                "Streak Card",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 7),
               const StreakCard(),
               const SizedBox(height: 35),
 

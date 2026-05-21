@@ -45,11 +45,13 @@ class QuizCard extends StatelessWidget {
               model.title,
               style: const TextStyle(
                 color: AppColors.hText,
-                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
                 shadows: [
                   Shadow(
                     offset: Offset(0, 1),
                     blurRadius: 2.0,
+
                     color: Colors.black,
                   ),
                 ],
@@ -62,7 +64,7 @@ class QuizCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppColors.titleColor,
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w900,
                 shadows: [
                   Shadow(
                     offset: Offset(0, 1),

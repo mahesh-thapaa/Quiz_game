@@ -12,7 +12,7 @@ class ChallengeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("This is Dailychallanger container");
+        debugPrint("This is Dailychallanger container");
       },
       child: Container(
         height: 320,
@@ -88,7 +88,7 @@ class ChallengeCard extends StatelessWidget {
                       Text(
                         "Champipons \nLeauge 2026",
                         style: TextStyle(
-                          fontSize: 36,
+                          fontSize: 35,
                           color: AppColors.hText,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.5,

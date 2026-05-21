@@ -52,7 +52,7 @@ class _EmailSignupState extends State<EmailSignup> {
       if (success) {
         final p = context.read<UserProgressProvider>();
         await Future.wait([p.loadFromFirestore(), p.initStreak(isLogin: true)]);
-        
+
         if (!mounted) return;
         setState(() => _isGuestLoading = false);
 
@@ -109,7 +109,10 @@ class _EmailSignupState extends State<EmailSignup> {
       // Navigate to email verification screen — NOT main screen yet
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const EmailVerificationScreen()),
+        MaterialPageRoute(
+          builder: (_) =>
+              EmailVerificationScreen(email: _emailController.text.trim()),
+        ),
       );
     }
   }
@@ -336,7 +339,9 @@ class _EmailSignupState extends State<EmailSignup> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: (_isGuestLoading || isLoading) ? null : _goToGuest,
+                        onPressed: (_isGuestLoading || isLoading)
+                            ? null
+                            : _goToGuest,
                         child: _isGuestLoading
                             ? SizedBox(
                                 width: 22,

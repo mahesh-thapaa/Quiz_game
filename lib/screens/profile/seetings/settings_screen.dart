@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
 import 'package:quiz_game/provider/theme_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_game/auth/change_password_screen.dart';
 import 'widgets/settings_toggle_tile.dart';
 import 'widgets/settings_arrow_tile.dart';
@@ -21,6 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final notificationProvider = context.watch<NotificationProvider>();
     final themeProvider = context.watch<ThemeProvider>();
     final themeColors = ThemeColors.of(context);
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
 
     return Scaffold(
       backgroundColor: themeColors.background,
@@ -66,23 +69,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
 
-            const SettingsSectionHeader(title: 'ACCOUNT'),
-            _SectionCard(
-              children: [
-                SettingsArrowTile(
-                  icon: Icons.lock_outline,
-                  label: 'Change Password',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ChangePasswordScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+            if (!isGuest) ...[
+              const SettingsSectionHeader(title: 'ACCOUNT'),
+              _SectionCard(
+                children: [
+                  // Change Email removed per request.
+                  SettingsArrowTile(
+                    icon: Icons.lock_outline,
+                    label: 'Change Password',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ChangePasswordScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
 
             const SizedBox(height: 40),
             Center(

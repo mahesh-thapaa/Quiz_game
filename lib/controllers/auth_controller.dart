@@ -73,8 +73,6 @@ class AuthController with ChangeNotifier {
       final freshUser = _auth.currentUser;
 
       if (freshUser != null && !freshUser.emailVerified) {
-        await _auth.signOut();
-
         _errorMessage = 'Please verify your email before logging in.';
 
         setLoading(false);
@@ -262,8 +260,6 @@ class AuthController with ChangeNotifier {
       await firebaseUser.sendEmailVerification();
 
       debugPrint('📧 Verification email sent to ${firebaseUser.email}');
-
-      await _auth.signOut();
 
       setLoading(false);
 

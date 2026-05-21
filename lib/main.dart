@@ -17,7 +17,6 @@ import 'package:quiz_game/provider/notification_provider.dart';
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
 import 'package:quiz_game/services/ads/ad_service.dart';
-
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 
 /// Background notification handler

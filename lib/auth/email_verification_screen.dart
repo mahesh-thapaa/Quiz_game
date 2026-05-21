@@ -10,7 +10,9 @@ import 'package:quiz_game/screens/main_screen/main_screen.dart';
 import 'package:quiz_game/auth/email_login.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({super.key});
+  final String email;
+
+  const EmailVerificationScreen({super.key, required this.email});
 
   @override
   State<EmailVerificationScreen> createState() =>
@@ -32,7 +34,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
   late Animation<double> _iconScale;
 
   String get _userEmail =>
-      FirebaseAuth.instance.currentUser?.email ?? 'your email';
+      FirebaseAuth.instance.currentUser?.email ?? widget.email;
 
   @override
   void initState() {
@@ -74,16 +76,39 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     if (verified) {
       _pollTimer?.cancel();
 
-      // Load user progress then go to main screen
-      final p = context.read<UserProgressProvider>();
-      await p.clearAndReload();
+      // Sign out user after verification so they can log in
+      await FirebaseAuth.instance.signOut();
 
       if (!mounted) return;
+
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
+        MaterialPageRoute(builder: (_) => const EmailLogin()),
         (_) => false,
       );
+
+      // Delay snackbar slightly so it appears correctly on the login screen
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!context.mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              "Email verified successfully! Please login.",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+      });
     } else {
       if (!silent && mounted) {
         setState(() => _isCheckingManually = false);
@@ -123,7 +148,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(
-          '📧 Verification email resent! Check your inbox.',
+          'Verification email resent! Check your inbox.',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.green,

@@ -158,35 +158,35 @@ class _LockedCard extends StatelessWidget {
           final bool? confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
-          backgroundColor: ThemeColors.of(context).cardBg,
-          title: Text(
-            'Unlock ${item.title}',
-            style: TextStyle(color: ThemeColors.of(context).hText),
-          ),
-          content: Text(
-            'Unlock this category for $unlockValue coins?',
-            style: TextStyle(color: ThemeColors.of(context).stext),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text(
-                'CANCEL',
-                style: TextStyle(color: Colors.grey),
+              backgroundColor: ThemeColors.of(context).cardBg,
+              title: Text(
+                'Unlock ${item.title}',
+                style: TextStyle(color: ThemeColors.of(context).hText),
               ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(
-                'UNLOCK',
-                style: TextStyle(
-                  color: p.coins >= unlockValue
-                      ? AppColors.primary
-                      : Colors.red,
+              content: Text(
+                'Unlock this category for $unlockValue coins?',
+                style: TextStyle(color: ThemeColors.of(context).stext),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text(
+                    'CANCEL',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
-              ),
-            ),
-          ],
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    'UNLOCK',
+                    style: TextStyle(
+                      color: p.coins >= unlockValue
+                          ? AppColors.primary
+                          : Colors.red,
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
 
@@ -315,8 +315,8 @@ class _LockedCard extends StatelessWidget {
                   Text(
                     item.title,
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
                       color: Colors.white,
                       shadows: [
                         Shadow(
@@ -335,7 +335,7 @@ class _LockedCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white70,
+                            color: Colors.white54,
                             shadows: [
                               Shadow(
                                 color: Colors.black,

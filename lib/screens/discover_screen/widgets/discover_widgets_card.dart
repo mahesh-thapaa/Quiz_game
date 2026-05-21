@@ -16,7 +16,9 @@ class DiscoverWidgetsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // ✅ PERFORMANCE FIX: Only listen to specific fields to prevent unnecessary rebuilds
     final stars = context.select((UserProgressProvider p) => p.stars);
-    final unlockedCategories = context.select((UserProgressProvider p) => p.unlockedCategories);
+    final unlockedCategories = context.select(
+      (UserProgressProvider p) => p.unlockedCategories,
+    );
     final coins = context.select((UserProgressProvider p) => p.coins);
 
     bool isUnlocked = false;
@@ -69,8 +71,8 @@ class DiscoverWidgetsCard extends StatelessWidget {
                     'UNLOCK',
                     style: TextStyle(
                       color: coins >= (model.unlockValue ?? 0)
-                        ? ThemeColors.of(context).primary
-                        : Colors.red,
+                          ? ThemeColors.of(context).primary
+                          : Colors.red,
                     ),
                   ),
                 ),
@@ -203,8 +205,8 @@ class DiscoverWidgetsCard extends StatelessWidget {
                   Text(
                     model.title,
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
                       color: Colors.white,
                       shadows: [
                         Shadow(
@@ -273,7 +275,7 @@ class _UnlockBadge extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: Colors.white54,
               ),
             ),
           ],

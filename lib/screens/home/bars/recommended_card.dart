@@ -66,7 +66,7 @@ class RecommendedCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 17,
                       fontWeight: FontWeight.w900,
                       height: 1.1,
                       shadows: [
@@ -86,7 +86,7 @@ class RecommendedCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.titleColor,
                       fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w900,
                       shadows: [
                         Shadow(
                           offset: Offset(0, 1),

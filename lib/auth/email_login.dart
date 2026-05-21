@@ -58,8 +58,7 @@ class _EmailLoginState extends State<EmailLogin> {
     if (!mounted) return;
 
     // Check if blocked by unverified email
-    if (!success &&
-        auth.errorMessage.contains('verify your email')) {
+    if (!success && auth.errorMessage.contains('verify your email')) {
       setState(() => _isUnverified = true);
       return;
     }
@@ -166,7 +165,9 @@ class _EmailLoginState extends State<EmailLogin> {
         onTap: () => Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => const EmailVerificationScreen(),
+            builder: (_) => EmailVerificationScreen(
+              email: _emailController.text.trim().toLowerCase(),
+            ),
           ),
         ),
         child: const Text(

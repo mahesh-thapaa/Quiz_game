@@ -59,7 +59,7 @@ class CategoryCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
                 maxLines: 1,

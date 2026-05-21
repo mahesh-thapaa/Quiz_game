@@ -107,7 +107,9 @@ class _SplashScreenState extends State<SplashScreen>
               if (!mounted) return;
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const EmailVerificationScreen()),
+                MaterialPageRoute(
+                  builder: (_) => EmailVerificationScreen(email: user.email!),
+                ),
               );
             }
           } else {
