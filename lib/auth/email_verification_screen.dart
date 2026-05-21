@@ -7,7 +7,6 @@ import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/main_screen/main_screen.dart';
-import 'package:quiz_game/auth/email_login.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -76,25 +75,26 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     if (verified) {
       _pollTimer?.cancel();
 
-      // Sign out user after verification so they can log in
-      await FirebaseAuth.instance.signOut();
+      // Load user progress and initialize streak
+      final progress = context.read<UserProgressProvider>();
+      await progress.clearAndReload();
 
       if (!mounted) return;
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const EmailLogin()),
+        MaterialPageRoute(builder: (_) => const MainScreen()),
         (_) => false,
       );
 
-      // Delay snackbar slightly so it appears correctly on the login screen
+      // Delay snackbar slightly so it appears correctly on the main screen
       Future.delayed(const Duration(milliseconds: 300), () {
         if (!context.mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(
-              "Email verified successfully! Please login.",
+              "Login successfully!",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -180,7 +180,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen>
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const EmailLogin()),
+      MaterialPageRoute(builder: (_) => const MainScreen()),
       (_) => false,
     );
   }

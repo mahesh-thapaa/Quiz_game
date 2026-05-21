@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
@@ -91,6 +92,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final themeColors = ThemeColors.of(context);
+    final isGuest = FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
+
     return Scaffold(
       backgroundColor: themeColors.background,
       appBar: AppBar(
@@ -150,9 +153,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _usernameController,
+                  enabled: !isGuest,
                   keyboardType: TextInputType.name,
                   textCapitalization: TextCapitalization.words,
-                  style: TextStyle(color: ThemeColors.of(context).hText),
+                  style: TextStyle(
+                    color: isGuest
+                        ? themeColors.stext.withValues(alpha: 0.8)
+                        : themeColors.hText,
+                  ),
                   decoration: _inputDecoration(
                     'Enter your username',
                     Icons.person_outline,
@@ -172,8 +180,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Shown on your profile and leaderboards.',
-                  style: TextStyle(color: AppColors.stext, fontSize: 12),
+                  isGuest
+                      ? 'Guest users cannot change their username.'
+                      : 'Shown on your profile and leaderboards.',
+                  style: TextStyle(
+                    color: isGuest ? Colors.amber.shade700 : AppColors.stext,
+                    fontSize: 12,
+                    fontWeight: isGuest ? FontWeight.w500 : FontWeight.normal,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -271,6 +285,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: themeColors.divider),
+      ),
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: themeColors.divider.withValues(alpha: 0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
