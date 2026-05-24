@@ -7,14 +7,16 @@ class AdDisplayController {
   AdDisplayController._internal();
 
   int _levelsCompletedSinceLastAd = 0;
-  static const int adFrequency = 2;
+  static const int adFrequency = 4;
 
   /// Call this when the user wants to proceed to the next level.
   /// If an ad is due, it shows the ad and then calls [onComplete].
   /// If no ad is due, it calls [onComplete] immediately.
   void handleLevelTransition({required VoidCallback onComplete}) {
     _levelsCompletedSinceLastAd++;
-    debugPrint('Levels completed since last ad: $_levelsCompletedSinceLastAd / $adFrequency');
+    debugPrint(
+      'Levels completed since last ad: $_levelsCompletedSinceLastAd / $adFrequency',
+    );
 
     if (_levelsCompletedSinceLastAd >= adFrequency) {
       _levelsCompletedSinceLastAd = 0;
@@ -25,7 +27,9 @@ class AdDisplayController {
   }
 
   void _showAutomaticAd({required VoidCallback onComplete}) {
-    debugPrint('AdDisplayController: Showing automatic ad after $adFrequency levels.');
+    debugPrint(
+      'AdDisplayController: Showing automatic ad after $adFrequency levels.',
+    );
     AdService().showInterstitialAd(
       onAdDismissed: onComplete,
       onAdFailedToShow: onComplete,

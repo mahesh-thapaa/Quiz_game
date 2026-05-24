@@ -51,16 +51,17 @@ class NotificationProvider extends ChangeNotifier {
 
     await _controller.scheduleDailyNotification(
       id: 1,
-      title: 'Daily Challenge Started',
-      body: 'Jump in and complete today\'s challenge!',
+      title: 'Kick Off Your Day With Football Trivia',
+      body: 'One quick game could push you to the top of the leaderboard.',
       hour: 7,
       minute: 0,
     );
 
     await _controller.scheduleDailyNotification(
       id: 2,
-      title: 'Keep Streak Alive',
-      body: 'Don\'t forget to play a game to maintain your streak!',
+      title: 'Last Chance to Keep Your Streak',
+      body:
+          'Miss today and your streak resets. One match quiz is all it takes.',
       hour: 18,
       minute: 0,
     );
