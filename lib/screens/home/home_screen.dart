@@ -96,10 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const HomeAppBar(),
               const SizedBox(height: 20),
 
-              // 2. XP Progress Bar
-              // const XPProgressBar(),
-              // const SizedBox(height: 25),
-
               // 3. Daily Bonus Card
               const DailyBonusCard(bonus: HomeData.bonus),
               const SizedBox(height: 20),

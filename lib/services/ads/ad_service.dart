@@ -11,16 +11,10 @@ class AdService {
   int _retryAttempt = 0;
 
   static String get _bannerUnitId {
-    if (kDebugMode) {
-      return 'ca-app-pub-3940256099942544/6300978111'; // Google Test Banner
-    }
     return 'ca-app-pub-7334258098187344/3053792918';
   }
 
   static String get _interstitialUnitId {
-    if (kDebugMode) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // Google Test Interstitial
-    }
     return 'ca-app-pub-7334258098187344/7625032700';
   }
 
@@ -29,11 +23,11 @@ class AdService {
       await MobileAds.instance.initialize();
 
       // IMPORTANT: Register your device as a test device to see ads before Play Store launch
-      await MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(
-          testDeviceIds: ['796126DBFFAB056B43AAAEC26E75F79E'], // Your device ID
-        ),
-      );
+      // await MobileAds.instance.updateRequestConfiguration(
+      //   RequestConfiguration(
+      //     testDeviceIds: ['796126DBFFAB056B43AAAEC26E75F79E'], // Your device ID
+      //   ),
+      // );
 
       loadInterstitialAd();
       debugPrint("Ads Initialized");

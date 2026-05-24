@@ -1,31 +1,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Internet -->
+  
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Notifications -->
+    
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Exact alarms -->
+
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- Reboot reschedule -->
+   
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+   
 
     <application
         android:name="${applicationName}"
         android:label="quiz_game"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
+
+       
+
         <meta-data
-        android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-7334258098187344~8681428658"/>
-            <!-- android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7334258098187344~8681428658"/> -->
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7334258098187344~8681428658" />
 
+      
 
-        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -36,50 +42,56 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Flutter normal theme -->
+          
+
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-        <!-- Flutter embedding -->
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- ================================================= -->
-        <!-- LOCAL NOTIFICATION RECEIVERS -->
-        <!-- ================================================= -->
 
-        <!-- Trigger scheduled notifications -->
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
 
-        <!-- Trigger action buttons -->
+
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
             android:exported="false" />
 
-        <!-- Reschedule after reboot / update -->
+
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
             android:exported="true">
 
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+
             </intent-filter>
+
         </receiver>
 
-        <!-- Foreground service -->
+
         <service
             android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
             android:exported="false"
@@ -87,12 +99,18 @@
 
     </application>
 
-    <!-- Required for text sharing -->
+   
+
     <queries>
+
         <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT"/>
-            <data android:mimeType="text/plain"/>
+
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+
+            <data android:mimeType="text/plain" />
+
         </intent>
+
     </queries>
 
 </manifest>
