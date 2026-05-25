@@ -13,6 +13,7 @@ import 'package:quiz_game/provider/password_provider.dart';
 import 'package:quiz_game/provider/daily_challenger_provider.dart';
 import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
+import 'package:quiz_game/services/internet_service.dart';
 
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
@@ -66,6 +67,9 @@ class AppRoot extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PasswordProvider()),
         ChangeNotifierProvider(create: (_) => DailyChallengerProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider.value(
+          value: InternetService()..startMonitoring(),
+        ),
       ],
       child: const MyApp(),
     );
@@ -83,6 +87,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(brightness: Brightness.light, fontFamily: 'Inter'),
       darkTheme: ThemeData(brightness: Brightness.dark, fontFamily: 'Inter'),
       home: const SplashScreen(),
+      builder: (context, child) {
+        if (child == null) {
+          return const SizedBox.shrink();
+        }
+
+        return InternetConnectionWrapper(child: child);
+      },
     );
   }
 }

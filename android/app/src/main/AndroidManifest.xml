@@ -20,7 +20,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="quiz_game"
+        android:label="Football Quiz"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
 
