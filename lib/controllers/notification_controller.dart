@@ -1,12 +1,16 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+// notification_controller.dart
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationController {
   static final NotificationController _instance =
       NotificationController._internal();
+
   factory NotificationController() => _instance;
+
   NotificationController._internal();
 
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -18,6 +22,7 @@ class NotificationController {
 
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
           requestAlertPermission: true,
@@ -25,30 +30,58 @@ class NotificationController {
           requestSoundPermission: true,
         );
 
-    const InitializationSettings initSettings = InitializationSettings(
+    const InitializationSettings settings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
 
     await _notificationsPlugin.initialize(
-      initSettings,
+      settings,
       onDidReceiveNotificationResponse: (details) {
-        debugPrint('Notification tapped: ${details.payload}');
+        debugPrint('🔔 Notification tapped: ${details.payload}');
       },
     );
 
-    // Request permissions for Android 13+
     final androidImplementation = _notificationsPlugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
+
     if (androidImplementation != null) {
       await androidImplementation.requestNotificationsPermission();
+
       await androidImplementation.requestExactAlarmsPermission();
     }
+
+    await _createChannels();
   }
 
-  /// Schedule a daily notification at a specific time
+  Future<void> _createChannels() async {
+    const AndroidNotificationChannel dailyChannel = AndroidNotificationChannel(
+      'football_quiz_daily_v2',
+      'Football Quiz Daily Notifications',
+      description: 'Daily football reminders',
+      importance: Importance.max,
+    );
+
+    const AndroidNotificationChannel instantChannel =
+        AndroidNotificationChannel(
+          'football_quiz_instant_v1',
+          'Football Quiz Instant Notifications',
+          description: 'Instant football quiz alerts',
+          importance: Importance.max,
+        );
+
+    final androidImplementation = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    await androidImplementation?.createNotificationChannel(dailyChannel);
+
+    await androidImplementation?.createNotificationChannel(instantChannel);
+  }
+
   Future<void> scheduleDailyNotification({
     required int id,
     required String title,
@@ -57,7 +90,8 @@ class NotificationController {
     required int minute,
   }) async {
     final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
+
+    tz.TZDateTime scheduledDate = tz.TZDateTime(
       tz.local,
       now.year,
       now.month,
@@ -66,7 +100,6 @@ class NotificationController {
       minute,
     );
 
-    // If the time has already passed today, schedule for tomorrow
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
@@ -77,31 +110,83 @@ class NotificationController {
         title,
         body,
         scheduledDate,
+
         const NotificationDetails(
           android: AndroidNotificationDetails(
-            'daily_reminders',
-            'Daily Reminders',
-            channelDescription: 'Daily challenge and streak reminders',
+            'football_quiz_daily_v2',
+            'Football Quiz Daily Notifications',
+            channelDescription: 'Daily football quiz reminders',
             importance: Importance.max,
             priority: Priority.high,
           ),
+
           iOS: DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle, // ✅ Safe & robust (avoids SecurityException on Android 13/14+)
+
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents:
-            DateTimeComponents.time, // This makes it repeat daily
+
+        matchDateTimeComponents: DateTimeComponents.time,
       );
-      debugPrint('✅ Scheduled notification $id at $hour:$minute');
-    } catch (e, stack) {
-      debugPrint('❌ Failed to schedule notification $id: $e');
-      debugPrint('Stacktrace: $stack');
+
+      debugPrint('✅ Scheduled Daily Notification -> ID: $id');
+    } catch (e) {
+      debugPrint('❌ Error scheduling notification: $e');
     }
+  }
+
+  Future<void> showInstantNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      await _notificationsPlugin.show(
+        id,
+        title,
+        body,
+
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'football_quiz_instant_v1',
+            'Football Quiz Instant Notifications',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+
+          iOS: DarwinNotificationDetails(),
+        ),
+      );
+
+      debugPrint('⚡ Instant Notification Sent -> ID: $id');
+    } catch (e) {
+      debugPrint('❌ Instant notification error: $e');
+    }
+  }
+
+  Future<void> cancelNotification(int id) async {
+    await _notificationsPlugin.cancel(id);
+
+    debugPrint('🗑 Notification Cancelled -> ID: $id');
   }
 
   Future<void> cancelAllNotifications() async {
     await _notificationsPlugin.cancelAll();
-    debugPrint('All notifications cancelled');
+
+    debugPrint('🗑 All Notifications Cancelled');
+  }
+
+  Future<void> printPendingNotifications() async {
+    final pending = await _notificationsPlugin.pendingNotificationRequests();
+
+    debugPrint('======================');
+
+    for (final item in pending) {
+      debugPrint('ID: ${item.id}, TITLE: ${item.title}');
+    }
+
+    debugPrint('======================');
   }
 }
