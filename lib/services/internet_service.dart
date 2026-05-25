@@ -4,48 +4,44 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 class InternetService with ChangeNotifier {
-  // Singleton instance
   static final InternetService _instance = InternetService._internal();
   factory InternetService() => _instance;
   InternetService._internal();
 
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
-  bool _isConnected = true; // Default to true to prevent initial false alarms
+  bool _isConnected = true;
 
   bool get isConnected => _isConnected;
 
-  /// Start monitoring connectivity changes
   void startMonitoring() {
     _subscription?.cancel();
-    
-    // Perform initial check immediately
+
     checkConnection();
 
-    // Listen to real-time changes
-    _subscription = _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> results) async {
+    _subscription = _connectivity.onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) async {
       await _handleConnectivityChange(results);
     });
   }
 
-  /// Stop monitoring
   void stopMonitoring() {
     _subscription?.cancel();
     _subscription = null;
   }
 
-  /// Internal handler for connectivity changes
-  Future<void> _handleConnectivityChange(List<ConnectivityResult> results) async {
+  Future<void> _handleConnectivityChange(
+    List<ConnectivityResult> results,
+  ) async {
     if (results.isEmpty || results.contains(ConnectivityResult.none)) {
       _updateConnectionStatus(false);
     } else {
-      // Hardware shows connection (Wi-Fi or Mobile Data), now check if we have actual internet access
       bool hasRealInternet = await performRealInternetCheck();
       _updateConnectionStatus(hasRealInternet);
     }
   }
 
-  /// Helper to check connection status using real internet check manually
   Future<bool> checkConnection() async {
     final results = await _connectivity.checkConnectivity();
     if (results.isEmpty || results.contains(ConnectivityResult.none)) {
@@ -58,11 +54,11 @@ class InternetService with ChangeNotifier {
     }
   }
 
-  /// Perform a real DNS lookup check to verify active internet access
   Future<bool> performRealInternetCheck() async {
     try {
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 4));
+      final result = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 4));
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } on SocketException catch (_) {
       return false;
@@ -81,14 +77,13 @@ class InternetService with ChangeNotifier {
   }
 }
 
-/// A premium, auto-managed wrapper widget that displays offline/online SnackBars
-/// over the active screen whenever the network connection status changes.
 class InternetConnectionWrapper extends StatefulWidget {
   final Widget child;
   const InternetConnectionWrapper({super.key, required this.child});
 
   @override
-  State<InternetConnectionWrapper> createState() => _InternetConnectionWrapperState();
+  State<InternetConnectionWrapper> createState() =>
+      _InternetConnectionWrapperState();
 }
 
 class _InternetConnectionWrapperState extends State<InternetConnectionWrapper> {
@@ -97,11 +92,10 @@ class _InternetConnectionWrapperState extends State<InternetConnectionWrapper> {
   @override
   void initState() {
     super.initState();
-    // Schedule check after the first build frame is completed
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       InternetService().addListener(_onConnectionChanged);
-      
-      // Perform initial check to see if we started offline
+
       if (!InternetService().isConnected) {
         _showOfflineSnackBar();
         _wasOffline = true;
@@ -152,10 +146,8 @@ class _InternetConnectionWrapperState extends State<InternetConnectionWrapper> {
         ),
         backgroundColor: Colors.redAccent.shade700,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-        duration: const Duration(days: 365), // Keep it pinned until connection is back
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        duration: const Duration(days: 365),
       ),
     );
   }
@@ -182,9 +174,7 @@ class _InternetConnectionWrapperState extends State<InternetConnectionWrapper> {
         ),
         backgroundColor: Colors.green.shade700,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         duration: const Duration(seconds: 3),
       ),
     );
