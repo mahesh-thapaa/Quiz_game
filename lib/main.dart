@@ -13,7 +13,7 @@ import 'package:quiz_game/provider/password_provider.dart';
 import 'package:quiz_game/provider/daily_challenger_provider.dart';
 import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/provider/notification_provider.dart';
-import 'package:quiz_game/services/internet_service.dart';
+import 'package:quiz_game/services/internet/internet_service.dart';
 
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
