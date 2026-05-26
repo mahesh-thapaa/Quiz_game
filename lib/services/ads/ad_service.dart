@@ -11,11 +11,11 @@ class AdService {
   int _retryAttempt = 0;
 
   static String get _bannerUnitId {
-    return 'ca-app-pub-7334258098187344/3053792918';
+    return 'ca-app-pub-2829352214511086/1997866154';
   }
 
   static String get _interstitialUnitId {
-    return 'ca-app-pub-7334258098187344/7625032700';
+    return 'ca-app-pub-2829352214511086/9555276602';
   }
 
   Future<void> init() async {

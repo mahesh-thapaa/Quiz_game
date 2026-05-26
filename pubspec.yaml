@@ -55,7 +55,14 @@ dependencies:
   cached_network_image: ^3.4.1
   firebase_crashlytics: ^5.2.0
   flutter_launcher_icons: ^0.14.4
+  
+
+
+
+
+
   connectivity_plus: ^6.0.3
+
 
 dev_dependencies:
   flutter_test:

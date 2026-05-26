@@ -169,7 +169,6 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
 
     if (!mounted) return;
 
-    // Calculate correct title for the next level
     String? nextTitle;
 
     if (widget.getGameplayTitle != null) {
@@ -265,13 +264,11 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
     _isFirstPlay = false;
 
     if (shouldSave) {
-      // Only save if it's improvement
       await widget.onLevelComplete(
         LevelResultModels(
           score: _score,
           totalQuestions: total,
-          starsEarned:
-              starsThisAttempt, // Pass actual stars earned for proper UI update
+          starsEarned: starsThisAttempt,
           xpEarned: xpEarned,
           coinsEarned: coinsEarned,
           accuracy: uiResult.accuracy,
@@ -377,7 +374,6 @@ class _QuizGameplayScreenState extends State<QuizGameplayScreen>
             ),
           ),
 
-          // ── Result overlay ──
           if (_showResult && _result != null)
             LevelCompleteScreen(
               result: _result!,
