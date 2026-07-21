@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
+import 'package:quiz_game/models/profile/leaderboard_entry_models.dart';
 
 class LeaderboardProvider extends ChangeNotifier {
   final _db = FirebaseFirestore.instance;

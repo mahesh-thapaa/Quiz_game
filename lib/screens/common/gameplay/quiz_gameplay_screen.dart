@@ -7,7 +7,7 @@ import 'package:quiz_game/screens/common/gameplay/level_complete_screen.dart';
 import 'package:quiz_game/screens/common/gameplay/quiz_top_bar.dart';
 import 'package:quiz_game/screens/common/gameplay/quiz_image_card.dart';
 import 'package:quiz_game/models/level_result_models.dart';
-import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
+import 'package:quiz_game/models/quiz_models/quiz_level.dart';
 import 'package:quiz_game/controllers/star_calculation_service.dart';
 import 'package:quiz_game/services/ads/ad_service.dart';
 // import 'package:quiz_game/controllers/house_ad_controller.dart';

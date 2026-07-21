@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
+import 'package:quiz_game/models/profile/leaderboard_entry_models.dart';
 
 class ProfileLeaderboard extends StatelessWidget {
   final List<LeaderboardEntry> entries;
@@ -141,11 +141,14 @@ class _LeaderboardRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
         color: entry.isCurrentUser
-            ? AppColors.primary.withOpacity(0.08)
+            ? AppColors.primary.withValues(alpha: 0.08)
             : AppColors.deepCard,
         borderRadius: BorderRadius.circular(10),
         border: entry.isCurrentUser
-            ? Border.all(color: AppColors.primary.withOpacity(0.3), width: 1)
+            ? Border.all(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                width: 1,
+              )
             : null,
       ),
       child: Row(

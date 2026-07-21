@@ -36,7 +36,7 @@ class NotificationController {
     );
 
     await _notificationsPlugin.initialize(
-      settings,
+      settings: settings,
       onDidReceiveNotificationResponse: (details) {
         debugPrint('🔔 Notification tapped: ${details.payload}');
       },
@@ -106,12 +106,12 @@ class NotificationController {
 
     try {
       await _notificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        scheduledDate,
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
 
-        const NotificationDetails(
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'football_quiz_daily_v2',
             'Football Quiz Daily Notifications',
@@ -124,9 +124,6 @@ class NotificationController {
         ),
 
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
 
         matchDateTimeComponents: DateTimeComponents.time,
       );
@@ -144,11 +141,11 @@ class NotificationController {
   }) async {
     try {
       await _notificationsPlugin.show(
-        id,
-        title,
-        body,
+        id: id,
+        title: title,
+        body: body,
 
-        const NotificationDetails(
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'football_quiz_instant_v1',
             'Football Quiz Instant Notifications',
@@ -167,7 +164,7 @@ class NotificationController {
   }
 
   Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id);
+    await _notificationsPlugin.cancel(id: id);
 
     debugPrint('🗑 Notification Cancelled -> ID: $id');
   }

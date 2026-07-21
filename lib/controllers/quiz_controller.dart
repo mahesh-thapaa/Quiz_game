@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
+import 'package:quiz_game/models/quiz_models/quiz_level.dart';
 import 'package:quiz_game/controllers/level_progess_services.dart';
 
 class QuizController {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
+import 'package:quiz_game/models/profile/leaderboard_entry_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/provider/profile_image_provider.dart';
@@ -413,8 +413,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: _isLoggingOut ? null : _handleLogoutPressed,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red.shade800,
-                    disabledBackgroundColor: Colors.red.shade800.withOpacity(
-                      0.6,
+                    disabledBackgroundColor: Colors.red.shade800.withValues(
+                      alpha: 0.6,
                     ),
                     minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(

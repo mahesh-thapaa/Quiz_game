@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/profile/leaderboardEntry_models.dart';
+import 'package:quiz_game/models/profile/leaderboard_entry_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 

@@ -2,7 +2,7 @@
 
 import 'package:quiz_game/models/quiz_level_tile.dart';
 import 'package:quiz_game/controllers/quiz_controller.dart';
-import 'package:quiz_game/models/quiz_models/QuizLevel.dart';
+import 'package:quiz_game/models/quiz_models/quiz_level.dart';
 
 class LevelGridController {
   final List<QuizLevelTile> block1Items;
