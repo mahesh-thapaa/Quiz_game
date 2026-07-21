@@ -6,12 +6,15 @@ import 'package:quiz_game/screens/common/level_grid_screen.dart';
 class ChallengeCard extends StatelessWidget {
   const ChallengeCard({super.key});
 
+  /// Firestore document ID for the Champions League quiz.
+  static const String _quizDocId = 'ITjxRubOgUp1MSXFRYjj';
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
           .collection('quizzes')
-          .doc('ITjxRubOgUp1MSXFRYjj')
+          .doc(_quizDocId)
           .snapshots(),
       builder: (context, snapshot) {
         String? imagePath;
@@ -52,7 +55,7 @@ class ChallengeCard extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => const LevelGridScreen(
                   title: "CHAMPIONS LEAGUE",
-                  categoryId: "ITjxRubOgUp1MSXFRYjj",
+                  categoryId: _quizDocId,
                   firestoreName: "Champions League",
                 ),
               ),

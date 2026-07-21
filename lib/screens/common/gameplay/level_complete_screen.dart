@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/level_result_models.dart';
-// import 'package:quiz_game/models/theme_colors.dart';
 import 'package:quiz_game/controllers/star_calculation_service.dart';
 import 'package:quiz_game/controllers/ad_display_controller.dart';
 

@@ -7,15 +7,36 @@ class AdService {
   AdService._internal();
 
   InterstitialAd? _interstitialAd;
+  BannerAd? _cachedBannerAd;
   bool _isInterstitialLoading = false;
   int _retryAttempt = 0;
 
+  // Test ad units (used in debug builds)
+  static const String _testBannerUnitId = 'ca-app-pub-3940256099942544/6300978111';
+  static const String _testInterstitialUnitId = 'ca-app-pub-3940256099942544/1033173712';
+
+  // Production ad units
+  static const String _prodBannerUnitId = 'ca-app-pub-2829352214511086/1997866154';
+  static const String _prodInterstitialUnitId = 'ca-app-pub-2829352214511086/9555276602';
+
+  // Overridable via --dart-define
+  static const String _overrideBannerUnitId = String.fromEnvironment(
+    'ADMOB_BANNER_UNIT_ID',
+    defaultValue: '',
+  );
+  static const String _overrideInterstitialUnitId = String.fromEnvironment(
+    'ADMOB_INTERSTITIAL_UNIT_ID',
+    defaultValue: '',
+  );
+
   static String get _bannerUnitId {
-    return 'ca-app-pub-2829352214511086/1997866154';
+    if (_overrideBannerUnitId.isNotEmpty) return _overrideBannerUnitId;
+    return kDebugMode ? _testBannerUnitId : _prodBannerUnitId;
   }
 
   static String get _interstitialUnitId {
-    return 'ca-app-pub-2829352214511086/9555276602';
+    if (_overrideInterstitialUnitId.isNotEmpty) return _overrideInterstitialUnitId;
+    return kDebugMode ? _testInterstitialUnitId : _prodInterstitialUnitId;
   }
 
   Future<void> init() async {
@@ -30,10 +51,18 @@ class AdService {
       // );
 
       loadInterstitialAd();
+      preloadBannerAd();
       debugPrint("Ads Initialized");
     } catch (e) {
       debugPrint("Ads Init Error: $e");
     }
+  }
+
+  void dispose() {
+    _interstitialAd?.dispose();
+    _interstitialAd = null;
+    _cachedBannerAd?.dispose();
+    _cachedBannerAd = null;
   }
 
   void loadInterstitialAd() {
@@ -99,10 +128,16 @@ class AdService {
     );
 
     _interstitialAd!.show();
-    _interstitialAd = null;
   }
 
   BannerAd createBannerAd() {
+    // Reuse cached banner ad if available
+    if (_cachedBannerAd != null) {
+      final ad = _cachedBannerAd!;
+      _cachedBannerAd = null;
+      return ad;
+    }
+
     return BannerAd(
       adUnitId: _bannerUnitId,
       size: AdSize.banner,
@@ -115,5 +150,26 @@ class AdService {
         },
       ),
     );
+  }
+
+  /// Preloads a banner ad for faster display next time.
+  void preloadBannerAd() {
+    if (_cachedBannerAd != null) return;
+    final ad = BannerAd(
+      adUnitId: _bannerUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          _cachedBannerAd = ad as BannerAd;
+          debugPrint("✅ Banner Preloaded");
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          debugPrint("❌ Banner Preload Failed: ${error.message}");
+        },
+      ),
+    );
+    ad.load();
   }
 }

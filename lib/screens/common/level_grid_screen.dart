@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'package:quiz_game/controllers/level_progess_services.dart';
+import 'package:quiz_game/controllers/level_progress_services.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/quiz_level_tile.dart';
 import 'package:quiz_game/models/level_overview_model.dart';
@@ -49,32 +49,38 @@ class _LevelGridScreenState extends State<LevelGridScreen> {
   }
 
   Future<void> _initializeData() async {
-    final Map<String, dynamic> data;
-    if (widget.categoryId == 'quick_quiz') {
-      final p = context.read<UserProgressProvider>();
-      data = await QuizController.loadQuickQuizData(
-        userLevel: p.level,
-        userCoins: p.coins,
-      );
-    } else {
-      data = await QuizController.loadQuizData(
-        categoryId: widget.categoryId,
-        firestoreName: widget.firestoreName,
-        quizId: widget.categoryId, // Passing categoryId as quizId (document ID)
-      );
-    }
+    try {
+      final Map<String, dynamic> data;
+      if (widget.categoryId == 'quick_quiz') {
+        final p = context.read<UserProgressProvider>();
+        data = await QuizController.loadQuickQuizData(
+          userLevel: p.level,
+          userCoins: p.coins,
+        );
+      } else {
+        data = await QuizController.loadQuizData(
+          categoryId: widget.categoryId,
+          firestoreName: widget.firestoreName,
+          quizId: widget.categoryId,
+        );
+      }
 
-    if (mounted) {
-      setState(() {
-        if (widget.categoryId == 'quick_quiz') {
-          _questionsByLevel = data['questionsByLevel'] ?? {};
-        }
-        _levelDocIds = data['levelDocIds'];
-        _bonusSlotToDocId = data['bonusSlotToDocId'];
-        _quizDocRef = data['quizDocReference'];
-        _controller.applyProgress(data['progress']);
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          if (widget.categoryId == 'quick_quiz') {
+            _questionsByLevel = data['questionsByLevel'] ?? {};
+          }
+          _levelDocIds = data['levelDocIds'];
+          _bonusSlotToDocId = data['bonusSlotToDocId'];
+          _quizDocRef = data['quizDocReference'];
+          _controller.applyProgress(data['progress']);
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 

@@ -15,7 +15,7 @@ class DailyChallengerProvider extends ChangeNotifier {
   void _startTimer() {
     _timer?.cancel();
     _update();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _update());
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) => _update());
   }
 
   void _update() {

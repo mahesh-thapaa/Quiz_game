@@ -113,8 +113,13 @@ class UserProgressProvider extends ChangeNotifier {
     }
   }
 
+  bool _purchasing = false;
+
   Future<bool> unlockWithCoins(String categoryId, int cost) async {
+    if (_purchasing) return false;
     if (_coins < cost) return false;
+
+    _purchasing = true;
 
     _coins -= cost;
     if (!_unlockedCategories.contains(categoryId)) {
@@ -123,6 +128,8 @@ class UserProgressProvider extends ChangeNotifier {
 
     notifyListeners();
     await _sync();
+
+    _purchasing = false;
     return true;
   }
 

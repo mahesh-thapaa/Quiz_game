@@ -6,8 +6,8 @@ import 'package:quiz_game/screens/Quiz_screen/widgets/header.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/quiz_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/challenger_card.dart';
 import 'package:quiz_game/screens/Quiz_screen/widgets/locked_section.dart';
-import 'package:quiz_game/screens/discover_screen/diccover_screen.dart';
-import 'package:quiz_game/models/quiz_models/quiz_modsels.dart';
+import 'package:quiz_game/screens/discover_screen/discover_screen.dart';
+import 'package:quiz_game/models/quiz_models/quiz_models_file.dart';
 
 class QuizScreen extends StatelessWidget {
   const QuizScreen({super.key});
@@ -34,7 +34,7 @@ class QuizScreen extends StatelessWidget {
         subtitle: "Guess the team",
         image: "assets/images/jursey.jpg",
         categoryId: 'jersey_quiz',
-        firestoreName: 'Jursey Quiz',
+        firestoreName: 'Jersey Quiz',
       ),
       QuizModel(
         title: "Logo Master",

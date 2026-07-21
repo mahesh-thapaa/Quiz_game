@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
-import 'package:quiz_game/models/quiz_models/quiz_modsels.dart';
+import 'package:quiz_game/models/quiz_models/quiz_models_file.dart';
 import 'package:quiz_game/screens/common/level_grid_screen.dart';
 
 class QuizCard extends StatelessWidget {

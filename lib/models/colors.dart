@@ -10,7 +10,6 @@ class AppColors {
   static const Color hText = Colors.white;
   static const Color stext = Color(0xFF94A3B8);
   static const Color titleColor = Color(0xFF1DB954);
-  static const Color iCOlor = Colors.white;
   static const Color primary = Color(0xFF19B357);
   static const Color dShade = Color(0xFFE6A817);
   static const Color doller = Color(0xFFFFD700);

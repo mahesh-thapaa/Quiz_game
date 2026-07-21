@@ -44,9 +44,24 @@ class LockedSection extends StatelessWidget {
 
             if (snapshot.hasError) {
               return Center(
-                child: Text(
-                  'Error: ${snapshot.error}',
-                  style: const TextStyle(color: Colors.red),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.wifi_off_rounded, color: Colors.white38, size: 36),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Failed to load categories',
+                      style: TextStyle(color: ThemeColors.of(context).stext),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        // Trigger rebuild by using the nearest Scaffold
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      },
+                      child: const Text('RETRY', style: TextStyle(color: AppColors.primary)),
+                    ),
+                  ],
                 ),
               );
             }

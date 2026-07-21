@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class NotificationService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -16,7 +16,7 @@ class NotificationService {
 
   Future<String?> getFcmToken() async {
     String? token = await messaging.getToken();
-    debugPrint("FCM Token: $token");
+    if (kDebugMode) debugPrint("FCM Token: $token");
     return token;
   }
 

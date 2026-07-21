@@ -300,14 +300,10 @@ class AuthController with ChangeNotifier {
       _errorMessage = _friendlyError(e.code);
 
       notifyListeners();
-
-      rethrow;
     } catch (e) {
       _errorMessage = 'Something went wrong.';
 
       notifyListeners();
-
-      rethrow;
     }
   }
 

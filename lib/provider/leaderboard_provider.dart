@@ -53,6 +53,10 @@ class LeaderboardProvider extends ChangeNotifier {
 
   int get currentUserRank => currentUser?.rank ?? _allUsers.length + 1;
 
+  /// Maximum number of users to load for the leaderboard.
+  /// Prevents unbounded memory/bandwidth growth as the user base scales.
+  static const int _leaderboardLimit = 500;
+
   void listenLeaderboard() {
     final uid = _uid;
     debugPrint('📊 LeaderboardProvider: Listening for UID: $uid');
@@ -69,6 +73,8 @@ class LeaderboardProvider extends ChangeNotifier {
 
     _subscription = _db
         .collection('users')
+        .orderBy('XP', descending: true)
+        .limit(_leaderboardLimit)
         .snapshots()
         .listen(
           (snapshot) {
@@ -134,7 +140,11 @@ class LeaderboardProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final snapshot = await _db.collection('users').get();
+      final snapshot = await _db
+          .collection('users')
+          .orderBy('XP', descending: true)
+          .limit(_leaderboardLimit)
+          .get();
 
       final docs = snapshot.docs.where((doc) {
         final data = doc.data();

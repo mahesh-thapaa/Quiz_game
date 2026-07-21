@@ -10,7 +10,7 @@ import 'package:quiz_game/provider/leaderboard_provider.dart';
 import 'package:quiz_game/provider/profile_image_provider.dart';
 import 'package:quiz_game/screens/profile/edit_profile/edit_profile_screen.dart';
 import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
-import 'package:quiz_game/screens/profile/seetings/settings_screen.dart';
+import 'package:quiz_game/screens/profile/settings/settings_screen.dart';
 import 'package:quiz_game/screens/profile/edit_profile/global_standing.dart';
 import 'package:quiz_game/screens/profile/profile_screen/leaderboard_row.dart';
 import 'package:quiz_game/auth/email_signup.dart';

@@ -7,7 +7,7 @@ import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/home_models/home_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
 import 'package:quiz_game/screens/home/widgets/reward_dialog.dart';
-import 'package:quiz_game/screens/home/bars/bonus_servies.dart';
+import 'package:quiz_game/screens/home/bars/bonus_services.dart';
 
 class DailyBonusCard extends StatefulWidget {
   final DailyBonusModel bonus;

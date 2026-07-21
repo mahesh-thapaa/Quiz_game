@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/home/bars/home_app_bar.dart';
-// import 'package:quiz_game/screens/home/bars/xp_progess_bar.dart';
-import 'package:quiz_game/screens/home/bars/dailly_bonus_card.dart';
+import 'package:quiz_game/screens/home/bars/daily_bonus_card.dart';
 import 'package:quiz_game/screens/home/bars/quick_play_card.dart';
 import 'package:quiz_game/screens/home/bars/recommended_card.dart';
 import 'package:quiz_game/screens/home/bars/streak_card.dart';

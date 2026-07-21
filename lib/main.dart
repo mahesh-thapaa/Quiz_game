@@ -1,6 +1,10 @@
+import 'dart:isolate';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,6 +41,18 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
+    /// Initialize Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    Isolate.current.addErrorListener(
+      RawReceivePort((pair) {
+        final error = pair[0];
+        final stack = pair[1] is StackTrace
+            ? pair[1] as StackTrace
+            : StackTrace.empty;
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      }).sendPort,
+    );
+
     /// Initialize Ads
     await AdService().init();
 
@@ -45,9 +61,53 @@ void main() async {
 
     /// Register FCM background handler
     FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
-  } catch (e) {
+  } catch (e, st) {
     debugPrint("⚠️ Firebase init error: $e");
+    try {
+      await FirebaseCrashlytics.instance.recordError(e, st, fatal: true);
+    } catch (_) {
+      // Crashlytics unavailable — Firebase init failed
+    }
   }
+
+  /// Global error widget — shows a friendly error screen instead of white screen
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      color: const Color(0xFF0B141E),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                color: Colors.redAccent,
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Something went wrong',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                kDebugMode
+                    ? details.exception.toString()
+                    : 'Please restart the app.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  };
 
   runApp(const AppRoot());
 }
@@ -72,7 +132,7 @@ class AppRoot extends StatelessWidget {
         ),
       ],
       child: const MyApp(),
-    ); 
+    );
   }
 }
 

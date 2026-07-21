@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_game/models/quiz_models/quiz_level.dart';
-import 'package:quiz_game/controllers/level_progess_services.dart';
+import 'package:quiz_game/controllers/level_progress_services.dart';
 
 class QuizController {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -107,7 +107,8 @@ class QuizController {
     }
   }
 
-  /// Fetches questions from all categories and shuffles them for Quick Quiz
+  /// Fetches questions from all categories and shuffles them for Quick Quiz.
+  /// Uses parallel Firestore reads to avoid N+1 sequential queries.
   static Future<Map<String, dynamic>> loadQuickQuizData({
     required int userLevel,
     required int userCoins,
@@ -126,7 +127,7 @@ class QuizController {
       final List<String> categories = [
         'Player Quiz',
         'Stadium Quiz',
-        'Jursey Quiz',
+        'Jersey Quiz',
         'Logo Master',
       ];
 
@@ -142,28 +143,34 @@ class QuizController {
       if (userLevel >= 11) categories.add('Goalkeeper Legends');
       if (userCoins >= 20000) categories.add('Golden Boot');
 
+      // Parallel: fetch all category quiz docs at once
+      final quizSnaps = await Future.wait(
+        categories.map(
+          (cat) => _db
+              .collection('quizzes')
+              .where('category', isEqualTo: cat)
+              .limit(1)
+              .get(),
+        ),
+      );
+
+      // Parallel: fetch all levels for each found quiz at once
+      final levelsSnaps = await Future.wait(
+        quizSnaps
+            .where((snap) => snap.docs.isNotEmpty)
+            .map((snap) => snap.docs.first.reference.collection('levels').limit(10).get()),
+      );
+
+      // Parallel: fetch all questions for every level at once
+      final allQuestionSnaps = await Future.wait(
+        levelsSnaps.expand((ls) => ls.docs).map((doc) => doc.reference.collection('questions').get()),
+      );
+
       List<QuizQuestion> allQuestions = [];
-
-      for (String cat in categories) {
-        final quizSnap = await _db
-            .collection('quizzes')
-            .where('category', isEqualTo: cat)
-            .limit(1)
-            .get();
-
-        if (quizSnap.docs.isNotEmpty) {
-          final levelsSnap = await quizSnap.docs.first.reference
-              .collection('levels')
-              .limit(10) // Take more levels for more variety
-              .get();
-
-          for (var doc in levelsSnap.docs) {
-            final qSnap = await doc.reference.collection('questions').get();
-            allQuestions.addAll(
-              qSnap.docs.map((q) => QuizQuestion.fromMap(q.data())).toList(),
-            );
-          }
-        }
+      for (final qSnap in allQuestionSnaps) {
+        allQuestions.addAll(
+          qSnap.docs.map((q) => QuizQuestion.fromMap(q.data())).toList(),
+        );
       }
 
       allQuestions.shuffle();
