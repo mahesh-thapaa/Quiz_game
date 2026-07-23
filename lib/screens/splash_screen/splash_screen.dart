@@ -36,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     notificationService.requestNotificationPermission();
     notificationService.getFcmToken();
+    notificationService.subscribeTopic();
 
     _logoCtrl = AnimationController(
       vsync: this,

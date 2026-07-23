@@ -115,10 +115,19 @@ class ProfileImageController {
           'avatarUrl': downloadUrl,
         }, SetOptions(merge: true));
 
+        // Clean up temp file
+        try {
+          await compressedFile.delete();
+        } catch (_) {}
+
         debugPrint('✅ Cloudinary Upload Success: $downloadUrl');
         return downloadUrl;
       } else {
         debugPrint('❌ Cloudinary Upload Failed (Status ${response.statusCode}): ${response.body}');
+        // Clean up temp file even on failure
+        try {
+          await compressedFile.delete();
+        } catch (_) {}
         return null;
       }
     } catch (e) {

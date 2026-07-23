@@ -13,6 +13,7 @@ import 'package:quiz_game/screens/profile/edit_profile/profile_avatar.dart';
 import 'package:quiz_game/screens/profile/settings/settings_screen.dart';
 import 'package:quiz_game/screens/profile/edit_profile/global_standing.dart';
 import 'package:quiz_game/screens/profile/profile_screen/leaderboard_row.dart';
+import 'package:quiz_game/screens/login.dart';
 import 'package:quiz_game/auth/email_signup.dart';
 
 import 'package:quiz_game/screens/profile/profile_screen/stat_card.dart';
@@ -103,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         debugPrint('🔄 Navigating to login...');
         // Replace all screens and go to login
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const EmailSignup()),
+          MaterialPageRoute(builder: (_) => const Login()),
           (route) => false,
         );
         debugPrint('✅ Navigation complete');
