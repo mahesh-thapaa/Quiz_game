@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quiz_game/auth/email_signup.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/models/profile/leaderboard_entry_models.dart';
 import 'package:quiz_game/provider/user_progress_provider.dart';
@@ -14,7 +15,6 @@ import 'package:quiz_game/screens/profile/settings/settings_screen.dart';
 import 'package:quiz_game/screens/profile/edit_profile/global_standing.dart';
 import 'package:quiz_game/screens/profile/profile_screen/leaderboard_row.dart';
 import 'package:quiz_game/screens/login.dart';
-import 'package:quiz_game/auth/email_signup.dart';
 
 import 'package:quiz_game/screens/profile/profile_screen/stat_card.dart';
 
