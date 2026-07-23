@@ -48,6 +48,7 @@ app.*.map.json
 /lib/api_keys.dart
 /android/app/google-services.json
 /android/key.properties
+/android/app/upload-keystore.jks
 /ios/GoogleService-Info.plist
 
 # Build-time environment
