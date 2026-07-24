@@ -95,12 +95,10 @@ void main() async {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                kDebugMode
-                    ? details.exception.toString()
-                    : 'Please restart the app.',
+              const Text(
+                'An unexpected issue occurred. Please restart the app or try again in a moment.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                style: TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ],
           ),
@@ -152,7 +150,16 @@ class MyApp extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        return InternetConnectionWrapper(child: child);
+        // Cap layout width on tablets/desktops so the phone design
+        // doesn't stretch across the full screen.
+        return InternetConnectionWrapper(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: child,
+            ),
+          ),
+        );
       },
     );
   }

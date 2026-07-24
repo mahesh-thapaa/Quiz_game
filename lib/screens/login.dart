@@ -120,8 +120,8 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: 250,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
                       "Test your knowledge against thousands of fans worldwide.",
                       textAlign: TextAlign.center,

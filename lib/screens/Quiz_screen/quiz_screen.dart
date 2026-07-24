@@ -70,18 +70,23 @@ class QuizScreen extends StatelessWidget {
                 style: TextStyle(color: themeColors.stext, fontSize: 14),
               ),
               const SizedBox(height: 10),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: quizzes.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.2,
-                ),
-                itemBuilder: (context, index) {
-                  return QuizCard(model: quizzes[index]);
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cols = constraints.maxWidth >= 600 ? 3 : 2;
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: quizzes.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 1.2,
+                    ),
+                    itemBuilder: (context, index) {
+                      return QuizCard(model: quizzes[index]);
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 20),

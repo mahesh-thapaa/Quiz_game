@@ -69,9 +69,16 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
                   if (snapshot.hasError) {
                     return Center(
-                      child: Text(
-                        'Error: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.red),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(
+                          'Something went wrong while loading challenges. Please try again shortly.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: ThemeColors.of(context).stext,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     );
                   }
@@ -122,19 +129,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       ),
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        sliver: SliverGrid(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 1.0,
+                        sliver: SliverLayoutBuilder(
+                          builder: (context, constraints) {
+                            final cols = constraints.crossAxisExtent >= 600
+                                ? 3
+                                : 2;
+                            return SliverGrid(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: cols,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 1.0,
+                                  ),
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) => DiscoverWidgetsCard(
+                                  model: challenges[index],
+                                ),
+                                childCount: challenges.length,
                               ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) =>
-                                DiscoverWidgetsCard(model: challenges[index]),
-                            childCount: challenges.length,
-                          ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -142,7 +157,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 },
               ),
             ),
-
           ],
         ),
       ),

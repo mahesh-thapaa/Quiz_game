@@ -19,29 +19,47 @@ class HomeAppBar extends StatelessWidget {
         const ProfileAvatar(radius: 22),
         const SizedBox(width: 12),
 
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'GoalIQ',
-              style: TextStyle(
-                color: themeColors.hText,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
+        // Name column takes available space and never overflows
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'GoalIQ',
+                style: TextStyle(
+                  color: themeColors.hText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            Text(
-              p.username.isNotEmpty ? p.username : 'Welcome!',
-              style: TextStyle(color: themeColors.stext, fontSize: 12),
-            ),
-          ],
+              Text(
+                p.username.isNotEmpty ? p.username : 'Welcome!',
+                style: TextStyle(color: themeColors.stext, fontSize: 12),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
-        const Spacer(),
-        _XPBadge(xp: p.xp),
         const SizedBox(width: 8),
-        _StarsBadge(stars: p.stars),
-        const SizedBox(width: 8),
-        _CoinsBadge(coins: p.coins),
+
+        // Badges shrink/scale down on narrow screens instead of overflowing
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _XPBadge(xp: p.xp),
+                const SizedBox(width: 8),
+                _StarsBadge(stars: p.stars),
+                const SizedBox(width: 8),
+                _CoinsBadge(coins: p.coins),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
