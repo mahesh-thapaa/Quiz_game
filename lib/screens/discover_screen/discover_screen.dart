@@ -103,7 +103,23 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       )
                       .toList();
 
-                  challenges.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+                  int sortPriority(DiscoverModels model) {
+                    final title = model.title.toLowerCase();
+                    if (title.contains("ballon d'or")) return 0;
+                    if (title.contains('world cup')) return 1;
+                    return 2;
+                  }
+
+                  challenges.sort((a, b) {
+                    final priorityA = sortPriority(a);
+                    final priorityB = sortPriority(b);
+
+                    if (priorityA != priorityB) {
+                      return priorityA.compareTo(priorityB);
+                    }
+
+                    return a.createdAt.compareTo(b.createdAt);
+                  });
 
                   return CustomScrollView(
                     physics: const BouncingScrollPhysics(),
