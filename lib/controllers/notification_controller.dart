@@ -19,14 +19,9 @@ class NotificationController {
   Future<void> init() async {
     tz.initializeTimeZones();
 
-    // Use the device's local timezone instead of a hardcoded one
-    final String localTimezoneName = DateTime.now().timeZoneName;
-    try {
-      tz.setLocalLocation(tz.getLocation(localTimezoneName));
-    } catch (_) {
-      // Fallback: leave as UTC if the system timezone name isn't in the tz database
-      debugPrint('⚠️ Could not set local timezone "$localTimezoneName", using UTC');
-    }
+    // Use Nepal timezone (IANA name — always valid in tz database)
+    tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
+    debugPrint('🕐 Timezone set to Asia/Kathmandu (NPT)');
 
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -131,7 +126,7 @@ class NotificationController {
           iOS: DarwinNotificationDetails(),
         ),
 
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
 
         matchDateTimeComponents: DateTimeComponents.time,
       );
