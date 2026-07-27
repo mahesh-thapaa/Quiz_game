@@ -21,7 +21,6 @@ import 'package:quiz_game/services/internet/internet_service.dart';
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
 import 'package:quiz_game/services/ads/ad_service.dart';
-import 'package:quiz_game/controllers/ad_display_controller.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 
 /// Background notification handler
@@ -54,7 +53,6 @@ void main() async {
 
     /// Initialize Ads
     await AdService().init();
-    await AdDisplayController();
 
     /// Initialize local notifications
     await NotificationController().init();

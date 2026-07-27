@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -19,13 +18,12 @@ class NotificationController {
     tz.initializeTimeZones();
 
     try {
-      final timezone = await FlutterTimezone.getLocalTimezone();
-      final String deviceTimezone = timezone.toString();
+      final String deviceTimezone = DateTime.now().timeZoneName;
       tz.setLocalLocation(tz.getLocation(deviceTimezone));
       debugPrint('Timezone set: $deviceTimezone');
-    } catch (e) {
+    } catch (_) {
       tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
-      debugPrint('Timezone fallback to Asia/Kathmandu: $e');
+      debugPrint('Timezone defaulted to Asia/Kathmandu');
     }
 
     const AndroidInitializationSettings androidSettings =

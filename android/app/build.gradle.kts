@@ -59,6 +59,10 @@ android {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:-unchecked", "-Xlint:-deprecation"))
+}
+
 flutter {
     source = "../.."
 }

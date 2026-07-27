@@ -51,7 +51,6 @@ dependencies:
   google_mobile_ads: ^9.0.0
   firebase_crashlytics: ^5.2.6
   connectivity_plus: ^7.3.0
-  flutter_timezone: ^5.1.0
 
 
 dev_dependencies:
