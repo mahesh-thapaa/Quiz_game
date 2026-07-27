@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -18,24 +17,26 @@ class NotificationController {
   Future<void> init() async {
     tz.initializeTimeZones();
 
-    // 💡 STEP 2 FIX: Initialize phone's local timezone with Nepal fallback
     try {
-      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-      final String timeZoneName = timezoneInfo.toString();
+      final offset = DateTime.now().timeZoneOffset;
+      final offsetMinutes = offset.inMinutes;
+      final sign = offsetMinutes >= 0 ? '+' : '-';
+      final absMinutes = offsetMinutes.abs();
+      final hours = (absMinutes ~/ 60).toString().padLeft(2, '0');
+      final minutes = (absMinutes % 60).toString().padLeft(2, '0');
+      final offsetStr = 'Etc/GMT$sign$hours:${minutes == '00' ? '' : minutes}';
 
-      // Ensure we don't accidentally fall back to UTC/Zulu default
-      if (timeZoneName == 'UTC' || timeZoneName == 'Etc/UTC') {
+      // Try Etc/GMT offset first, fallback to Asia/Kathmandu
+      try {
+        tz.setLocalLocation(tz.getLocation(offsetStr));
+        debugPrint('Timezone set from device offset: $offsetStr');
+      } catch (_) {
         tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
-        debugPrint('🕐 Timezone defaulted to Asia/Kathmandu (NPT)');
-      } else {
-        tz.setLocalLocation(tz.getLocation(timeZoneName));
-        debugPrint('🕐 Dynamic Timezone initialized -> $timeZoneName');
+        debugPrint('Timezone defaulted to Asia/Kathmandu (NPT)');
       }
     } catch (e) {
-      debugPrint(
-        '⚠️ Could not fetch device timezone, falling back to Nepal: $e',
-      );
       tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
+      debugPrint('Timezone fallback to Asia/Kathmandu: $e');
     }
 
     const AndroidInitializationSettings androidSettings =
@@ -56,7 +57,7 @@ class NotificationController {
     await _notificationsPlugin.initialize(
       settings: settings,
       onDidReceiveNotificationResponse: (details) {
-        debugPrint('🔔 Notification tapped: ${details.payload}');
+        debugPrint('Notification tapped: ${details.payload}');
       },
     );
 
@@ -81,16 +82,16 @@ class NotificationController {
 
   Future<void> _createChannels() async {
     const AndroidNotificationChannel dailyChannel = AndroidNotificationChannel(
-      'football_quiz_daily_v2',
-      'Football Quiz Daily Notifications',
+      "",
+      "",
       description: 'Daily football reminders',
       importance: Importance.max,
     );
 
     const AndroidNotificationChannel instantChannel =
         AndroidNotificationChannel(
-          'football_quiz_instant_v1',
-          'Football Quiz Instant Notifications',
+          "",
+          "",
           description: 'Instant football quiz alerts',
           importance: Importance.max,
         );
@@ -102,45 +103,6 @@ class NotificationController {
 
     await androidImplementation?.createNotificationChannel(dailyChannel);
     await androidImplementation?.createNotificationChannel(instantChannel);
-  }
-
-  /// 🧪 TEST METHOD: Schedules a notification exactly 2 minutes from now
-  Future<void> scheduleTestNotification({
-    int id = 999,
-    String title = '🧪 Test Notification',
-    String body = 'If you see this, background exact scheduling works!',
-  }) async {
-    final tz.TZDateTime scheduledDate = tz.TZDateTime.now(
-      tz.local,
-    ).add(const Duration(minutes: 2));
-
-    try {
-      await _notificationsPlugin.zonedSchedule(
-        id: id,
-        title: title,
-        body: body,
-        scheduledDate: scheduledDate,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'football_quiz_daily_v2',
-            'Football Quiz Daily Notifications',
-            channelDescription: 'Daily football quiz reminders',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      );
-
-      // 💡 STEP 3 FIX: Convert and log local time format in terminal output
-      final localDisplay = scheduledDate.toLocal();
-      debugPrint(
-        '🧪 Test notification scheduled for ID $id at local time: ${localDisplay.hour}:${localDisplay.minute}:${localDisplay.second}',
-      );
-    } catch (e) {
-      debugPrint('❌ Error scheduling test notification: $e');
-    }
   }
 
   Future<void> scheduleDailyNotification({
@@ -187,10 +149,10 @@ class NotificationController {
 
       final localDisplay = scheduledDate.toLocal();
       debugPrint(
-        '✅ Scheduled Daily Notification -> ID: $id at local time: ${localDisplay.hour}:${localDisplay.minute}',
+        'Scheduled Daily Notification -> ID: $id at local time: ${localDisplay.hour}:${localDisplay.minute}',
       );
     } catch (e) {
-      debugPrint('❌ Error scheduling notification: $e');
+      debugPrint('Error scheduling notification: $e');
     }
   }
 
@@ -217,27 +179,27 @@ class NotificationController {
 
       debugPrint('⚡ Instant Notification Sent -> ID: $id');
     } catch (e) {
-      debugPrint('❌ Instant notification error: $e');
+      debugPrint('Instant notification error: $e');
     }
   }
 
   Future<void> cancelNotification(int id) async {
     await _notificationsPlugin.cancel(id: id);
-    debugPrint('🗑 Notification Cancelled -> ID: $id');
+    debugPrint('Notification Cancelled -> ID: $id');
   }
 
   Future<void> cancelAllNotifications() async {
     await _notificationsPlugin.cancelAll();
-    debugPrint('🗑 All Notifications Cancelled');
+    debugPrint('All Notifications Cancelled');
   }
 
   Future<void> printPendingNotifications() async {
     final pending = await _notificationsPlugin.pendingNotificationRequests();
 
-    debugPrint('========== PENDING NOTIFICATIONS ==========');
+    debugPrint('ENDING NOTIFICATIONS');
     for (final item in pending) {
       debugPrint('ID: ${item.id}, TITLE: ${item.title}');
     }
-    debugPrint('===========================================');
+    debugPrint('');
   }
 }

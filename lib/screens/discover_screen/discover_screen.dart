@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:quiz_game/controllers/notification_controller.dart';
 import 'package:quiz_game/models/discover/discover_models.dart';
 import 'package:quiz_game/models/colors.dart';
 import 'package:quiz_game/screens/discover_screen/widgets/discover_widgets_card.dart';
@@ -173,14 +172,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   );
                 },
               ),
-            ),
-
-            ElevatedButton(
-              onPressed: () async {
-                await NotificationController().scheduleTestNotification();
-                await NotificationController().printPendingNotifications();
-              },
-              child: const Text('Test 2-Min Notification'),
             ),
           ],
         ),
