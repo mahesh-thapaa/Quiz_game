@@ -1,21 +1,67 @@
-// notification_provider.dart
-
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+class NotificationSchedule {
+  final int id;
+  final int hour;
+  final int minute;
+  final String title;
+  final String body;
+
+  const NotificationSchedule({
+    required this.id,
+    required this.hour,
+    required this.minute,
+    required this.title,
+    required this.body,
+  });
+}
 
 class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const String _prefsKey = 'notifications_enabled';
+  static const String _sentPrefix = 'notif_sent_';
 
   bool _notificationsEnabled = true;
-
   bool get notificationsEnabled => _notificationsEnabled;
 
   final NotificationController _controller = NotificationController();
 
+  static const List<NotificationSchedule> schedules = [
+    NotificationSchedule(
+      id: 101,
+      hour: 7,
+      minute: 0,
+      title: 'Kick Off Your Day With Football Trivia',
+      body: 'One quick game could push you to the top of the leaderboard.',
+    ),
+    NotificationSchedule(
+      id: 102,
+      hour: 18,
+      minute: 0,
+      title: 'Last Chance to Keep Your Streak',
+      body:
+          'Miss today and your streak resets. One match quiz is all it takes.',
+    ),
+  ];
+
   NotificationProvider() {
     WidgetsBinding.instance.addObserver(this);
-    _loadSettings();
+    _loadPrefs();
+  }
+
+  Future<void> init() async {
+    if (_notificationsEnabled) {
+      await _sendMissedNotifications();
+      await _scheduleAll();
+    }
+  }
+
+  Future<void> _loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    _notificationsEnabled = prefs.getBool(_prefsKey) ?? true;
+    notifyListeners();
   }
 
   @override
@@ -27,78 +73,85 @@ class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _notificationsEnabled) {
-      _rescheduleIfMissing();
+      _onAppResumed();
     }
   }
 
-  Future<void> _rescheduleIfMissing() async {
-    final pendingCount = await _controller.getPendingCount();
-    if (pendingCount < 2) {
-      debugPrint('Notifications missing ($pendingCount pending), re-scheduling...');
-      await scheduleAllNotifications();
-    }
-  }
-
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    _notificationsEnabled = prefs.getBool(_prefsKey) ?? true;
-
+  Future<void> _onAppResumed() async {
     if (_notificationsEnabled) {
-      await scheduleAllNotifications();
+      await _sendMissedNotifications();
+      await _scheduleAll();
+    }
+  }
+
+  Future<void> _sendMissedNotifications() async {
+    final now = tz.TZDateTime.now(tz.local);
+    final prefs = await SharedPreferences.getInstance();
+    final todayKey = '$_sentPrefix${now.year}${now.month}${now.day}';
+    final sentToday = prefs.getStringList(todayKey) ?? [];
+    bool updated = false;
+
+    for (final s in schedules) {
+      final scheduledTime = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        s.hour,
+        s.minute,
+      );
+
+      if (now.isAfter(scheduledTime) && !sentToday.contains('${s.id}')) {
+        await _controller.showInstantNotification(
+          id: s.id,
+          title: s.title,
+          body: s.body,
+        );
+        sentToday.add('${s.id}');
+        updated = true;
+      }
     }
 
-    notifyListeners();
+    if (updated) {
+      await prefs.setStringList(todayKey, sentToday);
+    }
   }
 
   Future<void> toggleNotifications(bool value) async {
     _notificationsEnabled = value;
 
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setBool(_prefsKey, value);
 
     if (value) {
-      debugPrint('🔔 Notifications Enabled');
-
-      await scheduleAllNotifications();
+      if (!_controller.hasPermission) {
+        final granted = await _controller.init();
+        if (!granted) {
+          _notificationsEnabled = false;
+          await prefs.setBool(_prefsKey, false);
+          notifyListeners();
+          return;
+        }
+      }
+      await _scheduleAll();
     } else {
-      debugPrint('🔕 Notifications Disabled');
-
       await _controller.cancelAllNotifications();
     }
 
     notifyListeners();
   }
 
-  Future<void> scheduleAllNotifications() async {
+  Future<void> _scheduleAll() async {
     await _controller.cancelAllNotifications();
 
-    await _controller.scheduleDailyNotification(
-      id: 101,
-      title: 'Kick Off Your Day With Football Trivia',
-      body: 'One quick game could push you to the top of the leaderboard.',
-      hour: 7,
-      minute: 0,
-    );
-
-    await _controller.scheduleDailyNotification(
-      id: 102,
-      title: 'Last Chance to Keep Your Streak',
-      body:
-          'Miss today and your streak resets. One match quiz is all it takes.',
-      hour: 18,
-      minute: 0,
-    );
-
-    await _controller.printPendingNotifications();
+    for (final s in schedules) {
+      await _controller.scheduleDailyNotification(
+        id: s.id,
+        title: s.title,
+        body: s.body,
+        hour: s.hour,
+        minute: s.minute,
+      );
+    }
   }
-
-  // Future<void> sendNewEventNotification() async {
-  //   await _controller.showInstantNotification(
-  //     id: 999,
-  //     title: '⚽ New Football Tournament',
-  //     body: 'Play now and earn bonus coins!',
-  //   );
-  // }
 }

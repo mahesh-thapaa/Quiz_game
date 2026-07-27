@@ -33,6 +33,8 @@ Future<void> _backgroundMessageHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final notificationProvider = NotificationProvider();
+
   try {
     /// Initialize Firebase
     await Firebase.initializeApp(
@@ -56,6 +58,9 @@ void main() async {
 
     /// Initialize local notifications
     await NotificationController().init();
+
+    /// Schedule daily notifications from provider
+    await notificationProvider.init();
 
     /// Register FCM background handler
     FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
@@ -99,7 +104,7 @@ void main() async {
     }
   }
 
-  /// Global error widget — shows a friendly error screen instead of white screen
+/// Global error widget — shows a friendly error screen instead of white screen
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Material(
       color: const Color(0xFF0B141E),
@@ -136,11 +141,12 @@ void main() async {
     );
   };
 
-  runApp(const AppRoot());
+  runApp(AppRoot(notificationProvider: notificationProvider));
 }
 
 class AppRoot extends StatelessWidget {
-  const AppRoot({super.key});
+  final NotificationProvider notificationProvider;
+  const AppRoot({super.key, required this.notificationProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +159,7 @@ class AppRoot extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileImageProvider()),
         ChangeNotifierProvider(create: (_) => PasswordProvider()),
         ChangeNotifierProvider(create: (_) => DailyChallengerProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider.value(value: notificationProvider),
         ChangeNotifierProvider.value(
           value: InternetService()..startMonitoring(),
         ),
