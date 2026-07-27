@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
 
-class NotificationProvider extends ChangeNotifier {
+class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const String _prefsKey = 'notifications_enabled';
 
   bool _notificationsEnabled = true;
@@ -14,7 +14,29 @@ class NotificationProvider extends ChangeNotifier {
   final NotificationController _controller = NotificationController();
 
   NotificationProvider() {
+    WidgetsBinding.instance.addObserver(this);
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _notificationsEnabled) {
+      _rescheduleIfMissing();
+    }
+  }
+
+  Future<void> _rescheduleIfMissing() async {
+    final pendingCount = await _controller.getPendingCount();
+    if (pendingCount < 2) {
+      debugPrint('Notifications missing ($pendingCount pending), re-scheduling...');
+      await scheduleAllNotifications();
+    }
   }
 
   Future<void> _loadSettings() async {

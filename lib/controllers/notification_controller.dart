@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -18,22 +19,10 @@ class NotificationController {
     tz.initializeTimeZones();
 
     try {
-      final offset = DateTime.now().timeZoneOffset;
-      final offsetMinutes = offset.inMinutes;
-      final sign = offsetMinutes >= 0 ? '+' : '-';
-      final absMinutes = offsetMinutes.abs();
-      final hours = (absMinutes ~/ 60).toString().padLeft(2, '0');
-      final minutes = (absMinutes % 60).toString().padLeft(2, '0');
-      final offsetStr = 'Etc/GMT$sign$hours:${minutes == '00' ? '' : minutes}';
-
-      // Try Etc/GMT offset first, fallback to Asia/Kathmandu
-      try {
-        tz.setLocalLocation(tz.getLocation(offsetStr));
-        debugPrint('Timezone set from device offset: $offsetStr');
-      } catch (_) {
-        tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
-        debugPrint('Timezone defaulted to Asia/Kathmandu (NPT)');
-      }
+      final timezone = await FlutterTimezone.getLocalTimezone();
+      final String deviceTimezone = timezone.toString();
+      tz.setLocalLocation(tz.getLocation(deviceTimezone));
+      debugPrint('Timezone set: $deviceTimezone');
     } catch (e) {
       tz.setLocalLocation(tz.getLocation('Asia/Kathmandu'));
       debugPrint('Timezone fallback to Asia/Kathmandu: $e');
@@ -82,16 +71,16 @@ class NotificationController {
 
   Future<void> _createChannels() async {
     const AndroidNotificationChannel dailyChannel = AndroidNotificationChannel(
-      "",
-      "",
-      description: 'Daily football reminders',
+      'football_quiz_daily_v2',
+      'Football Quiz Daily Notifications',
+      description: 'Daily football quiz reminders',
       importance: Importance.max,
     );
 
     const AndroidNotificationChannel instantChannel =
         AndroidNotificationChannel(
-          "",
-          "",
+          'football_quiz_instant_v1',
+          'Football Quiz Instant Notifications',
           description: 'Instant football quiz alerts',
           importance: Importance.max,
         );
@@ -196,10 +185,15 @@ class NotificationController {
   Future<void> printPendingNotifications() async {
     final pending = await _notificationsPlugin.pendingNotificationRequests();
 
-    debugPrint('ENDING NOTIFICATIONS');
+    debugPrint('Pending Notifications: ${pending.length}');
     for (final item in pending) {
       debugPrint('ID: ${item.id}, TITLE: ${item.title}');
     }
     debugPrint('');
+  }
+
+  Future<int> getPendingCount() async {
+    final pending = await _notificationsPlugin.pendingNotificationRequests();
+    return pending.length;
   }
 }

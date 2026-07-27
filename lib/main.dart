@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +21,7 @@ import 'package:quiz_game/services/internet/internet_service.dart';
 import 'package:quiz_game/controllers/auth_controller.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
 import 'package:quiz_game/services/ads/ad_service.dart';
+import 'package:quiz_game/controllers/ad_display_controller.dart';
 import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 
 /// Background notification handler
@@ -54,6 +54,7 @@ void main() async {
 
     /// Initialize Ads
     await AdService().init();
+    await AdDisplayController();
 
     /// Initialize local notifications
     await NotificationController().init();
