@@ -28,8 +28,7 @@ import 'package:quiz_game/screens/splash_screen/splash_screen.dart';
 @pragma('vm:entry-point')
 Future<void> _backgroundMessageHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  debugPrint("Background Message: ${message.messageId}");
+  debugPrint("📩 Background Message Received: ${message.messageId}");
 }
 
 void main() async {
@@ -61,6 +60,37 @@ void main() async {
 
     /// Register FCM background handler
     FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
+
+    /// 💡 1. Request FCM Push Notification Permission (Mandatory for Android 13+ and iOS)
+    NotificationSettings settings = await FirebaseMessaging.instance
+        .requestPermission(alert: true, badge: true, sound: true);
+    debugPrint('🔔 FCM Permission Status: ${settings.authorizationStatus}');
+
+    /// 💡 2. Enable Foreground Heads-Up Banners (iOS)
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+
+    /// 💡 3. Handle FCM Messages When App is Open (Foreground Listener)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint('📩 Foreground FCM Message: ${message.notification?.title}');
+
+      // Display foreground message as a heads-up local banner
+      if (message.notification != null) {
+        NotificationController().showInstantNotification(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          title: message.notification!.title ?? 'GoalIQ Alert',
+          body: message.notification!.body ?? '',
+        );
+      }
+    });
+
+    /// 💡 4. Fetch & Print Fresh FCM Device Token (For Testing in Firebase Console)
+    final String? fcmToken = await FirebaseMessaging.instance.getToken();
+    debugPrint('🔑 CURRENT FCM DEVICE TOKEN: $fcmToken');
   } catch (e, st) {
     debugPrint("⚠️ Firebase init error: $e");
     try {
@@ -144,20 +174,16 @@ class MyApp extends StatelessWidget {
       themeMode: context.watch<ThemeProvider>().themeMode,
       theme: ThemeData(brightness: Brightness.light, fontFamily: 'Inter'),
       darkTheme: ThemeData(brightness: Brightness.dark, fontFamily: 'Inter'),
-      home: const SplashScreen(),
+      home: const InternetConnectionWrapper(child: SplashScreen()),
       builder: (context, child) {
         if (child == null) {
           return const SizedBox.shrink();
         }
 
-        // Cap layout width on tablets/desktops so the phone design
-        // doesn't stretch across the full screen.
-        return InternetConnectionWrapper(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: child,
-            ),
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: child,
           ),
         );
       },
