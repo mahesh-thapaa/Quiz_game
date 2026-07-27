@@ -59,8 +59,9 @@ android {
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:-unchecked", "-Xlint:-deprecation"))
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+    options.isWarnings = false
 }
 
 flutter {
