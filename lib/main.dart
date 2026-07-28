@@ -104,7 +104,7 @@ void main() async {
     }
   }
 
-/// Global error widget — shows a friendly error screen instead of white screen
+  /// Global error widget — shows a friendly error screen instead of white screen
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Material(
       color: const Color(0xFF0B141E),

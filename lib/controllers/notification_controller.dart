@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -59,13 +60,16 @@ class NotificationController {
   Future<bool> init() async {
     if (_initialized) return _permissionGranted;
 
-    tz.initializeTimeZones();
-
     try {
+      tz.initializeTimeZones();
       final String deviceTimezone = DateTime.now().timeZoneName;
-      tz.setLocalLocation(tz.getLocation(deviceTimezone));
-    } catch (_) {
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      try {
+        tz.setLocalLocation(tz.getLocation(deviceTimezone));
+      } catch (_) {
+        tz.setLocalLocation(tz.UTC);
+      }
+    } catch (e) {
+      debugPrint('Timezone initialization warning: $e');
     }
 
     const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
