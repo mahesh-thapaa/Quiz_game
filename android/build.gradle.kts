@@ -3,12 +3,18 @@ allprojects {
         google()
         mavenCentral()
     }
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+        options.isWarnings = false
+    }
 }
 
 subprojects {
-    tasks.withType<JavaCompile>().configureEach {
-        options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
-        options.isWarnings = false
+    afterEvaluate {
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+            options.isWarnings = false
+        }
     }
 }
 
