@@ -4,19 +4,39 @@ allprojects {
         mavenCentral()
     }
     tasks.withType<JavaCompile>().configureEach {
-        options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+        options.compilerArgs.addAll(
+            listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation")
+        )
         options.isWarnings = false
+        logging.captureStandardOutput(LogLevel.DEBUG)
+        logging.captureStandardError(LogLevel.DEBUG)
     }
 }
 
 subprojects {
-    afterEvaluate {
+    pluginManager.withPlugin("java") {
         tasks.withType<JavaCompile>().configureEach {
-            options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation"))
+            options.compilerArgs.addAll(
+                listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation")
+            )
             options.isWarnings = false
+            logging.captureStandardOutput(LogLevel.DEBUG)
+            logging.captureStandardError(LogLevel.DEBUG)
+        }
+    }
+    pluginManager.withPlugin("com.android.library") {
+        tasks.withType<JavaCompile>().configureEach {
+            options.compilerArgs.addAll(
+                listOf("-nowarn", "-Xlint:none", "-Xlint:-unchecked", "-Xlint:-deprecation")
+            )
+            options.isWarnings = false
+            logging.captureStandardOutput(LogLevel.DEBUG)
+            logging.captureStandardError(LogLevel.DEBUG)
         }
     }
 }
+
+
 
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory

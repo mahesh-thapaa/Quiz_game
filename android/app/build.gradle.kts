@@ -6,6 +6,7 @@ plugins {
     id("com.android.application")
     id("dev.flutter.flutter-gradle-plugin")
 }
+
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -14,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.luminotechnology.goaliq"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -30,10 +31,11 @@ android {
     defaultConfig {
         applicationId = "com.luminotechnology.goaliq"
         minSdk = flutter.minSdkVersion
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias")
@@ -43,25 +45,17 @@ android {
         }
     }
 
-
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-
             isMinifyEnabled = true
             isShrinkResources = true
-
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
-    options.isWarnings = false
 }
 
 flutter {
