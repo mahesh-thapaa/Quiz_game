@@ -93,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 40),
             Center(
               child: Text(
-                'Version 1.0.0 (Lumino Technology)',
+                'Version 1.0.1 (Lumino Technology)',
                 style: TextStyle(color: themeColors.stext, fontSize: 12),
               ),
             ),
