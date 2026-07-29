@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiz_game/controllers/notification_controller.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationSchedule {
   final int id;
@@ -21,7 +20,6 @@ class NotificationSchedule {
 
 class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const String _prefsKey = 'notifications_enabled';
-  static const String _sentPrefix = 'notif_sent_';
 
   bool _notificationsEnabled = true;
   bool get notificationsEnabled => _notificationsEnabled;
@@ -51,9 +49,20 @@ class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
     _loadPrefs();
   }
 
+  /// Must be called during app initialization (e.g. in main.dart)
   Future<void> init() async {
+    // Ensure NotificationController (and timezones) are initialized first
+    final hasPermission = await _controller.init();
+
+    if (!hasPermission) {
+      _notificationsEnabled = false;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_prefsKey, false);
+      notifyListeners();
+      return;
+    }
+
     if (_notificationsEnabled) {
-      await _sendMissedNotifications();
       await _scheduleAll();
     }
   }
@@ -79,41 +88,8 @@ class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _onAppResumed() async {
     if (_notificationsEnabled) {
-      await _sendMissedNotifications();
+      // Re-schedule daily alarms on resume to keep repeat timers accurate across OS timezone changes
       await _scheduleAll();
-    }
-  }
-
-  Future<void> _sendMissedNotifications() async {
-    final now = tz.TZDateTime.now(tz.local);
-    final prefs = await SharedPreferences.getInstance();
-    final todayKey = '$_sentPrefix${now.year}${now.month}${now.day}';
-    final sentToday = prefs.getStringList(todayKey) ?? [];
-    bool updated = false;
-
-    for (final s in schedules) {
-      final scheduledTime = tz.TZDateTime(
-        tz.local,
-        now.year,
-        now.month,
-        now.day,
-        s.hour,
-        s.minute,
-      );
-
-      if (now.isAfter(scheduledTime) && !sentToday.contains('${s.id}')) {
-        await _controller.showInstantNotification(
-          id: s.id,
-          title: s.title,
-          body: s.body,
-        );
-        sentToday.add('${s.id}');
-        updated = true;
-      }
-    }
-
-    if (updated) {
-      await prefs.setStringList(todayKey, sentToday);
     }
   }
 
@@ -142,6 +118,7 @@ class NotificationProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> _scheduleAll() async {
+    // Cancel existing schedules first to prevent duplicate pending alarms
     await _controller.cancelAllNotifications();
 
     for (final s in schedules) {

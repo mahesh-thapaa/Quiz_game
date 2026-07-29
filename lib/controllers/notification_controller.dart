@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -10,6 +11,9 @@ class NotificationController {
   factory NotificationController() => _instance;
 
   NotificationController._internal();
+
+  static const MethodChannel _timezoneChannel =
+      MethodChannel('com.luminotechnology.goaliq/timezone');
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -57,37 +61,64 @@ class NotificationController {
     iOS: DarwinNotificationDetails(),
   );
 
-  Future<bool> init() async {
+  Future<bool> init({
+    void Function(NotificationResponse)? onNotificationTap,
+  }) async {
     if (_initialized) return _permissionGranted;
 
+    // 1. Timezone Setup & Alias Normalization
     try {
       tz.initializeTimeZones();
-      final String deviceTimezone = DateTime.now().timeZoneName;
+      String deviceTimezone = 'UTC';
+      try {
+        final String? zone =
+            await _timezoneChannel.invokeMethod<String>('getLocalTimezone');
+        if (zone != null && zone.isNotEmpty) {
+          deviceTimezone = zone;
+        }
+      } catch (e) {
+        debugPrint('Native timezone MethodChannel failed: $e');
+        deviceTimezone = DateTime.now().timeZoneName;
+      }
+
+      // Guard against old deprecated alias still present on some devices
+      if (deviceTimezone == 'Asia/Katmandu') {
+        deviceTimezone = 'Asia/Kathmandu';
+      }
+
       try {
         tz.setLocalLocation(tz.getLocation(deviceTimezone));
-      } catch (_) {
-        tz.setLocalLocation(tz.UTC);
+      } catch (e) {
+        debugPrint('Location lookup failed for $deviceTimezone: $e');
+        tz.setLocalLocation(tz.local);
       }
     } catch (e) {
       debugPrint('Timezone initialization warning: $e');
     }
 
-    const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
+    // 2. Settings Initialization
+    const androidSettings = AndroidInitializationSettings(
+      '@drawable/ic_notification',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings,
-      ),
+    const initializationSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
     );
 
-    final androidImpl =
-        _plugin.resolvePlatformSpecificImplementation<
+    await _plugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: onNotificationTap,
+    );
+
+    // 3. Platform Permissions & Channels
+    final androidImpl = _plugin
+        .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
 
@@ -95,9 +126,9 @@ class NotificationController {
       _permissionGranted =
           await androidImpl.requestNotificationsPermission() ?? false;
 
-      final canScheduleExact =
-          await androidImpl.canScheduleExactNotifications();
-      if (canScheduleExact != true) {
+      final canScheduleExact = await androidImpl
+          .canScheduleExactNotifications();
+      if (canScheduleExact == false) {
         await androidImpl.requestExactAlarmsPermission();
       }
 
@@ -118,7 +149,21 @@ class NotificationController {
         ),
       );
     } else {
-      _permissionGranted = true;
+      final iosImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      if (iosImpl != null) {
+        _permissionGranted =
+            await iosImpl.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            ) ??
+            false;
+      } else {
+        _permissionGranted = true;
+      }
     }
 
     _initialized = true;
@@ -157,7 +202,22 @@ class NotificationController {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Exact scheduling failed ($e). Retrying inexact mode...');
+      try {
+        await _plugin.zonedSchedule(
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: scheduledDate,
+          notificationDetails: _dailyDetails,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.time,
+        );
+      } catch (err) {
+        debugPrint('Error scheduling daily notification: $err');
+      }
+    }
   }
 
   Future<void> showInstantNotification({
@@ -172,7 +232,9 @@ class NotificationController {
         body: body,
         notificationDetails: _instantDetails,
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error showing instant notification: $e');
+    }
   }
 
   Future<void> cancelNotification(int id) async {
